@@ -1,0 +1,83 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{hyperref}
+
+%opening
+\title{Propuesta de Tesina \\ Licenciatura en Ciencias de la Computación}
+\author{}
+
+\begin{document}
+
+\maketitle
+
+\begin{description}
+ \item[Postulante] Agustín Settimo -- S-5289/2
+ \item[Director] Cecilia Manzino
+ \item[Codirector] Cristian Sottile
+\end{description}
+
+\section{Situación del Postulante}
+
+El postulante ya ha aprobado la totalidad de las asignaturas de la carrera.
+
+Actualmente el postulante se encuentra trabajando como desarrollador de software con una dedicación de 40hs semanales. Se espera dedicar 20hs semanales a la realización de la Tesina.
+
+\section{Título}
+
+Formalización de Sistema I con tipo Unit.
+
+\section{Introducción}
+
+Tanto los sistemas de tipos como los sistemas de pruebas distinguen elementos que tienen diferente forma aunque tengan el mismo significado, como pueden ser las pruebas de las conjunciones $A \wedge B$ y $B \vee A$, por lo cual una prueba de una no constituye una prueba de la otra, a pesar de que se puede demostrar mediante la existencia de un isomorfismo que dichas proposiciones son equivalentes. Sistema I es un cálculo lambda simplemente tipado con pares, extendido con una teoría ecuacional obtenida a partir de los isomorfismos de tipos existentes entre los tipos simples con pares, de forma tal que las proposiciones con mismo significado son equivalentes.
+
+Este calculo tiene aplicaciones interesantes. Por ejemplo, desde el punto de vista de los programas, nos permite construir expresiones de formas que antes eran erróneas, un termino $f : (A \wedge B) \Rightarrow C$ puede ser combinado como $f \langle a, b \rangle$ ó $f \: a \: b$, ya que por el isomorfismo de curry el termino $f$ también tiene tipo $A \Rightarrow B \Rightarrow C$.
+Por otro lado, los isomorfismos hacen que las pruebas sean más naturales, por ejemplo, para probar, $(A \wedge A \Rightarrow  B) \Rightarrow B$, deberíamos primero introducir la hipótesis $(A \wedge A \Rightarrow  B)$, y luego descomponerla en $A$ y $A \Rightarrow B$, en cambio utilizando el isomorfismo de curry transformamos el objetivo en $(A \Rightarrow A \Rightarrow  B) \Rightarrow B$ y luego introducimos directamente las hipótesis $A$ y $A \Rightarrow B$.
+
+
+\section{Fundamentos y estado del arte}
+
+El primer paso es considerar dos proposiciones $A$ y $B$ como isomorfas si existen dos pruebas $A \Rightarrow B$ y $B \Rightarrow A$, tal que al componerlas, en ambos sentidos, obtenemos como resultado la identidad. Di Cosmo \cite{dicosmo} caracterizó los conjuntos mínimos de isomorfismos que permiten construir todos los demás.
+
+La primera versión de Sistema I introducida en \cite{sistema-i} define una relación de equivalencia entre los términos, inducida por los isomorfismos de tipos. Si bien este sistema es fuertemente normalizante, no posee la propiedad de introducción (todo termino cerrado  en forma normal es una introducción).
+
+Luego, Sistema I$^\eta$ \cite{sistema-in} añade la regla de $\eta$-expansión a la relación de reducción lo cual permite desatascar los términos que impedían obtener la propiedad de introducción en Sistema I.
+
+En términos de expresividad, un siguiente paso natural para un lenguaje de programación simplemente tipado consiste en la adición de polimorfismo. Desde el punto de vista lógico, esto significa llevarlo de ser un lenguaje capaz de expresar especificaciones formales en primer orden, a uno capaz de expresar especificaciones en segundo orden. Justamente esto propone $SIP$ \cite{sistema-ip} (Sistema I Polimórfico).
+
+Si bien existe una implementación en Haskell de Sistema I \cite{lambda+}, no se hayan formalizaciones en asistentes de pruebas como $Agda$ o $Coq$. Por otro lado, no se han explorado los isomorfismo que surgen de la inclusión del tipo Unit. Por ejemplo, el isomorfismo $\top \equiv \top \Rightarrow \top$ permite tipar el termino $\Omega = (\lambda x^\top.xx)(\lambda x^\top.xx) : \top$. Una de las preguntas que surgen a 
+
+\section{Objetivos específicos}
+
+Proponemos extender Sistema I agregando el tipo $\top$. Para esto, añadiremos el tipo $\top$ y las reglas de tipado. Luego consideraremos tres nuevos isomorfismos correspondientes a dicho tipo, aplicando la misma técnica utilizada en $SIP$ para internalizar los isomorfismos extenderemos la relación de equivalencia entre términos.
+
+Luego realizaremos una formalización de toda la teoría en Agda, lo cual incluye la definición de los tipos y términos, las reglas de tipado, la relación de isomorfismo entre tipos, la relación de equivalencia entre términos, casos de ejemplos y la demostración de propiedades. Analizaremos los diferentes estilos de formalización para elegir el más adecuado tomando como referencia formalizaciones de STLC preexistentes.
+
+Evaluaremos también la posibilidad de formalizar la prueba de normalización fuerte para Sistema I con $\top$.
+
+\section{Metodología y Plan de Trabajo}
+Para alcanzar los objetivos planteados se propone el siguiente programa tentativo de trabajo.
+
+\begin{itemize}
+ \item Estudio de Sistema I y revisión del estado del arte. ($\sim$ 2 semanas)
+ \item Búsqueda de formalizaciones de STLC en Agda que sirvan de base. ($\sim$ 1 semanas)
+ \item Extensión de Sistema I con tipo Unit y los isomorfismos correspondientes. ($\sim$ 1 semanas)
+ \item Formalización en Agda de Sistema I. ($\sim$ 3 semanas)
+ \item Demostración de propiedades en Agda. ($\sim$ 2 semanas)
+ \item Síntesis de los resultados obtenidos y escritura de la tesina. ($\sim$ 6 semanas)
+\end{itemize}
+
+
+\begin{thebibliography}{1}
+    \bibitem{dicosmo}
+     Roberto Di Cosmo. Isomorphisms of types: from $\lambda$-calculus to information retrieval and language design. Progress in Theoretical Computer Science. Birkhauser, 1995.
+    \bibitem{sistema-i}
+    Alejandro Díaz-Caro y Gilles Dowek. Proof normalisation in a logic identifying isomorphic propositions. Schloss Dagstuhl-LeibnizZentrum fuer Informatik, 2019.
+    \bibitem{sistema-in}
+    Alejandro Díaz-Caro y Gilles Dowek. Extensional proofs in a propositional logic modulo isomorphisms, 2020.
+    \bibitem{sistema-ip}
+    Sottile, Cristian. Agregando polimorfismo a una lógica que identifica proposiciones isomorfas, 2020.
+    \bibitem{lambda+}Alejandro Díaz-Caro y Pablo E. Martínez Líopez. Isomorphisms considered as equalities: Projecting functions and enhancing partial application through an implementation of $\lambda$+, 2015.
+\end{thebibliography}
+
+\end{document}
