@@ -25,33 +25,38 @@ Actualmente el postulante se encuentra trabajando como desarrollador de software
 
 \section{Título}
 
-Formalización de Sistema I con tipo Unit.
+\textit{Formalización de Sistema I con tipo top.}
 
 \section{Introducción}
 
-Tanto los sistemas de tipos como los sistemas de pruebas distinguen elementos que tienen diferente forma aunque tengan el mismo significado, como pueden ser las pruebas de las conjunciones $A \wedge B$ y $B \vee A$, por lo cual una prueba de una no constituye una prueba de la otra, a pesar de que se puede demostrar mediante la existencia de un isomorfismo que dichas proposiciones son equivalentes. Sistema I es un cálculo lambda simplemente tipado con pares, extendido con una teoría ecuacional obtenida a partir de los isomorfismos de tipos existentes entre los tipos simples con pares, de forma tal que las proposiciones con mismo significado son equivalentes.
+Tanto los sistemas de tipos como los sistemas de pruebas distinguen elementos que tienen diferente forma aunque tengan el mismo significado, como pueden ser las pruebas de las conjunciones $A \wedge B$ y $B \wedge A$, por lo cual una prueba de una no constituye una prueba de la otra, a pesar de que se puede demostrar mediante la existencia de un isomorfismo que dichas proposiciones son equivalentes. Sistema I es un cálculo lambda simplemente tipado con pares, extendido con una teoría ecuacional obtenida a partir de los isomorfismos de tipos existentes entre los tipos simples con pares, de forma tal que las proposiciones con mismo significado son equivalentes.
 
-Este calculo tiene aplicaciones interesantes. Por ejemplo, desde el punto de vista de los programas, nos permite construir expresiones de formas que antes eran erróneas, un termino $f : (A \wedge B) \Rightarrow C$ puede ser combinado como $f \langle a, b \rangle$ ó $f \: a \: b$, ya que por el isomorfismo de curry el termino $f$ también tiene tipo $A \Rightarrow B \Rightarrow C$.
-Por otro lado, los isomorfismos hacen que las pruebas sean más naturales, por ejemplo, para probar, $(A \wedge A \Rightarrow  B) \Rightarrow B$, deberíamos primero introducir la hipótesis $(A \wedge A \Rightarrow  B)$, y luego descomponerla en $A$ y $A \Rightarrow B$, en cambio utilizando el isomorfismo de curry transformamos el objetivo en $(A \Rightarrow A \Rightarrow  B) \Rightarrow B$ y luego introducimos directamente las hipótesis $A$ y $A \Rightarrow B$.
+Este calculo tiene aplicaciones interesantes. Si $A$ y $B$ son tipos isomorfos entonces un término de tipo A puede usarse en lugar de un término de tipo B. Por ejemplo, desde el punto de vista de los programas, nos permite construir expresiones de formas que antes eran erróneas, un término $f : (A \wedge B) \Rightarrow C$ puede ser combinado como $f \langle a, b \rangle$ ó $f \: a \: b$, ya que por el isomorfismo de curry el término $f$ también tiene tipo $A \Rightarrow B \Rightarrow C$.
+Por otro lado, los isomorfismos hacen que las pruebas sean más naturales, por ejemplo, para probar, $A \wedge (A \Rightarrow  B) \Rightarrow B$, deberíamos primero introducir la hipótesis $A \wedge A \Rightarrow  B$, y luego descomponerla en $A$ y $A \Rightarrow B$, en cambio utilizando el isomorfismo de curry transformamos el objetivo en $(A \Rightarrow A \Rightarrow  B) \Rightarrow B$ y luego introducimos directamente las hipótesis $A$ y $A \Rightarrow B$.
 
+La introducción de una relación de equivalencia en el nivel de los tipos necesariamente deberá tener consecuencias en el nivel de los términos, ya que al cumplirse $A \equiv B$, cualquier término de tipo $A$ puede combinarse con todos los términos que son combinables con aquellos de tipo $B$, dando como resultado términos que no parecen bien formados. Por lo tanto, se introduce una relación de equivalencia entre términos que permita que aquellos resultantes de las nuevas combinaciones no se queden mal formados ni produzcan reducciones incorrectas.
+
+La relación de reducción también debe sufrir ciertas modificaciones. El inconveniente es que la regla $\beta$ clásica no distingue entre términos bien formados y mal formados. Para evitar que se reduzcan términos mal formados, se agrega una restricción: solo podrá aplicarse la regla entre una abstracción y un término cualquiera cuando el término tenga el mismo tipo.
+\[ \textrm{si $s : A$} \quad (\lambda x^A.r) s \hookrightarrow_\beta [x := s]r \]
+Debido al isomorfismo de la conmutatividad de la conjunción, todo par $\langle r, s \rangle$ es equivalente a $\langle s, r \rangle$, por lo que desaparece la noción de orden en el par. Dado que el orden en un par ya no es relevante, sino que lo relevante es el tipo de cada término, en vez de indicar la posición a proyectar en un par, se indicará el tipo: $\pi_A\langle r, s \rangle$. Una consecuencia importante, es que la proyección se vuelve no determinista cuando $r$ y $s$ tienen el mismo tipo, en cuyo caso podrá reducir indistintamente a $r$ o a $s$.
 
 \section{Fundamentos y estado del arte}
 
 El primer paso es considerar dos proposiciones $A$ y $B$ como isomorfas si existen dos pruebas $A \Rightarrow B$ y $B \Rightarrow A$, tal que al componerlas, en ambos sentidos, obtenemos como resultado la identidad. Di Cosmo \cite{dicosmo} caracterizó los conjuntos mínimos de isomorfismos que permiten construir todos los demás.
 
-La primera versión de Sistema I introducida en \cite{sistema-i} define una relación de equivalencia entre los términos, inducida por los isomorfismos de tipos. Si bien este sistema es fuertemente normalizante, no posee la propiedad de introducción (todo termino cerrado  en forma normal es una introducción).
+La primera versión de Sistema I introducida en \cite{sistema-i} define una relación de equivalencia entre los términos, inducida por los isomorfismos de tipos. Si bien este sistema es fuertemente normalizante, no posee la propiedad de introducción (todo término cerrado  en forma normal es una introducción).
 
 Luego, Sistema I$^\eta$ \cite{sistema-in} añade la regla de $\eta$-expansión a la relación de reducción lo cual permite desatascar los términos que impedían obtener la propiedad de introducción en Sistema I.
 
 En términos de expresividad, un siguiente paso natural para un lenguaje de programación simplemente tipado consiste en la adición de polimorfismo. Desde el punto de vista lógico, esto significa llevarlo de ser un lenguaje capaz de expresar especificaciones formales en primer orden, a uno capaz de expresar especificaciones en segundo orden. Justamente esto propone $SIP$ \cite{sistema-ip} (Sistema I Polimórfico).
 
-Si bien existe una implementación en Haskell de Sistema I \cite{lambda+}, no se hayan formalizaciones en asistentes de pruebas como $Agda$ o $Coq$. Por otro lado, no se han explorado los isomorfismo que surgen de la inclusión del tipo Unit. Por ejemplo, el isomorfismo $\top \equiv \top \Rightarrow \top$ permite tipar el termino $\Omega = (\lambda x^\top.xx)(\lambda x^\top.xx) : \top$. Una de las preguntas que surgen a 
+Si bien existe una implementación en Haskell de Sistema I \cite{lambda+}, no se hayan formalizaciones en asistentes de pruebas como $Agda$ o $Coq$. Por otro lado, no se han explorado los isomorfismo que surgen de la inclusión del tipo Unit. Por ejemplo, el isomorfismo $\top \equiv \top \Rightarrow \top$ permite tipar el término $\Omega = (\lambda x^\top.xx)(\lambda x^\top.xx) : \top$. Por lo tanto surge la pregunta de como preservar la propiedad de normalización cuando se incluyen los isomorfismos correspondientes a $\top$.
 
 \section{Objetivos específicos}
 
-Proponemos extender Sistema I agregando el tipo $\top$. Para esto, añadiremos el tipo $\top$ y las reglas de tipado. Luego consideraremos tres nuevos isomorfismos correspondientes a dicho tipo, aplicando la misma técnica utilizada en $SIP$ para internalizar los isomorfismos extenderemos la relación de equivalencia entre términos.
+Proponemos extender Sistema I agregando el tipo $\top$. Para esto, añadiremos el tipo $\top$ a las reglas de tipado. Luego consideraremos tres nuevos isomorfismos correspondientes a dicho tipo, aplicando la misma técnica utilizada en $SIP$ para internalizar los isomorfismos extenderemos la relación de equivalencia entre términos.
 
-Luego realizaremos una formalización de toda la teoría en Agda, lo cual incluye la definición de los tipos y términos, las reglas de tipado, la relación de isomorfismo entre tipos, la relación de equivalencia entre términos, casos de ejemplos y la demostración de propiedades. Analizaremos los diferentes estilos de formalización para elegir el más adecuado tomando como referencia formalizaciones de STLC preexistentes.
+Luego realizaremos una formalización de toda la teoría en Agda, lo cual incluye la definición de los tipos y términos, las reglas de tipado, la relación de reducción, la relación de isomorfismo entre tipos, la relación de equivalencia entre términos, casos de ejemplos y la demostración de propiedades, siendo la preservación de tipos una de las más importantes. Analizaremos los diferentes estilos de formalización para elegir el más adecuado tomando como referencia formalizaciones de cálculo lambda simplemente tipado preexistentes.
 
 Evaluaremos también la posibilidad de formalizar la prueba de normalización fuerte para Sistema I con $\top$.
 
@@ -60,10 +65,10 @@ Para alcanzar los objetivos planteados se propone el siguiente programa tentativ
 
 \begin{itemize}
  \item Estudio de Sistema I y revisión del estado del arte. ($\sim$ 2 semanas)
- \item Búsqueda de formalizaciones de STLC en Agda que sirvan de base. ($\sim$ 1 semanas)
- \item Extensión de Sistema I con tipo Unit y los isomorfismos correspondientes. ($\sim$ 1 semanas)
+ \item Búsqueda de formalizaciones de STLC en Agda que sirvan de base. ($\sim$ 1 semana)
+ \item Extensión de Sistema I con tipo Unit y los isomorfismos correspondientes. ($\sim$ 1 semana)
  \item Formalización en Agda de Sistema I. ($\sim$ 3 semanas)
- \item Demostración de propiedades en Agda. ($\sim$ 2 semanas)
+ \item Demostración de propiedades en Agda. ($\sim$ 3 semanas)
  \item Síntesis de los resultados obtenidos y escritura de la tesina. ($\sim$ 6 semanas)
 \end{itemize}
 
