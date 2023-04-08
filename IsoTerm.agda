@@ -3,8 +3,16 @@ module IsoTerm where
 open import IsoType
 open import Type
 open import Term
+open import Reduction
+open import Data.Sum using (inj₁; inj₂)
+open import Relation.Binary.PropositionalEquality using (refl)
+open import Subs using (rename; subst)
 
 infix  4 _⇄_
+
+σ : ∀ {Γ A B C} → (iso : B ≡ A) → Γ , A ∋ C → Γ , B ⊢ C
+σ iso Z      =  [ iso ]≡ (` Z)
+σ iso (S x)  =  ` (S x)
 
 -- (3) This realtion eliminates the [_]≡_ from the terms
 data _⇄_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
@@ -18,18 +26,74 @@ data _⇄_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
     → [ dist ]≡ ⟨ r , s ⟩ · t ⇄ ⟨ r · t , s · t ⟩
   curry : ∀ {Γ A B C} → {r : Γ ⊢ A ⇒ B ⇒ C} → {s : Γ ⊢ A} → {t : Γ ⊢ B}
     → [ curry ]≡ r · ⟨ s , t ⟩ ⇄ r · s · t
-  curry2 : ∀ {Γ A B C} → {r : Γ ⊢ A × B ⇒ C} → {s : Γ ⊢ A} → {t : Γ ⊢ B}
+  uncurry₂ : ∀ {Γ A B C} → {r : Γ ⊢ A × B ⇒ C} → {s : Γ ⊢ A} → {t : Γ ⊢ B}
     → [ sym curry ]≡ r · s · t ⇄ r · ⟨ s , t ⟩
---  unit : ∀ {Γ A} → {r : Γ ⊢ A}
---    → [ unit ]≡ ⟨ r , ⋆ ⟩ ⇄ r
---  unit2 : ∀ {Γ A} → {r : Γ ⊢ ⊤ ⇒ A}
---    → [ unit2 ]≡ r ⇄ r · ⋆
---  unit3 : ∀ {Γ A} → {r : Γ , A ⊢ ⊤}
---    → [ unit3 ]≡ (ƛ r) ⇄ ⋆
+  uncurry₁ : ∀ {Γ A B C} → {r : Γ ⊢ A × B ⇒ C} → {s : Γ ⊢ A}
+    → [ sym curry ]≡ r · s ⇄ ƛ rename S_ r · ⟨ rename S_ s , ` Z ⟩
+
+  dist-πƛ : ∀ {Γ A B C} {T p₁ p₂} → {r : Γ , C ⊢ A × B}
+    → proj (C ⇒ T) {p₁} ([ sym dist ]≡ (ƛ r)) ⇄ ƛ proj T {p₂} r
+  dist-π· : ∀ {Γ A B C} {T p₁ p₂} → {r : Γ ⊢ C ⇒ A × B} → {s : Γ ⊢ C}
+    → proj (C ⇒ T) {p₁} ([ sym dist ]≡ r) · s ⇄ proj T {p₂} (r · s)
+  
+  split₁ : ∀ {Γ A B C} → {r : Γ ⊢ A} → {s : Γ ⊢ B × C}
+    → proj (A × B) {inj₁ refl} ([ asso ]≡ ⟨ r , s ⟩) ⇄ ⟨ r , proj B {inj₁ refl} s ⟩
+  split₂ : ∀ {Γ A B C} → {r : Γ ⊢ A} → {s : Γ ⊢ B × C}
+    → proj C {inj₂ refl} ([ asso ]≡ ⟨ r , s ⟩) ⇄ proj C {inj₂ refl} s
+
+  sym-split₁ : ∀ {Γ A B C} → {r : Γ ⊢ A × B} → {s : Γ ⊢ C}
+    → proj A {inj₁ refl} ([ sym asso ]≡ ⟨ r , s ⟩) ⇄ proj A {inj₁ refl} r
+  sym-split₂ : ∀ {Γ A B C} → {r : Γ ⊢ A × B} → {s : Γ ⊢ C}
+    → proj (B × C) {inj₂ refl} ([ sym asso ]≡ ⟨ r , s ⟩) ⇄ ⟨ proj B {inj₂ refl} r , s ⟩
+
+  id-× : ∀ {Γ A} → {r : Γ ⊢ A}
+    → [ id-× ]≡ ⟨ r , ⋆ ⟩ ⇄ r
+  id-⇒ : ∀ {Γ A} → {r : Γ ⊢ ⊤ ⇒ A}
+    → [ id-⇒ ]≡ r ⇄ r · ⋆
+  sym-id-⇒ : ∀ {Γ A} → {r : Γ ⊢ A}
+    → [ sym id-⇒ ]≡ r ⇄ ƛ rename S_ r
+  abs : ∀ {Γ A} → {r : Γ ⊢ A ⇒ ⊤} → {t : Γ ⊢ ⊤}
+    → [ abs ]≡ r ⇄ t
 
   sym : ∀ {Γ A B} → {r : Γ ⊢ A} → {s : Γ ⊢ B} → {iso : A ≡ B}
     → [ iso ]≡ r ⇄ s
     → [ sym iso ]≡ s ⇄ r
+  
+  sym-sym : ∀ {Γ A B} → {r : Γ ⊢ A} → {iso : A ≡ B}
+    → [ sym (sym iso) ]≡ r ⇄ [ iso ]≡ r
+  
+--  inv : ∀ {Γ A B} → {r : Γ ⊢ A} → {iso : A ≡ B}
+--    → [ sym iso ]≡ ([ iso ]≡ r) ⇄ r
+  
+--  cong⇒₁2 : ∀ {Γ A B C} → {r : Γ , A ⊢ C} → {iso : A ≡ B}
+--    → [ cong⇒₁ iso ]≡ (ƛ r) ⇄ ƛ subst (σ (sym iso)) r
+
+  cong⇒₁ : ∀ {Γ A B C} → {r : Γ ⊢ A ⇒ C} → {s : Γ ⊢ B} → {iso : A ≡ B}
+    → [ cong⇒₁ iso ]≡ r · s ⇄ r · [ sym iso ]≡ s
+  
+  sym-cong⇒₁ : ∀ {Γ A B C} → {r : Γ ⊢ B ⇒ C} → {s : Γ ⊢ A} → {iso : A ≡ B}
+    → [ sym (cong⇒₁ iso) ]≡ r · s ⇄ r · [ iso ]≡ s
+  
+  cong⇒₂ : ∀ {Γ A B C} → {r : Γ , C ⊢ A} → {iso : A ≡ B}
+    → [ cong⇒₂ iso ]≡ (ƛ r) ⇄ ƛ ([ iso ]≡ r)
+  
+--  cong⇒₂2 : ∀ {Γ A B C} → {r : Γ ⊢ C ⇒ A} → {s : Γ ⊢ C} → {iso : A ≡ B}
+--    → [ cong⇒₂ iso ]≡ r · s ⇄ [ iso ]≡ (r · s)
+  
+  sym-cong⇒₂ : ∀ {Γ A B C} → {r : Γ , C ⊢ B} → {iso : A ≡ B}
+    → [ sym (cong⇒₂ iso) ]≡ (ƛ r) ⇄ ƛ ([ sym iso ]≡ r)
+  
+  cong×₁ : ∀ {Γ A B C} → {r : Γ ⊢ A} → {s : Γ ⊢ C} → {iso : A ≡ B}
+    → [ cong×₁ iso ]≡ ⟨ r , s ⟩ ⇄ ⟨ [ iso ]≡ r , s ⟩
+  
+  sym-cong×₁ : ∀ {Γ A B C} → {r : Γ ⊢ B} → {s : Γ ⊢ C} → {iso : A ≡ B}
+    → [ sym (cong×₁ iso) ]≡ ⟨ r , s ⟩ ⇄ ⟨ [ sym iso ]≡ r , s ⟩
+  
+  cong×₂ : ∀ {Γ A B C} → {r : Γ ⊢ C} → {s : Γ ⊢ A} → {iso : A ≡ B}
+    → [ cong×₂ iso ]≡ ⟨ r , s ⟩ ⇄ ⟨ r , [ iso ]≡ s ⟩
+  
+  sym-cong×₂ : ∀ {Γ A B C} → {r : Γ ⊢ C} → {s : Γ ⊢ B} → {iso : A ≡ B}
+    → [ sym (cong×₂ iso) ]≡ ⟨ r , s ⟩ ⇄ ⟨ r , [ sym iso ]≡ s ⟩
   
   ξ-·₁ : ∀ {Γ A B} {L L' : Γ ⊢ A ⇒ B} {M : Γ ⊢ A}
     → L ⇄ L'
@@ -55,51 +119,6 @@ data _⇄_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
     → L ⇄ L'
     → ([ iso ]≡ L) ⇄ ([ iso ]≡ L')
   
-  ξ-ƛ : ∀ {Γ A B} {L L' : Γ , B ⊢ A}
+  ζ : ∀ {Γ A B} {L L' : Γ , B ⊢ A}
     → L ⇄ L'
     → ƛ L ⇄ ƛ L'
-
-data Progress {Γ A} (M : Γ ⊢ A) : Set where
-
-  step : ∀ {N : Γ ⊢ A}
-    → M ⇄ N
-      ----------
-    → Progress M
-
-  nothing : Progress M
-
-
-symmetric : ∀ {Γ A} → (M : Γ ⊢ A) → Progress M
-symmetric (` x)                             = nothing
-symmetric ⋆                                 = nothing
-symmetric ([ comm ]≡ ⟨ r , s ⟩)             = step comm
-symmetric ([ asso ]≡ ⟨ r , ⟨ s , t ⟩ ⟩)     = step asso
-symmetric ([ dist ]≡ ⟨ ƛ r , ƛ s ⟩)         = step dist-ƛ
-symmetric ([ dist ]≡ ⟨ r , s ⟩ · t)         = step dist-·
-symmetric ([ curry ]≡ r · ⟨ s , t ⟩)        = step curry
--- symmetric ([ unit ]≡ x) = {!   !}
--- symmetric ([ unit2 ]≡ x) = {!   !}
--- symmetric ([ unit3 ]≡ x) = {!   !}
-symmetric ([ sym comm ]≡ ⟨ r , s ⟩)         = step (sym comm)
-symmetric ([ sym asso ]≡ ⟨ ⟨ r , s ⟩ , t ⟩) = step (sym asso)
-symmetric ([ sym dist ]≡ (ƛ ⟨ r , s ⟩))     = step (sym dist-ƛ)
-symmetric ([ sym curry ]≡ r · s · t)        = step (curry2)
-symmetric ([ iso ]≡ N) with symmetric N
-...    | step N⇄M = step (ξ-≡ N⇄M)
-...    | nothing = nothing
-symmetric (ƛ N) with symmetric N
-...    | step N⇄M = step (ξ-ƛ N⇄M)
-...    | nothing = nothing
-symmetric (L · M) with symmetric L
-...    | step L⇄L'                          = step (ξ-·₁ L⇄L')
-...    | nothing with symmetric M
-...        | step M⇄M'                      = step (ξ-·₂ M⇄M')
-...        | nothing                        = nothing
-symmetric ⟨ M , N ⟩ with symmetric M
-...    | step M⇄M'                          = step (ξ-⟨,⟩₁ M⇄M')
-...    | nothing with symmetric N
-...        | step N⇄N'                      = step (ξ-⟨,⟩₂ N⇄N')
-...        | nothing                        = nothing
-symmetric (proj C N) with symmetric N
-...    | step N⇄N'                          = step (ξ-proj N⇄N')
-...    | nothing                            = nothing 
