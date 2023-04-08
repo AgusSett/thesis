@@ -2,7 +2,7 @@ module Term where
 
 open import Type
 open import IsoType
-open import Relation.Binary.PropositionalEquality renaming (_≡_ to _≋_)
+open import Relation.Binary.PropositionalEquality renaming (_≡_ to _≋_) hiding (sym)
 open import Data.Sum
 
 infix  4 _∋_
@@ -44,7 +44,7 @@ data _⊢_ : Context → Type → Set where
 
   -- ≡
 
-  [_]≡_ : ∀ {Γ A B} → A ≡ B → Γ ⊢ A → Γ ⊢ B -- (1) This rule constructs "wrong" terms
+  [_]≡_ : ∀ {Γ A B} → A ≡ B → Γ ⊢ A → Γ ⊢ B -- (1) This rule constructs "unstable" terms
 
   -- functions
 
@@ -102,3 +102,51 @@ data Value : ∀ {Γ A} → Γ ⊢ A → Set where
     → Value W
       ----------------
     → Value ⟨ V , W ⟩
+
+
+data Neutral : ∀ {Γ A} → Γ ⊢ A → Set
+data Normal  : ∀ {Γ A} → Γ ⊢ A → Set
+
+data Neutral where
+
+  `_  : ∀ {Γ A} (x : Γ ∋ A)
+      -------------
+    → Neutral (` x)
+
+  _·_  : ∀ {Γ A B} {L : Γ ⊢ A ⇒ B} {M : Γ ⊢ A}
+    → Neutral L
+    → Normal M
+      ---------------
+    → Neutral (L · M)
+  
+  proj : ∀ {Γ A B C p} {L : Γ ⊢ A × B}
+    → Neutral L
+      ---------------
+    → Neutral (proj C {p} L)
+  
+  [_]≡_ : ∀ {Γ A B} {N : Γ ⊢ A}
+    → (iso : A ≡ B)
+    → Normal N
+      ------------------
+    → Neutral ([ iso ]≡ N)
+
+data Normal where
+
+  ^_ : ∀ {Γ A} {M : Γ ⊢ A}
+    → Neutral M
+      ---------
+    → Normal M
+
+  N-ƛ : ∀ {Γ A B} {N : Γ , A ⊢ B}
+      ------------
+    → Normal (ƛ N)
+  
+  ⟨_,_⟩ : ∀ {Γ A B} {V : Γ ⊢ A} {W : Γ ⊢ B}
+    → Normal V
+    → Normal W
+      ----------------
+    → Normal ⟨ V , W ⟩
+  
+  N-⋆ : ∀ {Γ}
+      ---------------------------
+    → Normal (⋆ {Γ})
