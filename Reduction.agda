@@ -62,17 +62,3 @@ data _↪_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
     → N ↪ N'
     → [ iso ]≡ N ↪ [ iso ]≡ N'
 
-{-
-data Progress {Γ A} (M : Γ ⊢ A) : Set where
-
-  step : ∀ {N : Γ ⊢ A}
-    → M ↪ N
-      ----------
-    → Progress M
-
-  done :
-      Value M
-      ----------
-    → Progress M
-  
-  nothing : Progress M
