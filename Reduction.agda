@@ -61,4 +61,8 @@ data _↪_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
   ξ-≡ : ∀ {Γ A B} {N : Γ ⊢ A} {N' : Γ ⊢ A} {iso : A ≡ B}
     → N ↪ N'
     → [ iso ]≡ N ↪ [ iso ]≡ N'
+  
+  ζ : ∀ {Γ A B} {L L' : Γ , B ⊢ A}
+    → L ↪ L'
+    → ƛ L ↪ ƛ L'
 
