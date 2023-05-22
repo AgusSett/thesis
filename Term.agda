@@ -126,7 +126,7 @@ data Neutral where
   
   [_]≡_ : ∀ {Γ A B} {N : Γ ⊢ A}
     → (iso : A ≡ B)
-    → Normal N
+    → Neutral N
       ------------------
     → Neutral ([ iso ]≡ N)
 
@@ -138,6 +138,7 @@ data Normal where
     → Normal M
 
   N-ƛ : ∀ {Γ A B} {N : Γ , A ⊢ B}
+    → {Normal N}
       ------------
     → Normal (ƛ N)
   

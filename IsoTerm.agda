@@ -6,13 +6,23 @@ open import Term
 open import Reduction
 open import Data.Sum using (inj₁; inj₂)
 open import Relation.Binary.PropositionalEquality using (refl)
-open import Subs using (rename; subst)
+open import Subs using (rename; subst; _[_])
 
 infix  4 _⇄_
 
-σ : ∀ {Γ A B C} → (iso : B ≡ A) → Γ , A ∋ C → Γ , B ⊢ C
-σ iso Z      =  [ iso ]≡ (` Z)
-σ iso (S x)  =  ` (S x)
+σ-cong⇒₁ : ∀ {Γ A B C} → (iso : B ≡ A) → Γ , A ∋ C → Γ , B ⊢ C
+σ-cong⇒₁ iso Z      =  [ iso ]≡ (` Z)
+σ-cong⇒₁ iso (S x)  =  ` (S x)
+
+σ-uncurry : ∀ {Γ A B C} → Γ , A × B ∋ C → Γ , A , B ⊢ C
+σ-uncurry Z = ⟨ (` (S Z)) , (` Z) ⟩
+σ-uncurry (S x) = ` (S (S x))
+
+σ-curry : ∀ {Γ A B C} → Γ , A , B ∋ C → Γ , A × B ⊢ C
+σ-curry {B = B} Z = proj B {inj₂ refl} (` Z)
+σ-curry {A = A} (S Z) = proj A {inj₁ refl} (` Z)
+σ-curry (S (S x)) = ` (S x)
+
 
 -- (3) This realtion eliminates the [_]≡_ from the terms
 data _⇄_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
@@ -22,32 +32,26 @@ data _⇄_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
     → [ asso ]≡ ⟨ r , ⟨ s , t ⟩ ⟩ ⇄ ⟨ ⟨ r , s ⟩ , t ⟩
   dist-ƛ : ∀ {Γ A B C} → {r : Γ , C ⊢ A} → {s : Γ , C ⊢ B}
     → [ dist ]≡ ⟨ ƛ r , ƛ s ⟩ ⇄ ƛ ⟨ r , s ⟩
-  dist-· : ∀ {Γ A B C} → {r : Γ ⊢ C ⇒ A} → {s : Γ ⊢ C ⇒ B} → {t : Γ ⊢ C}
+  dist-· : ∀ {Γ A B C} → {r : Γ ⊢ C ⇒ A} → {s : Γ ⊢ C ⇒ B} → {t : Γ ⊢ C} -- ???
     → [ dist ]≡ ⟨ r , s ⟩ · t ⇄ ⟨ r · t , s · t ⟩
-  curry : ∀ {Γ A B C} → {r : Γ ⊢ A ⇒ B ⇒ C} → {s : Γ ⊢ A} → {t : Γ ⊢ B}
+  curry : ∀ {Γ A B C} → {r : Γ ⊢ A ⇒ B ⇒ C} → {s : Γ ⊢ A} → {t : Γ ⊢ B}  -- ???
     → [ curry ]≡ r · ⟨ s , t ⟩ ⇄ r · s · t
-  uncurry₂ : ∀ {Γ A B C} → {r : Γ ⊢ A × B ⇒ C} → {s : Γ ⊢ A} → {t : Γ ⊢ B}
+  uncurry : ∀ {Γ A B C} → {r : Γ ⊢ A × B ⇒ C} → {s : Γ ⊢ A} → {t : Γ ⊢ B} -- ???
     → [ sym curry ]≡ r · s · t ⇄ r · ⟨ s , t ⟩
-  uncurry₁ : ∀ {Γ A B C} → {r : Γ ⊢ A × B ⇒ C} → {s : Γ ⊢ A}
-    → [ sym curry ]≡ r · s ⇄ ƛ rename S_ r · ⟨ rename S_ s , ` Z ⟩
 
-  dist-πƛ : ∀ {Γ A B C} {T p₁ p₂} → {r : Γ , C ⊢ A × B}
-    → proj (C ⇒ T) {p₁} ([ sym dist ]≡ (ƛ r)) ⇄ ƛ proj T {p₂} r
-  dist-π· : ∀ {Γ A B C} {T p₁ p₂} → {r : Γ ⊢ C ⇒ A × B} → {s : Γ ⊢ C}
-    → proj (C ⇒ T) {p₁} ([ sym dist ]≡ r) · s ⇄ proj T {p₂} (r · s)
+  curry-s : ∀ {Γ A B C} → {r : Γ , A , B ⊢ C}
+    → [ curry ]≡ (ƛ ƛ r) ⇄ ƛ subst σ-curry r
+  uncurry-s : ∀ {Γ A B C} → {r : Γ , A × B ⊢ C}
+    → [ sym curry ]≡ (ƛ r) ⇄ ƛ ƛ subst σ-uncurry r
+
+  eta : ∀ {Γ A B} → {r : Γ ⊢ A ⇒ B}
+    → r ⇄ ƛ rename S_ r · ` Z
   
-  split₁ : ∀ {Γ A B C} → {r : Γ ⊢ A} → {s : Γ ⊢ B × C}
-    → proj (A × B) {inj₁ refl} ([ asso ]≡ ⟨ r , s ⟩) ⇄ ⟨ r , proj B {inj₁ refl} s ⟩
-  split₂ : ∀ {Γ A B C} → {r : Γ ⊢ A} → {s : Γ ⊢ B × C}
-    → proj C {inj₂ refl} ([ asso ]≡ ⟨ r , s ⟩) ⇄ proj C {inj₂ refl} s
+  split : ∀ {Γ A B} → {r : Γ ⊢ A × B}
+    → r ⇄ ⟨ proj A {inj₁ refl} r , proj B {inj₂ refl} r ⟩
 
-  sym-split₁ : ∀ {Γ A B C} → {r : Γ ⊢ A × B} → {s : Γ ⊢ C}
-    → proj A {inj₁ refl} ([ sym asso ]≡ ⟨ r , s ⟩) ⇄ proj A {inj₁ refl} r
-  sym-split₂ : ∀ {Γ A B C} → {r : Γ ⊢ A × B} → {s : Γ ⊢ C}
-    → proj (B × C) {inj₂ refl} ([ sym asso ]≡ ⟨ r , s ⟩) ⇄ ⟨ proj B {inj₂ refl} r , s ⟩
-
-  id-× : ∀ {Γ A} → {r : Γ ⊢ A}
-    → [ id-× ]≡ ⟨ r , ⋆ ⟩ ⇄ r
+  id-× : ∀ {Γ A} → {r : Γ ⊢ A} → {t : Γ ⊢ ⊤}
+    → [ id-× ]≡ ⟨ r , t ⟩ ⇄ r
   id-⇒ : ∀ {Γ A} → {r : Γ ⊢ ⊤ ⇒ A}
     → [ id-⇒ ]≡ r ⇄ r · ⋆
   sym-id-⇒ : ∀ {Γ A} → {r : Γ ⊢ A}
@@ -62,23 +66,14 @@ data _⇄_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
   sym-sym : ∀ {Γ A B} → {r : Γ ⊢ A} → {iso : A ≡ B}
     → [ sym (sym iso) ]≡ r ⇄ [ iso ]≡ r
   
---  inv : ∀ {Γ A B} → {r : Γ ⊢ A} → {iso : A ≡ B}
---    → [ sym iso ]≡ ([ iso ]≡ r) ⇄ r
-  
---  cong⇒₁2 : ∀ {Γ A B C} → {r : Γ , A ⊢ C} → {iso : A ≡ B}
---    → [ cong⇒₁ iso ]≡ (ƛ r) ⇄ ƛ subst (σ (sym iso)) r
+  cong⇒₁ : ∀ {Γ A B C} → {r : Γ , A ⊢ C} → {iso : A ≡ B}
+    → [ cong⇒₁ iso ]≡ (ƛ r) ⇄ ƛ subst (σ-cong⇒₁ (sym iso)) r
 
-  cong⇒₁ : ∀ {Γ A B C} → {r : Γ ⊢ A ⇒ C} → {s : Γ ⊢ B} → {iso : A ≡ B}
-    → [ cong⇒₁ iso ]≡ r · s ⇄ r · [ sym iso ]≡ s
-  
-  sym-cong⇒₁ : ∀ {Γ A B C} → {r : Γ ⊢ B ⇒ C} → {s : Γ ⊢ A} → {iso : A ≡ B}
-    → [ sym (cong⇒₁ iso) ]≡ r · s ⇄ r · [ iso ]≡ s
+  sym-cong⇒₁ : ∀ {Γ A B C} → {r : Γ , B ⊢ C} → {iso : A ≡ B}
+    → [ sym (cong⇒₁ iso) ]≡ (ƛ r) ⇄ ƛ subst (σ-cong⇒₁ iso) r
   
   cong⇒₂ : ∀ {Γ A B C} → {r : Γ , C ⊢ A} → {iso : A ≡ B}
     → [ cong⇒₂ iso ]≡ (ƛ r) ⇄ ƛ ([ iso ]≡ r)
-  
---  cong⇒₂2 : ∀ {Γ A B C} → {r : Γ ⊢ C ⇒ A} → {s : Γ ⊢ C} → {iso : A ≡ B}
---    → [ cong⇒₂ iso ]≡ r · s ⇄ [ iso ]≡ (r · s)
   
   sym-cong⇒₂ : ∀ {Γ A B C} → {r : Γ , C ⊢ B} → {iso : A ≡ B}
     → [ sym (cong⇒₂ iso) ]≡ (ƛ r) ⇄ ƛ ([ sym iso ]≡ r)
