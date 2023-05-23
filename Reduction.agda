@@ -2,10 +2,10 @@ module Reduction where
 
 open import Term
 open import Type
-open import IsoType
+open import IsoType hiding (sym)
 open import Subs
 open import Data.Sum using (inj₁; inj₂)
-open import Relation.Binary.PropositionalEquality using (refl)
+open import Relation.Binary.PropositionalEquality using (cong₂; sym; refl)
 
 infixr 2 _↪_
 
@@ -66,3 +66,18 @@ data _↪_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
     → L ↪ L'
     → ƛ L ↪ ƛ L'
 
+
+↪[] : ∀ {Γ Δ A}{t t' : Γ ⊢ A}{σ : Subst Γ Δ} → t ↪ t' → subst σ t ↪ subst σ t'
+↪[] (ξ-·₁ step) = ξ-·₁ (↪[] step)
+↪[] (ξ-·₂ step) = ξ-·₂ (↪[] step)
+↪[] {σ = σ} (β-ƛ {N = N} {V = V})
+  rewrite cong₂ (_↪_) {x = (ƛ subst (exts σ) N) · (subst σ V)} refl (sym (subst-commute {Σ = ∅} {N = N} {M = V} {σ = σ}))
+    = β-ƛ
+↪[] (ζ step) = ζ (↪[] step)
+↪[] (ξ-⟨,⟩₁ step) = ξ-⟨,⟩₁ (↪[] step)
+↪[] (ξ-⟨,⟩₂ step) = ξ-⟨,⟩₂ (↪[] step)
+↪[] (ξ-proj step) = ξ-proj (↪[] step)
+↪[] β-proj₁ = β-proj₁
+↪[] β-proj₂ = β-proj₂
+↪[] (ξ-≡ step) = ξ-≡ (↪[] step)
+ 

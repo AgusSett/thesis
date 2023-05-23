@@ -5,6 +5,7 @@ open import IsoType
 open import IsoTerm
 open import Reduction
 open import Progress
+open import StrongNorm using (SN; sn; strong-norm)
 
 infix  2 _⇝_
 infix  1 begin_
@@ -47,26 +48,24 @@ data Steps {A} : ∅ ⊢ A → Set where
 
 open import Data.Nat using (ℕ; zero; suc)
 
-eval : ∀ {A}
-  → ℕ -- Agda need this argument for the termination check
+eval´ : ∀ {A}
   → (L : ∅ ⊢ A)
+  → SN L
   → Steps L
-eval zero L                     = steps (L ∎)
-eval (suc n) L with progress L
-eval (suc n) L | done VL = steps (L ∎)
-eval (suc n) L | step⇄ {M} L⇄M with eval n M
-...            | steps M⇝N                  = steps (L ⇄⟨ L⇄M ⟩ M⇝N)
-eval (suc n) L | step↪ {M} L↪M with eval n M
-...            | steps M⇝N                  = steps (L ↪⟨ L↪M ⟩ M⇝N)
+eval´ L _ with progress L
+eval´ L _      | done VL       =  steps (L ∎)
+eval´ L (sn f) | step⇄ {M} L⇄M with eval´ M {!  !}
+...               | steps M⇝N  =  steps (L ⇄⟨ L⇄M ⟩ M⇝N)
+eval´ L (sn f) | step↪ {M} L↪M with eval´ M (f L↪M)
+...               | steps M⇝N  =  steps (L ↪⟨ L↪M ⟩ M⇝N)
 
-
+eval : ∀ {A} → (L : ∅ ⊢ A) → Steps L
+eval L = eval´ L (strong-norm L)
 
 open import Type
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Relation.Binary.PropositionalEquality using (refl)
 
-data SN {Γ A} (t : Γ ⊢ A) : Set where
-  sn : (∀ {t'} → t ↪ t' ⊎ t ⇄ t' → SN t') → SN t
 
 -- This was computed using C-c C-n `eval 10 (([ curry ]≡ proj (⊤ ⇒ ⊤ ⇒ ⊤) {inj₁ refl} ([ sym dist ]≡ (ƛ ([ sym dist ]≡ (ƛ ⟨ ⋆ , ⋆ ⟩))))) · ⟨ ⋆ , ⋆ ⟩)`
 _ : (([ curry ]≡ proj (⊤ ⇒ ⊤ ⇒ ⊤) ([ sym dist ]≡ (ƛ ([ sym dist ]≡ (ƛ ⟨ ⋆ , ⋆ ⟩))))) · ⟨ ⋆ , ⋆ ⟩) ⇝ (⋆ {∅})

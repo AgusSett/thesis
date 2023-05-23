@@ -3,10 +3,9 @@ module IsoTerm where
 open import IsoType
 open import Type
 open import Term
-open import Reduction
 open import Data.Sum using (inj₁; inj₂)
 open import Relation.Binary.PropositionalEquality using (refl)
-open import Subs using (rename; subst; _[_])
+open import Subs using (Subst; Rename; rename; subst; _[_])
 
 infix  4 _⇄_
 
@@ -117,3 +116,84 @@ data _⇄_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
   ζ : ∀ {Γ A B} {L L' : Γ , B ⊢ A}
     → L ⇄ L'
     → ƛ L ⇄ ƛ L'
+
+{-
+⇄[] : ∀ {Γ Δ A}{t t' : Γ ⊢ A}{σ : Subst Γ Δ} → t ⇄ t' → subst σ t ⇄ subst σ t'
+⇄[] comm = comm
+⇄[] asso = asso
+⇄[] dist-ƛ = dist-ƛ
+⇄[] dist-· = dist-·
+⇄[] curry = curry
+⇄[] uncurry = uncurry
+⇄[] curry-s = {!   !}
+⇄[] uncurry-s = {!   !}
+⇄[] eta = {! eta  !}
+⇄[] split = split
+⇄[] id-× = id-×
+⇄[] id-⇒ = id-⇒
+⇄[] sym-id-⇒ = {! sym-id-⇒  !}
+⇄[] abs = abs
+⇄[] (sym step) = sym (⇄[] step)
+⇄[] sym-sym = sym-sym
+⇄[] cong⇒₁ = {! cong⇒₁  !}
+⇄[] sym-cong⇒₁ = {!   !}
+⇄[] cong⇒₂ = cong⇒₂
+⇄[] sym-cong⇒₂ = sym-cong⇒₂
+⇄[] cong×₁ = cong×₁
+⇄[] sym-cong×₁ = sym-cong×₁
+⇄[] cong×₂ = cong×₂
+⇄[] sym-cong×₂ = sym-cong×₂
+⇄[] (ξ-·₁ step) = ξ-·₁ (⇄[] step)
+⇄[] (ξ-·₂ step) = ξ-·₂ (⇄[] step)
+⇄[] (ξ-⟨,⟩₁ step) = ξ-⟨,⟩₁ (⇄[] step)
+⇄[] (ξ-⟨,⟩₂ step) = ξ-⟨,⟩₂ (⇄[] step)
+⇄[] (ξ-proj step) = ξ-proj (⇄[] step)
+⇄[] (ξ-≡ step) = ξ-≡ (⇄[] step)
+⇄[] (ζ step) = ζ (⇄[] step)
+-}
+
+open import Data.Product using (∃; proj₁; proj₂) renaming (_,_ to ﹙_,_﹚; _×_ to _⊗_)
+open import Relation.Binary.PropositionalEquality using (cong; refl)
+
+rename⇄ : ∀ {Γ Δ A}{t : Γ ⊢ A}{σ : Rename Γ Δ}{t'} → (rename σ t) ⇄ t' → ∃ λ t'' → (t ⇄ t'') ⊗ (rename σ t'' Relation.Binary.PropositionalEquality.≡ t')
+rename⇄ {t = [ _ ]≡ (ƛ ƛ t)} curry-s = ﹙ ƛ subst σ-curry t , ﹙ curry-s , {! refl  !} ﹚ ﹚
+rename⇄ {t = [ _ ]≡ (ƛ t)} uncurry-s = ﹙ ƛ (ƛ subst σ-uncurry t) , ﹙ uncurry-s , {! refl  !} ﹚ ﹚
+rename⇄ {t = [ _ ]≡ ⟨ a , ⟨ b , c ⟩ ⟩} asso = ﹙ _ , ﹙ asso , refl ﹚ ﹚
+rename⇄ {t = [ _ ]≡ ⟨ a , b ⟩} comm = ﹙ _ , ﹙ comm , refl ﹚ ﹚
+rename⇄ {t = [ _ ]≡ ⟨ ⟨ a , b ⟩ , c ⟩} (sym asso) = ?
+rename⇄ {t = [ sym comm ]≡ ⟨ a , b ⟩} split = ?
+rename⇄ {t = [ sym comm ]≡ ⟨ a , b ⟩} (sym comm) = ?
+rename⇄ {t = [ _ ]≡ ⟨ ƛ a , ƛ b ⟩} dist-ƛ = ﹙ _ , ﹙ dist-ƛ , refl ﹚ ﹚
+rename⇄ {t = ([ _ ]≡ ⟨ f , f₁ ⟩) · b} dist-· = ﹙ _ , ﹙ dist-· , refl ﹚ ﹚
+rename⇄ {t = [ _ ]≡ f · ⟨ a , b ⟩} curry = ﹙ _ , ﹙ curry , refl ﹚ ﹚
+rename⇄ {t = [ _ ]≡ f · a · b} uncurry = ﹙ _ , ﹙ uncurry , refl ﹚ ﹚
+rename⇄ {t = [ id-× ]≡ ⟨ a , b ⟩} id-× = ﹙ _ , ﹙ id-× , refl ﹚ ﹚
+rename⇄ {t = [ id-⇒ ]≡ t} id-⇒ = ﹙ _ , ﹙ id-⇒ , refl ﹚ ﹚
+rename⇄ {t = [ sym id-⇒ ]≡ t} sym-id-⇒ = ﹙ _ , ﹙ sym-id-⇒ , {! rename-shift-weaken  !} ﹚ ﹚
+rename⇄ {t = [ abs ]≡ t} abs = ﹙ ⋆ , ﹙ abs , {!   !} ﹚ ﹚
+rename⇄ {t = [ sym iso ]≡ t} (sym step) = {!   !}
+rename⇄ {t = [ sym (sym iso) ]≡ t} sym-sym = ﹙ _ , ﹙ sym-sym , refl ﹚ ﹚
+rename⇄ {t = [ _ ]≡ (ƛ r)} cong⇒₁ = {!   !}
+rename⇄ {t = [ _ ]≡ (ƛ r)} sym-cong⇒₁ = {!   !}
+rename⇄ {t = [ _ ]≡ (ƛ r)} cong⇒₂ = ﹙ _ , ﹙ cong⇒₂ , refl ﹚ ﹚
+rename⇄ {t = [ _ ]≡ (ƛ r)} sym-cong⇒₂ = ﹙ _ , ﹙ sym-cong⇒₂ , refl ﹚ ﹚
+rename⇄ {t = [ _ ]≡ ⟨ a , b ⟩} cong×₁ = ﹙ _ , ﹙ cong×₁ , refl ﹚ ﹚
+rename⇄ {t = [ _ ]≡ ⟨ a , b ⟩} sym-cong×₁ = ﹙ _ , ﹙ sym-cong×₁ , refl ﹚ ﹚
+rename⇄ {t = [ _ ]≡ ⟨ a , b ⟩} cong×₂ = ﹙ _ , ﹙ cong×₂ , refl ﹚ ﹚
+rename⇄ {t = [ _ ]≡ ⟨ a , b ⟩} sym-cong×₂ = ﹙ _ , ﹙ sym-cong×₂ , refl ﹚ ﹚
+rename⇄ {t = ƛ t} (ζ step) with rename⇄ step
+... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ ζ step , refl ﹚ ﹚
+rename⇄ {t = f · a} (ξ-·₁ step) with rename⇄ step
+... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ ξ-·₁ step , refl ﹚ ﹚
+rename⇄ {t = f · a} (ξ-·₂ step) with rename⇄ step
+... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ (ξ-·₂ step) , refl ﹚ ﹚
+rename⇄ {t = ⟨ a , b ⟩} (ξ-⟨,⟩₁ step) with rename⇄ step
+... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ (ξ-⟨,⟩₁ step) , refl ﹚ ﹚
+rename⇄ {t = ⟨ a , b ⟩} (ξ-⟨,⟩₂ step) with rename⇄ step
+... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ (ξ-⟨,⟩₂ step) , refl ﹚ ﹚
+rename⇄ {t = proj _ t} (ξ-proj step) with rename⇄ step
+... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ (ξ-proj step) , refl ﹚ ﹚
+rename⇄ {t = [ _ ]≡ t} (ξ-≡ step) with rename⇄ step
+... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ (ξ-≡ step) , refl ﹚ ﹚
+rename⇄ {t = x} eta = ﹙ {!   !} , ﹙ eta , {! cong ƛ_ (subst-shift-weaken )  !} ﹚ ﹚
+rename⇄ {t = x} split = ﹙ _ , ﹙ split , refl ﹚ ﹚
