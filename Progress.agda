@@ -34,27 +34,27 @@ progress ([ iso ]≡ N) with progress N
 ... | step⇄ N⇄N' = step⇄ (ξ-≡ N⇄N')
 ... | step↪ N↪N' = step↪ (ξ-≡ N↪N')
 progress ([ comm ]≡ _) | done ⟨ NN , NM ⟩ = step⇄ comm
-progress ([ sym comm ]≡ _) | done ⟨ NN , NM ⟩ = step⇄ (sym comm)
+progress ([ sym comm ]≡ _) | done ⟨ NN , NM ⟩ = step⇄ (sym-comm)
 progress ([ asso ]≡ _) | done ⟨ NN , ⟨ NM₁ , NM₂ ⟩ ⟩ = step⇄ asso
-progress ([ asso ]≡ _) | done ⟨ NN , NM ⟩ = step⇄ (ξ-≡ (ξ-⟨,⟩₂ split))
-progress ([ sym asso ]≡ _) | done ⟨ ⟨ NN₁ , NN₂ ⟩ , NM ⟩ = step⇄ (sym asso)
-progress ([ sym asso ]≡ _) | done ⟨ NN , NM ⟩ = step⇄ (ξ-≡ (ξ-⟨,⟩₁ split))
+progress ([ asso ]≡ _) | done ⟨ NN , NM ⟩ = step⇄ (asso-split)
+progress ([ sym asso ]≡ _) | done ⟨ ⟨ NN₁ , NN₂ ⟩ , NM ⟩ = step⇄ (sym-asso)
+progress ([ sym asso ]≡ _) | done ⟨ NN , NM ⟩ = step⇄ (sym-asso-split)
 progress ([ dist ]≡ _) | done ⟨ N-ƛ , N-ƛ ⟩ = step⇄ dist-ƛ
-progress ([ dist ]≡ _) | done ⟨ N-ƛ , NM ⟩ = step⇄ (ξ-≡ (ξ-⟨,⟩₂ eta))
-progress ([ dist ]≡ _) | done ⟨ NN , NM ⟩ = step⇄ (ξ-≡ (ξ-⟨,⟩₁ eta))
-progress ([ sym dist ]≡ (ƛ ⟨ NN , NM ⟩)) | done N-ƛ = step⇄ (sym dist-ƛ)
-progress ([ sym dist ]≡ (ƛ NN)) | done N-ƛ = step⇄ (ξ-≡ (ζ split))
+progress ([ dist ]≡ _) | done ⟨ N-ƛ , NM ⟩ = step⇄ (dist-ƛη₂)
+progress ([ dist ]≡ _) | done ⟨ NN , NM ⟩ = step⇄ (dist-ƛη₁)
+progress ([ sym dist ]≡ (ƛ ⟨ NN , NM ⟩)) | done N-ƛ = step⇄ (sym-dist-ƛ)
+progress ([ sym dist ]≡ (ƛ NN)) | done N-ƛ = step⇄ (sym-dist-ƛ-split)
 
-progress ([ curry ]≡ _) | done (N-ƛ {_} {_} {_} {_} {^ x}) = step⇄ (ξ-≡ (ζ eta))
+progress ([ curry ]≡ _) | done (N-ƛ {_} {_} {_} {_} {^ x}) = step⇄ (curry-sη)
 progress ([ curry ]≡ _) | done (N-ƛ {_} {_} {_} {_} {N-ƛ}) = step⇄ curry-s
 progress ([ sym curry ]≡ _) | done N-ƛ = step⇄ uncurry-s
 
 progress ([ id-× ]≡ _) | done ⟨ NN , NM ⟩ = step⇄ id-×
 progress ([ id-⇒ ]≡ _) | done NN = step⇄ id-⇒
-progress ([ abs ]≡ N) | done NN = step⇄ (abs {_} {_} {_} {⋆})
-progress ([ sym id-× ]≡ N) | done NN = step⇄ (sym (id-× {_} {_} {_} {⋆}))
+progress ([ abs ]≡ N) | done NN = step⇄ abs
+progress ([ sym id-× ]≡ N) | done NN = step⇄ (sym-id-×)
 progress ([ sym id-⇒ ]≡ N) | done NN = step⇄ sym-id-⇒
-progress ([ sym abs ]≡ N) | done NN = step⇄ (sym (abs {_} {_} {ƛ ⋆})) -- ƛ rename S_ N
+progress ([ sym abs ]≡ N) | done NN = step⇄ (sym-abs)
 
 progress ([ cong⇒₁ iso ]≡ _) | done N-ƛ = step⇄ cong⇒₁
 progress ([ cong⇒₂ iso ]≡ _) | done N-ƛ = step⇄ cong⇒₂
@@ -68,9 +68,6 @@ progress ([ sym (cong×₂ iso) ]≡ _) | done ⟨ NN , NM ⟩ = step⇄ sym-con
 progress ([ sym (sym iso) ]≡ N) | done NN = step⇄ sym-sym
 progress ([ iso ]≡ N) | done (^ NN) = done (^ [ iso ]≡ NN)
 
-progress (([ dist ]≡ ⟨ r , s ⟩) · M)  = step⇄ dist-·
-progress (([ sym curry ]≡ r · s) · M) = step⇄ uncurry
-progress (([ curry ]≡ r) · ⟨ _ , _ ⟩) = step⇄ curry
 progress (ƛ N) with progress N
 ... | step⇄ N⇄N' = step⇄ (ζ N⇄N')
 ... | step↪ N↪N' = step↪ (ζ N↪N')
