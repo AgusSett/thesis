@@ -5,32 +5,10 @@ open import Type
 open import Term
 open import Data.Sum using (inj₁; inj₂)
 open import Relation.Binary.PropositionalEquality using (refl)
-open import Subs using (Subst; Rename; rename; subst; _[_]; _•_; ids; ⟪_⟫)
+open import Subs using (Subst; Rename; rename; subst; _[_]; _•_; ids; ⟪_⟫; σ-cong⇒₁; σ-curry; σ-uncurry)
 open import Function.Base using (_∘_)
 
 infix  4 _⇄_
-
-σ-cong⇒₁ : ∀ {Γ A B} → (iso : B ≡ A) → Subst (Γ , A) (Γ , B)
-σ-cong⇒₁ iso Z      =  [ iso ]≡ (` Z)
-σ-cong⇒₁ iso (S x)  =  ` (S x)
-
---test : ∀ {Γ A B} → (iso : B ≡ A) → Subst (Γ , A) (Γ , B)
---test iso = [ iso ]≡ (` Z) • λ z → ` (S z)
-
-σ-uncurry : ∀ {Γ A B} → Subst (Γ , A × B) (Γ , A , B)
-σ-uncurry Z = ⟨ (` (S Z)) , (` Z) ⟩
-σ-uncurry (S x) = ` (S (S x))
-
---test2 : ∀ {Γ A B} → Subst (Γ , A × B) (Γ , A , B)
---test2 = ⟨ (` (S Z)) , (` Z) ⟩ • λ x → ` (S (S x))
-
-σ-curry : ∀ {Γ A B} → Subst (Γ , A , B) (Γ , A × B)
-σ-curry {B = B} Z = proj B {inj₂ refl} (` Z)
-σ-curry {A = A} (S Z) = proj A {inj₁ refl} (` Z)
-σ-curry (S (S x)) = ` (S x)
-
---test : ∀ {Γ A B} → Subst (Γ , A , B) (Γ , A × B)
---test {A = A}{B = B} = proj B {inj₂ refl} (` Z) • proj A {inj₁ refl} (` Z) • ids ∘ S_
 
 
 -- (3) This realtion eliminates the [_]≡_ from the terms
@@ -60,11 +38,11 @@ data _⇄_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
     → [ dist ]≡ ⟨ ƛ r , s ⟩ ⇄ ƛ ⟨ r , rename S_ s · ` Z ⟩
 
   curry-s : ∀ {Γ A B C} → {r : Γ , A , B ⊢ C}
-    → [ curry ]≡ (ƛ ƛ r) ⇄ ƛ subst Subs.σ-curry r
+    → [ curry ]≡ (ƛ ƛ r) ⇄ ƛ subst σ-curry r
   curry-sη : ∀ {Γ A B C} → {r : Γ , A ⊢ B ⇒ C}
-    → [ curry ]≡ (ƛ r) ⇄ ƛ subst Subs.σ-curry (rename S_ r · ` Z)
+    → [ curry ]≡ (ƛ r) ⇄ ƛ subst σ-curry (rename S_ r · ` Z)
   uncurry-s : ∀ {Γ A B C} → {r : Γ , A × B ⊢ C}
-    → [ sym curry ]≡ (ƛ r) ⇄ ƛ ƛ subst Subs.σ-uncurry r
+    → [ sym curry ]≡ (ƛ r) ⇄ ƛ ƛ subst σ-uncurry r
 
   --eta : ∀ {Γ A B} → {r : Γ ⊢ A ⇒ B}
   --  → r ⇄ ƛ rename S_ r · ` Z
@@ -89,10 +67,10 @@ data _⇄_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
     → [ sym (sym iso) ]≡ r ⇄ [ iso ]≡ r
   
   cong⇒₁ : ∀ {Γ A B C} → {r : Γ , A ⊢ C} → {iso : A ≡ B}
-    → [ cong⇒₁ iso ]≡ (ƛ r) ⇄ ƛ subst (Subs.σ-cong⇒₁ (sym iso)) r
+    → [ cong⇒₁ iso ]≡ (ƛ r) ⇄ ƛ subst (σ-cong⇒₁ (sym iso)) r
 
   sym-cong⇒₁ : ∀ {Γ A B C} → {r : Γ , B ⊢ C} → {iso : A ≡ B}
-    → [ sym (cong⇒₁ iso) ]≡ (ƛ r) ⇄ ƛ subst (Subs.σ-cong⇒₁ iso) r
+    → [ sym (cong⇒₁ iso) ]≡ (ƛ r) ⇄ ƛ subst (σ-cong⇒₁ iso) r
   
   cong⇒₂ : ∀ {Γ A B C} → {r : Γ , C ⊢ A} → {iso : A ≡ B}
     → [ cong⇒₂ iso ]≡ (ƛ r) ⇄ ƛ ([ iso ]≡ r)
@@ -147,18 +125,18 @@ open import Subs using
   ; subst-uncurry-commute
   ; subst-curry-commute
   ; subst-curryη-commute)
-open import Relation.Binary.PropositionalEquality using (_≡_; cong; cong₂; refl; trans)
+open import Relation.Binary.PropositionalEquality using (cong; cong₂; refl; trans) renaming (sym to symm; _≡_ to _≡E_)
 
 
 ⇄[] : ∀ {Γ Δ A}{t t' : Γ ⊢ A}{σ : Subst Γ Δ} → t ⇄ t' → subst σ t ⇄ subst σ t'
-⇄[] comm = comm
-⇄[] sym-comm = sym-comm
-⇄[] asso = asso
-⇄[] sym-asso = sym-asso
-⇄[] asso-split = asso-split
-⇄[] sym-asso-split = sym-asso-split
-⇄[] dist-ƛ = dist-ƛ
-⇄[] sym-dist-ƛ = sym-dist-ƛ
+⇄[] comm             = comm
+⇄[] sym-comm         = sym-comm
+⇄[] asso             = asso
+⇄[] sym-asso         = sym-asso
+⇄[] asso-split       = asso-split
+⇄[] sym-asso-split   = sym-asso-split
+⇄[] dist-ƛ           = dist-ƛ
+⇄[] sym-dist-ƛ       = sym-dist-ƛ
 ⇄[] sym-dist-ƛ-split = sym-dist-ƛ-split
 ⇄[] {σ = σ} (dist-ƛη₁ {C = C}{r = r}{s = s})
   rewrite (subst-shift-weaken {Σ = ∅} {B = C} {N = r} {σ = σ}) | (subst-shift-weaken {Σ = ∅} {B = C} {N = s} {σ = σ})
@@ -167,13 +145,13 @@ open import Relation.Binary.PropositionalEquality using (_≡_; cong; cong₂; r
   rewrite (subst-shift-weaken {Σ = ∅} {B = C} {N = s} {σ = σ})
     = dist-ƛη₂
 ⇄[] {σ = σ} (curry-s {r = r})
-  rewrite (Relation.Binary.PropositionalEquality.sym (subst-curry-commute {Σ = ∅} {N = r} {σ = σ}))
+  rewrite (symm (subst-curry-commute {Σ = ∅} {N = r} {σ = σ}))
     = curry-s
 ⇄[] {σ = σ} (curry-sη {r = r})
-  rewrite (Relation.Binary.PropositionalEquality.sym (subst-curryη-commute {N = r} {σ = σ}))
+  rewrite (symm (subst-curryη-commute {N = r} {σ = σ}))
     = curry-sη
 ⇄[] {σ = σ} (uncurry-s {r = r})
-  rewrite (Relation.Binary.PropositionalEquality.sym (subst-uncurry-commute {Σ = ∅} {N = r} {σ = σ}))
+  rewrite (symm (subst-uncurry-commute {Σ = ∅} {N = r} {σ = σ}))
     = uncurry-s
 ⇄[] id-× = id-×
 ⇄[] sym-id-× = sym-id-×
@@ -187,28 +165,27 @@ open import Relation.Binary.PropositionalEquality using (_≡_; cong; cong₂; r
     = sym-abs
 ⇄[] sym-sym = sym-sym
 ⇄[] {σ = σ} (cong⇒₁ {r = r} {iso = iso})
-  rewrite (Relation.Binary.PropositionalEquality.sym (subst-cong⇒₁-commute {Σ = ∅} {N = r} {σ = σ} {iso = sym iso}))
+  rewrite (symm (subst-cong⇒₁-commute {Σ = ∅} {N = r} {σ = σ} {iso = sym iso}))
     = cong⇒₁
 ⇄[] {σ = σ} (sym-cong⇒₁ {r = r} {iso = iso})
-  rewrite (Relation.Binary.PropositionalEquality.sym (subst-cong⇒₁-commute {Σ = ∅} {N = r} {σ = σ} {iso = iso}))
+  rewrite (symm (subst-cong⇒₁-commute {Σ = ∅} {N = r} {σ = σ} {iso = iso}))
     = sym-cong⇒₁
-⇄[] cong⇒₂ = cong⇒₂
-⇄[] sym-cong⇒₂ = sym-cong⇒₂
-⇄[] cong×₁ = cong×₁
-⇄[] sym-cong×₁ = sym-cong×₁
-⇄[] cong×₂ = cong×₂
-⇄[] sym-cong×₂ = sym-cong×₂
-⇄[] (ξ-·₁ step) = ξ-·₁ (⇄[] step)
-⇄[] (ξ-·₂ step) = ξ-·₂ (⇄[] step)
+⇄[] cong⇒₂        = cong⇒₂
+⇄[] sym-cong⇒₂    = sym-cong⇒₂
+⇄[] cong×₁        = cong×₁
+⇄[] sym-cong×₁    = sym-cong×₁
+⇄[] cong×₂        = cong×₂
+⇄[] sym-cong×₂    = sym-cong×₂
+⇄[] (ξ-·₁ step)   = ξ-·₁ (⇄[] step)
+⇄[] (ξ-·₂ step)   = ξ-·₂ (⇄[] step)
 ⇄[] (ξ-⟨,⟩₁ step) = ξ-⟨,⟩₁ (⇄[] step)
 ⇄[] (ξ-⟨,⟩₂ step) = ξ-⟨,⟩₂ (⇄[] step)
 ⇄[] (ξ-proj step) = ξ-proj (⇄[] step)
-⇄[] (ξ-≡ step) = ξ-≡ (⇄[] step)
-⇄[] (ζ step) = ζ (⇄[] step)
+⇄[] (ξ-≡ step)    = ξ-≡ (⇄[] step)
+⇄[] (ζ step)      = ζ (⇄[] step)
 
 
 open import Data.Product using (∃; proj₁; proj₂) renaming (_,_ to ﹙_,_﹚; _×_ to _⊗_)
-open import Relation.Binary.PropositionalEquality using (cong; refl)
 open import Subs using
   ( rename-cong⇒₁-commute
   ; rename-uncurry-commute
@@ -216,40 +193,40 @@ open import Subs using
   ; rename-curryη-commute)
 
 
-rename⇄ : ∀ {Γ Δ A}{t : Γ ⊢ A}{σ : Rename Γ Δ}{t'} → (rename σ t) ⇄ t' → ∃ λ t'' → (t ⇄ t'') ⊗ (rename σ t'' Relation.Binary.PropositionalEquality.≡ t')
-rename⇄ {t = [ curry ]≡ (ƛ ƛ t)} curry-s = ﹙ _ , ﹙ curry-s , cong ƛ_ (Relation.Binary.PropositionalEquality.sym (rename-curry-commute {N = t})) ﹚ ﹚
+rename⇄ : ∀ {Γ Δ A}{t : Γ ⊢ A}{σ : Rename Γ Δ}{t'} → (rename σ t) ⇄ t' → ∃ λ t'' → (t ⇄ t'') ⊗ (rename σ t'' ≡E t')
+rename⇄ {t = [ curry ]≡ (ƛ ƛ t)} curry-s = ﹙ _ , ﹙ curry-s , cong ƛ_ (symm (rename-curry-commute {N = t})) ﹚ ﹚
 rename⇄ {t = [ curry ]≡ (ƛ t)}{σ = σ} curry-sη
   rewrite rename-curryη-commute {N = t} {ρ = σ}
     = ﹙ _ , ﹙ curry-sη , refl ﹚ ﹚
 rename⇄ {t = [ asso ]≡ ⟨ a , ⟨ b , c ⟩ ⟩} asso = ﹙ _ , ﹙ asso , refl ﹚ ﹚
-rename⇄ {t = [ asso ]≡ ⟨ a , b ⟩} asso-split = ﹙ _ , ﹙ asso-split , refl ﹚ ﹚
-rename⇄ {t = [ comm ]≡ ⟨ a , b ⟩} comm = ﹙ _ , ﹙ comm , refl ﹚ ﹚
-rename⇄ {t = [ dist ]≡ ⟨ ƛ a , ƛ b ⟩} dist-ƛ = ﹙ _ , ﹙ dist-ƛ , refl ﹚ ﹚
+rename⇄ {t = [ asso ]≡ ⟨ a , b ⟩} asso-split   = ﹙ _ , ﹙ asso-split , refl ﹚ ﹚
+rename⇄ {t = [ comm ]≡ ⟨ a , b ⟩} comm         = ﹙ _ , ﹙ comm , refl ﹚ ﹚
+rename⇄ {t = [ dist ]≡ ⟨ ƛ a , ƛ b ⟩} dist-ƛ   = ﹙ _ , ﹙ dist-ƛ , refl ﹚ ﹚
 rename⇄ {t = [ dist ]≡ ⟨ ƛ a , b ⟩}{σ = σ} (dist-ƛη₂ {C = C})
-  rewrite Relation.Binary.PropositionalEquality.sym (rename-shift-weaken {Σ = ∅} {B = C} {N = b} {ρ = σ})
+  rewrite symm (rename-shift-weaken {Σ = ∅} {B = C} {N = b} {ρ = σ})
     = ﹙ _ , ﹙ dist-ƛη₂ , refl ﹚ ﹚
 rename⇄ {t = [ dist ]≡ ⟨ a , b ⟩}{σ = σ} (dist-ƛη₁ {C = C})
-  rewrite Relation.Binary.PropositionalEquality.sym (rename-shift-weaken {Σ = ∅} {B = C} {N = b} {ρ = σ}) | Relation.Binary.PropositionalEquality.sym (rename-shift-weaken {Σ = ∅} {B = C} {N = a} {ρ = σ})
+  rewrite symm (rename-shift-weaken {Σ = ∅} {B = C} {N = b} {ρ = σ}) | symm (rename-shift-weaken {Σ = ∅} {B = C} {N = a} {ρ = σ})
     = ﹙ _ , ﹙ dist-ƛη₁ , refl ﹚ ﹚
-rename⇄ {t = [ id-× ]≡ ⟨ a , b ⟩} id-× = ﹙ _ , ﹙ id-× , refl ﹚ ﹚
-rename⇄ {t = [ id-⇒ ]≡ t} id-⇒ = ﹙ _ , ﹙ id-⇒ , refl ﹚ ﹚
-rename⇄ {t = [ sym id-⇒ ]≡ t} sym-id-⇒ = ﹙ _ , ﹙ sym-id-⇒ , cong ƛ_ (rename-shift-weaken {Σ = ∅}) ﹚ ﹚
-rename⇄ {t = [ abs ]≡ t} abs = ﹙ _ , ﹙ abs , refl ﹚ ﹚
-rename⇄ {t = [ sym comm ]≡ ⟨ a , b ⟩} (sym-comm) = ﹙ _ , ﹙ sym-comm , refl ﹚ ﹚
-rename⇄ {t = [ sym asso ]≡ ⟨ ⟨ a , b ⟩ , c ⟩} (sym-asso) = ﹙ _ , ﹙ sym-asso , refl ﹚ ﹚
-rename⇄ {t = [ sym asso ]≡ ⟨ a , c ⟩} (sym-asso-split) = ﹙ _ , ﹙ sym-asso-split , refl ﹚ ﹚
-rename⇄ {t = [ sym dist ]≡ (ƛ ⟨ a , b ⟩)} (sym-dist-ƛ) = ﹙ _ , ﹙ sym-dist-ƛ , refl ﹚ ﹚
-rename⇄ {t = [ sym dist ]≡ (ƛ a)} (sym-dist-ƛ-split) = ﹙ _ , ﹙ sym-dist-ƛ-split , refl ﹚ ﹚
-rename⇄ {t = [ sym curry ]≡ (ƛ t)} uncurry-s = ﹙ _ , ﹙ uncurry-s , cong ƛ_ (cong ƛ_ (Relation.Binary.PropositionalEquality.sym (rename-uncurry-commute {N = t}))) ﹚ ﹚
-rename⇄ {t = [ sym id-× ]≡ t} (sym-id-×) = ﹙ _ , ﹙ sym-id-× , refl ﹚ ﹚
-rename⇄ {t = [ sym abs ]≡ t} (sym-abs) = ﹙ _ , ﹙ sym-abs , (cong ƛ_ (rename-shift-weaken {Σ = ∅})) ﹚ ﹚
-rename⇄ {t = [ sym (cong⇒₁ iso)]≡ (ƛ t)} (sym-cong⇒₁) = ﹙ _ , ﹙ sym-cong⇒₁ , (cong ƛ_ (Relation.Binary.PropositionalEquality.sym (rename-cong⇒₁-commute {N = t}))) ﹚ ﹚
-rename⇄ {t = [ sym (cong⇒₂ iso)]≡ (ƛ t)} (sym-cong⇒₂) = ﹙ _ , ﹙ sym-cong⇒₂ , refl ﹚ ﹚
+rename⇄ {t = [ id-× ]≡ ⟨ a , b ⟩} id-×                    = ﹙ _ , ﹙ id-× , refl ﹚ ﹚
+rename⇄ {t = [ id-⇒ ]≡ t} id-⇒                            = ﹙ _ , ﹙ id-⇒ , refl ﹚ ﹚
+rename⇄ {t = [ sym id-⇒ ]≡ t} sym-id-⇒                    = ﹙ _ , ﹙ sym-id-⇒ , cong ƛ_ (rename-shift-weaken {Σ = ∅}) ﹚ ﹚
+rename⇄ {t = [ abs ]≡ t} abs                              = ﹙ _ , ﹙ abs , refl ﹚ ﹚
+rename⇄ {t = [ sym comm ]≡ ⟨ a , b ⟩} (sym-comm)          = ﹙ _ , ﹙ sym-comm , refl ﹚ ﹚
+rename⇄ {t = [ sym asso ]≡ ⟨ ⟨ a , b ⟩ , c ⟩} (sym-asso)  = ﹙ _ , ﹙ sym-asso , refl ﹚ ﹚
+rename⇄ {t = [ sym asso ]≡ ⟨ a , c ⟩} (sym-asso-split)    = ﹙ _ , ﹙ sym-asso-split , refl ﹚ ﹚
+rename⇄ {t = [ sym dist ]≡ (ƛ ⟨ a , b ⟩)} (sym-dist-ƛ)    = ﹙ _ , ﹙ sym-dist-ƛ , refl ﹚ ﹚
+rename⇄ {t = [ sym dist ]≡ (ƛ a)} (sym-dist-ƛ-split)      = ﹙ _ , ﹙ sym-dist-ƛ-split , refl ﹚ ﹚
+rename⇄ {t = [ sym curry ]≡ (ƛ t)} uncurry-s              = ﹙ _ , ﹙ uncurry-s , cong ƛ_ (cong ƛ_ (symm (rename-uncurry-commute {N = t}))) ﹚ ﹚
+rename⇄ {t = [ sym id-× ]≡ t} (sym-id-×)                  = ﹙ _ , ﹙ sym-id-× , refl ﹚ ﹚
+rename⇄ {t = [ sym abs ]≡ t} (sym-abs)                    = ﹙ _ , ﹙ sym-abs , (cong ƛ_ (rename-shift-weaken {Σ = ∅})) ﹚ ﹚
+rename⇄ {t = [ sym (cong⇒₁ iso)]≡ (ƛ t)} (sym-cong⇒₁)     = ﹙ _ , ﹙ sym-cong⇒₁ , (cong ƛ_ (symm (rename-cong⇒₁-commute {N = t}))) ﹚ ﹚
+rename⇄ {t = [ sym (cong⇒₂ iso)]≡ (ƛ t)} (sym-cong⇒₂)     = ﹙ _ , ﹙ sym-cong⇒₂ , refl ﹚ ﹚
 rename⇄ {t = [ sym (cong×₁ iso)]≡ ⟨ a , b ⟩} (sym-cong×₁) = ﹙ _ , ﹙ sym-cong×₁ , refl ﹚ ﹚
 rename⇄ {t = [ sym (cong×₂ iso)]≡ ⟨ a , b ⟩} (sym-cong×₂) = ﹙ _ , ﹙ sym-cong×₂ , refl ﹚ ﹚
-rename⇄ {t = [ sym (sym iso) ]≡ t} sym-sym = ﹙ _ , ﹙ sym-sym , refl ﹚ ﹚
-rename⇄ {t = [ cong⇒₁ iso ]≡ (ƛ r)} cong⇒₁ = ﹙ _ , ﹙ cong⇒₁ , cong ƛ_ (Relation.Binary.PropositionalEquality.sym (rename-cong⇒₁-commute {N = r})) ﹚ ﹚
-rename⇄ {t = [ _ ]≡ (ƛ r)} cong⇒₂ = ﹙ _ , ﹙ cong⇒₂ , refl ﹚ ﹚
+rename⇄ {t = [ sym (sym iso) ]≡ t} sym-sym     = ﹙ _ , ﹙ sym-sym , refl ﹚ ﹚
+rename⇄ {t = [ cong⇒₁ iso ]≡ (ƛ r)} cong⇒₁     = ﹙ _ , ﹙ cong⇒₁ , cong ƛ_ (symm (rename-cong⇒₁-commute {N = r})) ﹚ ﹚
+rename⇄ {t = [ _ ]≡ (ƛ r)} cong⇒₂              = ﹙ _ , ﹙ cong⇒₂ , refl ﹚ ﹚
 rename⇄ {t = [ cong×₁ iso ]≡ ⟨ a , b ⟩} cong×₁ = ﹙ _ , ﹙ cong×₁ , refl ﹚ ﹚
 rename⇄ {t = [ cong×₂ iso ]≡ ⟨ a , b ⟩} cong×₂ = ﹙ _ , ﹙ cong×₂ , refl ﹚ ﹚
 rename⇄ {t = ƛ t} (ζ step) with rename⇄ step
@@ -257,7 +234,7 @@ rename⇄ {t = ƛ t} (ζ step) with rename⇄ step
 rename⇄ {t = f · a} (ξ-·₁ step) with rename⇄ step
 ... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ ξ-·₁ step , refl ﹚ ﹚
 rename⇄ {t = f · a} (ξ-·₂ step) with rename⇄ step
-... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ (ξ-·₂ step) , refl ﹚ ﹚
+... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ ξ-·₂ step , refl ﹚ ﹚
 rename⇄ {t = ⟨ a , b ⟩} (ξ-⟨,⟩₁ step) with rename⇄ step
 ... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ (ξ-⟨,⟩₁ step) , refl ﹚ ﹚
 rename⇄ {t = ⟨ a , b ⟩} (ξ-⟨,⟩₂ step) with rename⇄ step
