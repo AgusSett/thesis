@@ -5,6 +5,7 @@ open import IsoType
 open import IsoTerm
 open import Reduction
 open import Progress
+open import StrongNorm using (SN; sn; strong-norm)
 
 infix  2 _⇝_
 infix  1 begin_
@@ -45,44 +46,39 @@ data Steps {A} : ∅ ⊢ A → Set where
       ----------
     → Steps L
 
-open import Data.Nat using (ℕ; zero; suc)
+open import Data.Sum using (_⊎_; inj₁; inj₂)
 
-eval : ∀ {A}
-  → ℕ -- Agda need this argument for the termination check
+eval´ : ∀ {A}
   → (L : ∅ ⊢ A)
+  → SN L
   → Steps L
-eval zero L                     = steps (L ∎)
-eval (suc n) L with progress L
-eval (suc n) L | done VL = steps (L ∎)
-eval (suc n) L | step⇄ {M} L⇄M with eval n M
-...            | steps M⇝N                  = steps (L ⇄⟨ L⇄M ⟩ M⇝N)
-eval (suc n) L | step↪ {M} L↪M with eval n M
-...            | steps M⇝N                  = steps (L ↪⟨ L↪M ⟩ M⇝N)
+eval´ L _ with progress L
+eval´ L _      | done VL       =  steps (L ∎)
+eval´ L (sn f) | step⇄ {M} L⇄M with eval´ M (f (inj₂ L⇄M))
+...               | steps M⇝N  =  steps (L ⇄⟨ L⇄M ⟩ M⇝N)
+eval´ L (sn f) | step↪ {M} L↪M with eval´ M (f (inj₁ L↪M))
+...               | steps M⇝N  =  steps (L ↪⟨ L↪M ⟩ M⇝N)
 
-
+eval : ∀ {A} → (L : ∅ ⊢ A) → Steps L
+eval L = eval´ L (strong-norm L)
 
 open import Type
-open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Relation.Binary.PropositionalEquality using (refl)
 
-data SN {Γ A} (t : Γ ⊢ A) : Set where
-  sn : (∀ {t'} → t ↪ t' ⊎ t ⇄ t' → SN t') → SN t
 
--- This was computed using C-c C-n `eval 10 (([ curry ]≡ proj (⊤ ⇒ ⊤ ⇒ ⊤) {inj₁ refl} ([ sym dist ]≡ (ƛ ([ sym dist ]≡ (ƛ ⟨ ⋆ , ⋆ ⟩))))) · ⟨ ⋆ , ⋆ ⟩)`
-_ : (([ curry ]≡ proj (⊤ ⇒ ⊤ ⇒ ⊤) ([ sym dist ]≡ (ƛ ([ sym dist ]≡ (ƛ ⟨ ⋆ , ⋆ ⟩))))) · ⟨ ⋆ , ⋆ ⟩) ⇝ (⋆ {∅})
+-- This was computed using C-c C-n `eval (([ curry ]≡ proj (⊤ ⇒ ⊤ ⇒ ⊤) {inj₁ refl} ([ sym dist ]≡ (ƛ ([ sym dist ]≡ (ƛ ⟨ ⋆ , ⋆ ⟩))))) · ⟨ ⋆ , ⋆ ⟩)`
+_ : (([ curry ]≡ proj (⊤ ⇒ ⊤ ⇒ ⊤) {inj₁ refl} ([ sym dist ]≡ (ƛ ([ sym dist ]≡ (ƛ ⟨ ⋆ , ⋆ ⟩))))) · ⟨ ⋆ , ⋆ ⟩) ⇝ (⋆ {∅})
 _ =
   begin
     [ curry ]≡ proj (⊤ ⇒ ⊤ ⇒ ⊤) ([ sym dist ]≡ (ƛ ([ sym dist ]≡ (ƛ ⟨ ⋆ , ⋆ ⟩)))) · ⟨ ⋆ , ⋆ ⟩
-      ⇄⟨ curry ⟩
-    proj (⊤ ⇒ ⊤ ⇒ ⊤) ([ sym dist ]≡ (ƛ ([ sym dist ]≡ (ƛ ⟨ ⋆ , ⋆ ⟩)))) · ⋆ · ⋆
-      ⇄⟨ ξ-·₁ (ξ-·₁ (ξ-proj (ξ-≡ (ζ (sym dist-ƛ))))) ⟩
-    proj (⊤ ⇒ ⊤ ⇒ ⊤) ([ sym dist ]≡ (ƛ ⟨ ƛ ⋆ , ƛ ⋆ ⟩)) · ⋆ · ⋆
-      ⇄⟨ ξ-·₁ (ξ-·₁ (ξ-proj (sym dist-ƛ))) ⟩
-    proj (⊤ ⇒ ⊤ ⇒ ⊤) ⟨ ƛ (ƛ ⋆) , ƛ (ƛ ⋆) ⟩ · ⋆ · ⋆
-      ↪⟨ ξ-·₁ (ξ-·₁ (β-proj₁)) ⟩
-    (ƛ (ƛ ⋆)) · ⋆ · ⋆
-      ↪⟨ ξ-·₁ (β-ƛ) ⟩
-    (ƛ ⋆) · ⋆
+      ⇄⟨ ξ-·₁ (ξ-≡ (ξ-proj (ξ-≡ (ζ sym-dist-ƛ)))) ⟩
+    [ curry ]≡ proj (⊤ ⇒ ⊤ ⇒ ⊤) ([ sym dist ]≡ (ƛ ⟨ ƛ ⋆ , ƛ ⋆ ⟩)) · ⟨ ⋆ , ⋆ ⟩
+      ⇄⟨ ξ-·₁ (ξ-≡ (ξ-proj sym-dist-ƛ)) ⟩
+    [ curry ]≡ proj (⊤ ⇒ ⊤ ⇒ ⊤) ⟨ ƛ (ƛ ⋆) , ƛ (ƛ ⋆) ⟩ · ⟨ ⋆ , ⋆ ⟩
+      ↪⟨ ξ-·₁ (ξ-≡ β-proj₁) ⟩
+    [ curry ]≡ (ƛ (ƛ ⋆)) · ⟨ ⋆ , ⋆ ⟩
+      ⇄⟨ ξ-·₁ curry ⟩
+    (ƛ ⋆) · ⟨ ⋆ , ⋆ ⟩
       ↪⟨ β-ƛ ⟩
     ⋆
   ∎
@@ -95,11 +91,43 @@ open import Subs using (rename)
 _⟪_⟫ : ∀ {Γ B} → (A : Type) → (r : Γ ⊢ (A ⇒ A) ⇒ B) → Γ ⊢ B
 A ⟪ r ⟫ = r · (ƛ ` Z)
 
-𝟙 : Type
-𝟙 = τ
+One : Type
+One = τ
 
-𝟚 : Type
-𝟚 = τ ⇒ τ
+Two : Type
+Two = τ ⇒ τ
+
+encode : ∀ {Γ A B} → (r : Γ ⊢ A) (s : Γ ⊢ B) → Γ ⊢ ((One ⇒ One) ⇒ A) × ((Two ⇒ Two) ⇒ B)
+encode r s = ⟨ ⟦ r ⟧ One , ⟦ s ⟧ Two ⟩
+
+π₁ : ∀ {Γ A B} → (Γ ⊢ ((One ⇒ One) ⇒ A) × ((Two ⇒ Two) ⇒ B)) → Γ ⊢ A
+π₁ {A = A} x = One ⟪ proj ((One ⇒ One) ⇒ A) {inj₁ refl} x ⟫
+
+encode-π₁ : ∀ {A} → π₁ {∅ , A , A} (encode (` Z) (` S Z)) ⇝ ` Z
+encode-π₁ {A} =
+  begin
+    proj ((One ⇒ One) ⇒ A) ⟨ ƛ ` (S Z) , ƛ ` (S (S Z)) ⟩ · (ƛ ` Z)
+      ↪⟨ ξ-·₁ β-proj₁ ⟩
+    (ƛ ` (S Z)) · (ƛ ` Z)
+      ↪⟨ β-ƛ ⟩
+    ` Z
+  ∎
+
+⟨a,a⟩-π₁ : ∀ {A} → proj {∅ , A , A} A ⟨ ` Z , ` S Z ⟩ ⇝ ` Z
+⟨a,a⟩-π₁ {A} =
+  begin
+    proj A ⟨ ` Z , ` S Z ⟩
+      ↪⟨ β-proj₁ ⟩
+    ` Z
+  ∎
+
+⟨a,a⟩-π₂ : ∀ {A} → proj {∅ , A , A} A ⟨ ` Z , ` S Z ⟩ ⇝ ` S Z
+⟨a,a⟩-π₂ {A} =
+  begin
+    proj A ⟨ ` Z , ` S Z ⟩
+      ↪⟨ β-proj₂ ⟩
+    ` S Z
+  ∎
 
 -- Ω = (λx:T.xx)(λx:T.xx) : T
 Ω : ∅ ⊢ ⊤
@@ -115,8 +143,24 @@ _ =
     (ƛ ([ sym abs ]≡ (` Z)) · ` Z) · ⋆
       ↪⟨ β-ƛ ⟩
     ([ sym abs ]≡ ⋆) · ⋆
-      ⇄⟨ ξ-·₁ (sym abs) ⟩
+      ⇄⟨ ξ-·₁ sym-abs ⟩
     (ƛ ⋆) · ⋆
+      ↪⟨ β-ƛ ⟩
+    ⋆
+  ∎
+
+_ : Ω ⇝ ⋆ 
+_ =
+  begin
+    Ω
+      ⇄⟨ ξ-·₁ (ζ (ξ-·₂ abs)) ⟩
+    (ƛ ` Z · ⋆) · (ƛ ([ sym abs ]≡ (` Z)) · ` Z)
+      ⇄⟨ ξ-·₂ (ζ (ξ-·₁ sym-abs)) ⟩
+    (ƛ ` Z · ⋆) · (ƛ (ƛ ` (S Z)) · ` Z)
+      ↪⟨ ξ-·₂ (ζ β-ƛ) ⟩
+    (ƛ ` Z · ⋆) · (ƛ ` Z)
+      ↪⟨ β-ƛ ⟩
+    (ƛ ` Z) · ⋆
       ↪⟨ β-ƛ ⟩
     ⋆
   ∎
@@ -152,3 +196,4 @@ _ = ⟨ ƛ ƛ ` (S Z) , ƛ ƛ ` Z ⟩
 _ : ∀ {Γ A B} → Γ ⊢ A ⇒ B ⇒ (A × B)
 _ = ƛ ([ dist ]≡ ⟨ ƛ ` (S Z) , ƛ ` Z ⟩)
 
+ 
