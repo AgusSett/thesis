@@ -40,14 +40,15 @@ progress ([ asso ]≡ _) | done ⟨ NN , NM ⟩ = step⇄ (asso-split)
 progress ([ sym asso ]≡ _) | done ⟨ ⟨ NN₁ , NN₂ ⟩ , NM ⟩ = step⇄ (sym-asso)
 progress ([ sym asso ]≡ _) | done ⟨ NN , NM ⟩ = step⇄ (sym-asso-split)
 progress ([ dist ]≡ _) | done ⟨ N-ƛ , N-ƛ ⟩ = step⇄ dist-ƛ
-progress ([ dist ]≡ _) | done ⟨ N-ƛ , NM ⟩ = step⇄ (dist-ƛη₂)
-progress ([ dist ]≡ _) | done ⟨ NN , NM ⟩ = step⇄ (dist-ƛη₁)
+progress ([ dist ]≡ _) | done ⟨ N-ƛ , NM ⟩ = step⇄ (dist-ƛηᵣ)
+progress ([ dist ]≡ _) | done ⟨ NN , N-ƛ ⟩ = step⇄ (dist-ƛηₗ)
+progress ([ dist ]≡ _) | done ⟨ NN , NM ⟩ = step⇄ (dist-ƛηₗᵣ)
 progress ([ sym dist ]≡ (ƛ ⟨ NN , NM ⟩)) | done N-ƛ = step⇄ (sym-dist-ƛ)
 progress ([ sym dist ]≡ (ƛ NN)) | done N-ƛ = step⇄ (sym-dist-ƛ-split)
 
-progress ([ curry ]≡ _) | done (N-ƛ {_} {_} {_} {_} {^ x}) = step⇄ (curry-sη)
-progress ([ curry ]≡ _) | done (N-ƛ {_} {_} {_} {_} {N-ƛ}) = step⇄ curry-s
-progress ([ sym curry ]≡ _) | done N-ƛ = step⇄ uncurry-s
+progress ([ curry ]≡ _) | done (N-ƛ {_} {_} {_} {_} {^ x}) = step⇄ (curry-η)
+progress ([ curry ]≡ _) | done (N-ƛ {_} {_} {_} {_} {N-ƛ}) = step⇄ curry
+progress ([ sym curry ]≡ _) | done N-ƛ = step⇄ uncurry
 
 progress ([ id-× ]≡ _) | done ⟨ NN , NM ⟩ = step⇄ id-×
 progress ([ id-⇒ ]≡ _) | done NN = step⇄ id-⇒

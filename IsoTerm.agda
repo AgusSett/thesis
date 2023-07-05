@@ -13,10 +13,17 @@ infix  4 _⇄_
 
 -- (3) This realtion eliminates the [_]≡_ from the terms
 data _⇄_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
+  ------------------------------------------------------------------------
+  -- ⟨ r , s ⟩ ⇄ ⟨ s , r ⟩
+  ------------------------------------------------------------------------
   comm : ∀ {Γ A B} → {r : Γ ⊢ A} → {s : Γ ⊢ B}
     → [ comm ]≡ ⟨ r , s ⟩ ⇄ ⟨ s , r ⟩
   sym-comm : ∀ {Γ A B} → {r : Γ ⊢ A} → {s : Γ ⊢ B}
     → [ sym comm ]≡ ⟨ r , s ⟩ ⇄ ⟨ s , r ⟩
+
+  ------------------------------------------------------------------------
+  -- ⟨ r , ⟨ s , t ⟩ ⟩ ⇄ ⟨ ⟨ r , s ⟩ , t ⟩
+  ------------------------------------------------------------------------
   asso : ∀ {Γ A B C} → {r : Γ ⊢ A} → {s : Γ ⊢ B} → {t : Γ ⊢ C}
     → [ asso ]≡ ⟨ r , ⟨ s , t ⟩ ⟩ ⇄ ⟨ ⟨ r , s ⟩ , t ⟩
   sym-asso : ∀ {Γ A B C} → {r : Γ ⊢ A} → {s : Γ ⊢ B} → {t : Γ ⊢ C}
@@ -26,22 +33,30 @@ data _⇄_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
   sym-asso-split : ∀ {Γ A B C} → {r : Γ ⊢ A × B} → {s : Γ ⊢ C}
     → [ sym asso ]≡ ⟨ r , s ⟩ ⇄ ⟨ proj A {inj₁ refl} r , ⟨ proj B {inj₂ refl} r , s ⟩ ⟩
 
+  ------------------------------------------------------------------------
+  -- ⟨ ƛ r , ƛ s ⟩ ⇄ ƛ ⟨ r , s ⟩
+  ------------------------------------------------------------------------
   dist-ƛ : ∀ {Γ A B C} → {r : Γ , C ⊢ A} → {s : Γ , C ⊢ B}
     → [ dist ]≡ ⟨ ƛ r , ƛ s ⟩ ⇄ ƛ ⟨ r , s ⟩
+  dist-ƛηₗᵣ : ∀ {Γ A B C} → {r : Γ ⊢ C ⇒ A} → {s : Γ ⊢ C ⇒ B}
+    → [ dist ]≡ ⟨ r , s ⟩ ⇄ ƛ ⟨ rename S_ r · ` Z , rename S_ s · ` Z ⟩
+  dist-ƛηₗ : ∀ {Γ A B C} → {r : Γ ⊢ C ⇒ A} → {s : Γ , C ⊢ B}
+    → [ dist ]≡ ⟨ r , ƛ s ⟩ ⇄ ƛ ⟨ rename S_ r · ` Z , s ⟩
+  dist-ƛηᵣ : ∀ {Γ A B C} → {r : Γ , C ⊢ A} → {s : Γ ⊢ C ⇒ B}
+    → [ dist ]≡ ⟨ ƛ r , s ⟩ ⇄ ƛ ⟨ r , rename S_ s · ` Z ⟩
   sym-dist-ƛ : ∀ {Γ A B C} → {r : Γ , C ⊢ A} → {s : Γ , C ⊢ B}
     → [ sym dist ]≡ (ƛ ⟨ r , s ⟩) ⇄ ⟨ ƛ r , ƛ s ⟩
   sym-dist-ƛ-split : ∀ {Γ A B C} → {r : Γ , C ⊢ A × B}
     → [ sym dist ]≡ (ƛ r) ⇄ ⟨ ƛ proj A {inj₁ refl} r , ƛ proj B {inj₂ refl} r ⟩
-  dist-ƛη₁ : ∀ {Γ A B C} → {r : Γ ⊢ C ⇒ A} → {s : Γ ⊢ C ⇒ B}
-    → [ dist ]≡ ⟨ r , s ⟩ ⇄ ƛ ⟨ rename S_ r · ` Z , rename S_ s · ` Z ⟩
-  dist-ƛη₂ : ∀ {Γ A B C} → {r : Γ , C ⊢ A} → {s : Γ ⊢ C ⇒ B}
-    → [ dist ]≡ ⟨ ƛ r , s ⟩ ⇄ ƛ ⟨ r , rename S_ s · ` Z ⟩
 
-  curry-s : ∀ {Γ A B C} → {r : Γ , A , B ⊢ C}
+  ------------------------------------------------------------------------
+  -- r · ⟨ s , t ⟩ ⇄ r · s · t
+  ------------------------------------------------------------------------
+  curry : ∀ {Γ A B C} → {r : Γ , A , B ⊢ C}
     → [ curry ]≡ (ƛ ƛ r) ⇄ ƛ subst σ-curry r
-  curry-sη : ∀ {Γ A B C} → {r : Γ , A ⊢ B ⇒ C}
+  curry-η : ∀ {Γ A B C} → {r : Γ , A ⊢ B ⇒ C}
     → [ curry ]≡ (ƛ r) ⇄ ƛ subst σ-curry (rename S_ r · ` Z)
-  uncurry-s : ∀ {Γ A B C} → {r : Γ , A × B ⊢ C}
+  uncurry : ∀ {Γ A B C} → {r : Γ , A × B ⊢ C}
     → [ sym curry ]≡ (ƛ r) ⇄ ƛ ƛ subst σ-uncurry r
 
   --eta : ∀ {Γ A B} → {r : Γ ⊢ A ⇒ B}
@@ -54,10 +69,12 @@ data _⇄_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
     → [ id-× ]≡ ⟨ r , t ⟩ ⇄ r
   sym-id-× : ∀ {Γ A} → {r : Γ ⊢ A}
     → [ sym id-× ]≡ r ⇄ ⟨ r , ⋆ ⟩
+
   id-⇒ : ∀ {Γ A} → {r : Γ ⊢ ⊤ ⇒ A}
     → [ id-⇒ ]≡ r ⇄ r · ⋆
   sym-id-⇒ : ∀ {Γ A} → {r : Γ ⊢ A}
     → [ sym id-⇒ ]≡ r ⇄ ƛ rename S_ r
+
   abs : ∀ {Γ A} → {r : Γ ⊢ A ⇒ ⊤}
     → [ abs ]≡ r ⇄ ⋆
   sym-abs : ∀ {Γ A} → {t : Γ ⊢ ⊤}
@@ -68,25 +85,21 @@ data _⇄_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
   
   cong⇒₁ : ∀ {Γ A B C} → {r : Γ , A ⊢ C} → {iso : A ≡ B}
     → [ cong⇒₁ iso ]≡ (ƛ r) ⇄ ƛ subst (σ-cong⇒₁ (sym iso)) r
-
   sym-cong⇒₁ : ∀ {Γ A B C} → {r : Γ , B ⊢ C} → {iso : A ≡ B}
     → [ sym (cong⇒₁ iso) ]≡ (ƛ r) ⇄ ƛ subst (σ-cong⇒₁ iso) r
   
   cong⇒₂ : ∀ {Γ A B C} → {r : Γ , C ⊢ A} → {iso : A ≡ B}
     → [ cong⇒₂ iso ]≡ (ƛ r) ⇄ ƛ ([ iso ]≡ r)
-  
   sym-cong⇒₂ : ∀ {Γ A B C} → {r : Γ , C ⊢ B} → {iso : A ≡ B}
     → [ sym (cong⇒₂ iso) ]≡ (ƛ r) ⇄ ƛ ([ sym iso ]≡ r)
   
   cong×₁ : ∀ {Γ A B C} → {r : Γ ⊢ A} → {s : Γ ⊢ C} → {iso : A ≡ B}
     → [ cong×₁ iso ]≡ ⟨ r , s ⟩ ⇄ ⟨ [ iso ]≡ r , s ⟩
-  
   sym-cong×₁ : ∀ {Γ A B C} → {r : Γ ⊢ B} → {s : Γ ⊢ C} → {iso : A ≡ B}
     → [ sym (cong×₁ iso) ]≡ ⟨ r , s ⟩ ⇄ ⟨ [ sym iso ]≡ r , s ⟩
   
   cong×₂ : ∀ {Γ A B C} → {r : Γ ⊢ C} → {s : Γ ⊢ A} → {iso : A ≡ B}
     → [ cong×₂ iso ]≡ ⟨ r , s ⟩ ⇄ ⟨ r , [ iso ]≡ s ⟩
-  
   sym-cong×₂ : ∀ {Γ A B C} → {r : Γ ⊢ C} → {s : Γ ⊢ B} → {iso : A ≡ B}
     → [ sym (cong×₂ iso) ]≡ ⟨ r , s ⟩ ⇄ ⟨ r , [ sym iso ]≡ s ⟩
   
@@ -138,21 +151,24 @@ open import Relation.Binary.PropositionalEquality using (cong; cong₂; refl; tr
 ⇄[] dist-ƛ           = dist-ƛ
 ⇄[] sym-dist-ƛ       = sym-dist-ƛ
 ⇄[] sym-dist-ƛ-split = sym-dist-ƛ-split
-⇄[] {σ = σ} (dist-ƛη₁ {C = C}{r = r}{s = s})
+⇄[] {σ = σ} (dist-ƛηₗᵣ {C = C}{r = r}{s = s})
   rewrite (subst-shift-weaken {Σ = ∅} {B = C} {N = r} {σ = σ}) | (subst-shift-weaken {Σ = ∅} {B = C} {N = s} {σ = σ})
-    = dist-ƛη₁
-⇄[] {σ = σ} (dist-ƛη₂ {C = C}{s = s})
+    = dist-ƛηₗᵣ
+⇄[] {σ = σ} (dist-ƛηᵣ {C = C}{s = s})
   rewrite (subst-shift-weaken {Σ = ∅} {B = C} {N = s} {σ = σ})
-    = dist-ƛη₂
-⇄[] {σ = σ} (curry-s {r = r})
+    = dist-ƛηᵣ
+⇄[] {σ = σ} (dist-ƛηₗ {C = C}{r = r})
+  rewrite (subst-shift-weaken {Σ = ∅} {B = C} {N = r} {σ = σ})
+    = dist-ƛηₗ
+⇄[] {σ = σ} (curry {r = r})
   rewrite (symm (subst-curry-commute {Σ = ∅} {N = r} {σ = σ}))
-    = curry-s
-⇄[] {σ = σ} (curry-sη {r = r})
+    = curry
+⇄[] {σ = σ} (curry-η {r = r})
   rewrite (symm (subst-curryη-commute {N = r} {σ = σ}))
-    = curry-sη
-⇄[] {σ = σ} (uncurry-s {r = r})
+    = curry-η
+⇄[] {σ = σ} (uncurry {r = r})
   rewrite (symm (subst-uncurry-commute {Σ = ∅} {N = r} {σ = σ}))
-    = uncurry-s
+    = uncurry
 ⇄[] id-× = id-×
 ⇄[] sym-id-× = sym-id-×
 ⇄[] id-⇒ = id-⇒
@@ -194,20 +210,23 @@ open import Subs using
 
 
 rename⇄ : ∀ {Γ Δ A}{t : Γ ⊢ A}{σ : Rename Γ Δ}{t'} → (rename σ t) ⇄ t' → ∃ λ t'' → (t ⇄ t'') ⊗ (rename σ t'' ≡E t')
-rename⇄ {t = [ curry ]≡ (ƛ ƛ t)} curry-s = ﹙ _ , ﹙ curry-s , cong ƛ_ (symm (rename-curry-commute {N = t})) ﹚ ﹚
-rename⇄ {t = [ curry ]≡ (ƛ t)}{σ = σ} curry-sη
+rename⇄ {t = [ curry ]≡ (ƛ ƛ t)} curry = ﹙ _ , ﹙ curry , cong ƛ_ (symm (rename-curry-commute {N = t})) ﹚ ﹚
+rename⇄ {t = [ curry ]≡ (ƛ t)}{σ = σ} curry-η
   rewrite rename-curryη-commute {N = t} {ρ = σ}
-    = ﹙ _ , ﹙ curry-sη , refl ﹚ ﹚
+    = ﹙ _ , ﹙ curry-η , refl ﹚ ﹚
 rename⇄ {t = [ asso ]≡ ⟨ a , ⟨ b , c ⟩ ⟩} asso = ﹙ _ , ﹙ asso , refl ﹚ ﹚
 rename⇄ {t = [ asso ]≡ ⟨ a , b ⟩} asso-split   = ﹙ _ , ﹙ asso-split , refl ﹚ ﹚
 rename⇄ {t = [ comm ]≡ ⟨ a , b ⟩} comm         = ﹙ _ , ﹙ comm , refl ﹚ ﹚
 rename⇄ {t = [ dist ]≡ ⟨ ƛ a , ƛ b ⟩} dist-ƛ   = ﹙ _ , ﹙ dist-ƛ , refl ﹚ ﹚
-rename⇄ {t = [ dist ]≡ ⟨ ƛ a , b ⟩}{σ = σ} (dist-ƛη₂ {C = C})
+rename⇄ {t = [ dist ]≡ ⟨ ƛ a , b ⟩}{σ = σ} (dist-ƛηᵣ {C = C})
   rewrite symm (rename-shift-weaken {Σ = ∅} {B = C} {N = b} {ρ = σ})
-    = ﹙ _ , ﹙ dist-ƛη₂ , refl ﹚ ﹚
-rename⇄ {t = [ dist ]≡ ⟨ a , b ⟩}{σ = σ} (dist-ƛη₁ {C = C})
+    = ﹙ _ , ﹙ dist-ƛηᵣ , refl ﹚ ﹚
+rename⇄ {t = [ dist ]≡ ⟨ a , ƛ b ⟩}{σ = σ} (dist-ƛηₗ {C = C})
+  rewrite symm (rename-shift-weaken {Σ = ∅} {B = C} {N = a} {ρ = σ})
+    = ﹙ _ , ﹙ dist-ƛηₗ , refl ﹚ ﹚
+rename⇄ {t = [ dist ]≡ ⟨ a , b ⟩}{σ = σ} (dist-ƛηₗᵣ {C = C})
   rewrite symm (rename-shift-weaken {Σ = ∅} {B = C} {N = b} {ρ = σ}) | symm (rename-shift-weaken {Σ = ∅} {B = C} {N = a} {ρ = σ})
-    = ﹙ _ , ﹙ dist-ƛη₁ , refl ﹚ ﹚
+    = ﹙ _ , ﹙ dist-ƛηₗᵣ , refl ﹚ ﹚
 rename⇄ {t = [ id-× ]≡ ⟨ a , b ⟩} id-×                    = ﹙ _ , ﹙ id-× , refl ﹚ ﹚
 rename⇄ {t = [ id-⇒ ]≡ t} id-⇒                            = ﹙ _ , ﹙ id-⇒ , refl ﹚ ﹚
 rename⇄ {t = [ sym id-⇒ ]≡ t} sym-id-⇒                    = ﹙ _ , ﹙ sym-id-⇒ , cong ƛ_ (rename-shift-weaken {Σ = ∅}) ﹚ ﹚
@@ -217,7 +236,7 @@ rename⇄ {t = [ sym asso ]≡ ⟨ ⟨ a , b ⟩ , c ⟩} (sym-asso)  = ﹙ _ , 
 rename⇄ {t = [ sym asso ]≡ ⟨ a , c ⟩} (sym-asso-split)    = ﹙ _ , ﹙ sym-asso-split , refl ﹚ ﹚
 rename⇄ {t = [ sym dist ]≡ (ƛ ⟨ a , b ⟩)} (sym-dist-ƛ)    = ﹙ _ , ﹙ sym-dist-ƛ , refl ﹚ ﹚
 rename⇄ {t = [ sym dist ]≡ (ƛ a)} (sym-dist-ƛ-split)      = ﹙ _ , ﹙ sym-dist-ƛ-split , refl ﹚ ﹚
-rename⇄ {t = [ sym curry ]≡ (ƛ t)} uncurry-s              = ﹙ _ , ﹙ uncurry-s , cong ƛ_ (cong ƛ_ (symm (rename-uncurry-commute {N = t}))) ﹚ ﹚
+rename⇄ {t = [ sym curry ]≡ (ƛ t)} uncurry                = ﹙ _ , ﹙ uncurry , cong ƛ_ (cong ƛ_ (symm (rename-uncurry-commute {N = t}))) ﹚ ﹚
 rename⇄ {t = [ sym id-× ]≡ t} (sym-id-×)                  = ﹙ _ , ﹙ sym-id-× , refl ﹚ ﹚
 rename⇄ {t = [ sym abs ]≡ t} (sym-abs)                    = ﹙ _ , ﹙ sym-abs , (cong ƛ_ (rename-shift-weaken {Σ = ∅})) ﹚ ﹚
 rename⇄ {t = [ sym (cong⇒₁ iso)]≡ (ƛ t)} (sym-cong⇒₁)     = ﹙ _ , ﹙ sym-cong⇒₁ , (cong ƛ_ (symm (rename-cong⇒₁-commute {N = t}))) ﹚ ﹚

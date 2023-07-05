@@ -547,14 +547,6 @@ subst-curry-split {N = ⟨ a , b ⟩}  = cong₂ ⟨_,_⟩ (subst-curry-split {N
 subst-curry-split {N = proj _ N}   = cong (proj _) (subst-curry-split {N = N})
 
 ------------------------------------------------------------------------
--- ⟪ proj B (` Z) • ids ⟫ (⟪ exts (proj A (` Z) • ids ∘ S_) ⟫ N) ≡ ⟪ σ-curry ⟫ N
-------------------------------------------------------------------------
-
-subst-curry-split2 : ∀{Γ A B C}{N : Γ , A , B ⊢ C}
-    → ⟪ proj B {inj₂ refl} (` Z) • ids ⟫ (⟪ exts (proj A {inj₁ refl} (` Z) • ids ∘ S_) ⟫ N) ≡ ⟪ σ-curry ⟫ N
-subst-curry-split2 {N = N} = trans (subst-curry-split {Σ = ∅} {N = N} {u = ` Z} {ρ = S_}) (Z-weaken {Σ = ∅} {N = ⟪ σ-curry ⟫ N})
-
-------------------------------------------------------------------------
 -- ⟪ proj A u • ids ∘ ρ ⟫ N ≡ ⟪ u • ids ∘ ρ ⟫ (⟪ σ-curry ⟫ (rename S_ N))
 ------------------------------------------------------------------------
 
@@ -599,46 +591,25 @@ subst-cong⇒₁-split {N = proj _ N}   = cong (proj _) (subst-cong⇒₁-split 
 -- ⟪ u₁ • ids ∘ ρ₁ ⟫ (⟪ exts (u • ids ∘ ρ) ⟫ (⟪ σ-uncurry ⟫ N)) ≡ ⟪ ⟨ rename ρ₁ u , u₁ ⟩ • ids ∘ ρ₁ ∘ ρ ⟫ N
 ------------------------------------------------------------------------
 
-subst-uncurry-split2-var : ∀{Γ Δ Δ₁ Σ A B C}{v : (Γ , A × B) ,* Σ ∋ C}{u : Δ ⊢ A}{u₁ : Δ₁ ⊢ B}{ρ : Rename Γ Δ}{ρ₁ : Rename Δ Δ₁}
+subst-uncurry-split-var : ∀{Γ Δ Δ₁ Σ A B C}{v : (Γ , A × B) ,* Σ ∋ C}{u : Δ ⊢ A}{u₁ : Δ₁ ⊢ B}{ρ : Rename Γ Δ}{ρ₁ : Rename Δ Δ₁}
     → ⟪ exts* (u₁ • ids ∘ ρ₁) ⟫ (⟪ exts* (exts (u • ids ∘ ρ)) ⟫ (exts* σ-uncurry v)) ≡ exts* (⟨ rename ρ₁ u , u₁ ⟩ • ids ∘ ρ₁ ∘ ρ) v
-subst-uncurry-split2-var {Σ = ∅} {v = Z} {u = u}             = cong₂ ⟨_,_⟩ (trans (subst-weaken {Σ = ∅} {N = u}) (rename-subst-ids {Σ = ∅})) refl
-subst-uncurry-split2-var {Σ = ∅} {v = S v}                   = refl
-subst-uncurry-split2-var {Σ = _ , _} {v = Z}                 = refl
-subst-uncurry-split2-var {Σ = _ , _} {v = S v}{u}{u₁}{ρ}{ρ₁} =
+subst-uncurry-split-var {Σ = ∅} {v = Z} {u = u}             = cong₂ ⟨_,_⟩ (trans (subst-weaken {Σ = ∅} {N = u}) (rename-subst-ids {Σ = ∅})) refl
+subst-uncurry-split-var {Σ = ∅} {v = S v}                   = refl
+subst-uncurry-split-var {Σ = _ , _} {v = Z}                 = refl
+subst-uncurry-split-var {Σ = _ , _} {v = S v}{u}{u₁}{ρ}{ρ₁} =
   begin
     _ ≡⟨ cong (⟪ exts (exts* (u₁ • ids ∘ ρ₁)) ⟫) (subst-shift-weaken {Σ = ∅} {N = exts* σ-uncurry v}) ⟩
     _ ≡⟨ subst-shift-weaken {Σ = ∅} {N = ⟪ exts* (exts (u • ids ∘ ρ)) ⟫ (exts* σ-uncurry v)} ⟩
-    _ ≡⟨ cong (rename S_) (subst-uncurry-split2-var {v = v}) ⟩
+    _ ≡⟨ cong (rename S_) (subst-uncurry-split-var {v = v}) ⟩
     _
   ∎
 
-subst-uncurry-split2 : ∀{Γ Δ Δ₁ Σ A B C}{N : (Γ , A × B) ,* Σ ⊢ C}{u : Δ ⊢ A}{u₁ : Δ₁ ⊢ B}{ρ : Rename Γ Δ}{ρ₁ : Rename Δ Δ₁}
+subst-uncurry-split : ∀{Γ Δ Δ₁ Σ A B C}{N : (Γ , A × B) ,* Σ ⊢ C}{u : Δ ⊢ A}{u₁ : Δ₁ ⊢ B}{ρ : Rename Γ Δ}{ρ₁ : Rename Δ Δ₁}
     → ⟪ exts* (u₁ • ids ∘ ρ₁) ⟫ (⟪ exts* (exts (u • ids ∘ ρ)) ⟫ (⟪ exts* σ-uncurry ⟫ N)) ≡ ⟪ exts* (⟨ rename ρ₁ u , u₁ ⟩ • ids ∘ ρ₁ ∘ ρ) ⟫ N
-subst-uncurry-split2 {N = ` v}        = subst-uncurry-split2-var {v = v}
-subst-uncurry-split2 {N = ⋆}          = refl
-subst-uncurry-split2 {N = [ iso ]≡ N} = cong [ iso ]≡_ (subst-uncurry-split2 {N = N})
-subst-uncurry-split2 {N = ƛ N}        = cong ƛ_ (subst-uncurry-split2 {Σ = _ , _} {N = N})
-subst-uncurry-split2 {N = a · b}      = cong₂ _·_ (subst-uncurry-split2 {N = a}) (subst-uncurry-split2 {N = b})
-subst-uncurry-split2 {N = ⟨ a , b ⟩}  = cong₂ ⟨_,_⟩ (subst-uncurry-split2 {N = a}) (subst-uncurry-split2 {N = b})
-subst-uncurry-split2 {N = proj _ N}   = cong (proj _) (subst-uncurry-split2 {N = N})
-
-------------------------------------------------------------------------
--- ⟪ exts (u • ids ∘ ρ) ⟫ (⟪ σ-uncurry ⟫ N) ≡ ⟪ ⟨ rename S_ u , ` Z ⟩ • ids ∘ S_ ∘ ρ ⟫ N
-------------------------------------------------------------------------
-
-subst-shift-uncurry-split : ∀{Γ Δ A B C}{N : Γ , A × B ⊢ C}{u : Δ ⊢ A}{ρ : Rename Γ Δ}
-    → ⟪ exts (u • ids ∘ ρ) ⟫ (⟪ σ-uncurry ⟫ N) ≡ ⟪ ⟨ rename S_ u , ` Z ⟩ • ids ∘ (λ x → (S ρ x)) ⟫ N
-subst-shift-uncurry-split {N = N} {u = u} {ρ = ρ} = trans (sym (Z-weaken {Σ = ∅})) (subst-uncurry-split2 {Σ = ∅} {N = N} {u = u} {u₁ = ` Z} {ρ = ρ} {ρ₁ = S_})
-
-------------------------------------------------------------------------
--- ⟪ u • ids ∘ ρ ⟫ (⟪ σ-uncurry ⟫ N) ≡ ⟪ ⟨ ` ρ Z , u ⟩ • ids ∘ ρ ∘ S_ ⟫ N
-------------------------------------------------------------------------
-
-subst-uncurry-split : ∀{Γ Δ A B C}{N : Γ , A × B ⊢ C}{u : Δ ⊢ B}{ρ : Rename (Γ , A) Δ}
-    → ⟪ u • ids ∘ ρ ⟫ (⟪ σ-uncurry ⟫ N) ≡ ⟪ ⟨ ` ρ Z , u ⟩ • ids ∘ (λ x → ρ (S x)) ⟫ N
-subst-uncurry-split {N = N} {u = u} {ρ = ρ} =
-  begin
-    _ ≡⟨ cong (⟪ u • ids ∘ ρ ⟫) (sym (Z-weaken {Σ = ∅ , _} {N = ⟪ σ-uncurry ⟫ N})) ⟩
-    _ ≡⟨ subst-uncurry-split2 {Σ = ∅} {N = N} {u = ` Z} {u₁ = u} {ρ = S_} {ρ₁ = ρ} ⟩
-    _
-  ∎
+subst-uncurry-split {N = ` v}        = subst-uncurry-split-var {v = v}
+subst-uncurry-split {N = ⋆}          = refl
+subst-uncurry-split {N = [ iso ]≡ N} = cong [ iso ]≡_ (subst-uncurry-split {N = N})
+subst-uncurry-split {N = ƛ N}        = cong ƛ_ (subst-uncurry-split {Σ = _ , _} {N = N})
+subst-uncurry-split {N = a · b}      = cong₂ _·_ (subst-uncurry-split {N = a}) (subst-uncurry-split {N = b})
+subst-uncurry-split {N = ⟨ a , b ⟩}  = cong₂ ⟨_,_⟩ (subst-uncurry-split {N = a}) (subst-uncurry-split {N = b})
+subst-uncurry-split {N = proj _ N}   = cong (proj _) (subst-uncurry-split {N = N})
