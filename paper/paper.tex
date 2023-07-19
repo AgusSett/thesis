@@ -2,6 +2,8 @@
 \usepackage[a4paper,width=150mm,top=25mm,bottom=25mm]{geometry}
 \usepackage[spanish]{babel}
 \usepackage{hyperref}
+\usepackage{amssymb}
+\usepackage{amsmath}
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \usepackage[style=alphabetic]{biblatex}
@@ -13,100 +15,161 @@
 \author{Agustin Settimo}
 
 \begin{document}
+	
+	\maketitle
+	\tableofcontents
+	
+	\begin{abstract}
+		
+	\end{abstract}
+	
+	\chapter{Introducción}
+	Los sistemas de tipos permiten especificar el comportamiento de los programas.
+	Por ejemplo, el tipo $(A \times B) \rightarrow C$ representa los programas que permiten obtener un valor de tipo $C$ a partir de un par de valores de tipo $A$ y $B$. Por otro lado, el tipo $A \rightarrow B \rightarrow C$ representa los programas que primero acepta un valor de tipo $A$, luego uno de tipo $B$ y finalmente devuelve un valor de tipo $C$.
+	Estas dos especificaciones son distintas en su forma pero parecen tener el mismo significado semántico.Esto se debe
+	al isomorfismo de Curry.
+	Debido a la estrecha relación entre la programación y la lógica, se observa un comportamiento análogo cuando se trabaja con pruebas.
+	Por ejemplo, una prueba de $(A \wedge B) \Rightarrow C$ no constituye una prueba de $A \Rightarrow B \Rightarrow C$, y viceversa, a pesar de que ambas tienen el mismo significado. 
+	
+	\section{Motivación}
+	
+	Tanto los sistemas de tipos como los sistemas de pruebas distinguen elementos que tienen diferente forma aunque tengan el mismo significado, como pueden ser las pruebas de las conjunciones $A \wedge B$ y $B \wedge A$, por lo cual una prueba de una no constituye una prueba de la otra, a pesar de que se puede demostrar mediante la existencia de un isomorfismo que dichas proposiciones son equivalentes.
+	
+	Programas con tipos isomorfos representan el mismo tipo de problema, por lo que tratarlos como si fueran idénticos tiene aplicaciones interesantes.
+	Por ejemplo, desde el punto de vista de los programas, nos permite construir expresiones de formas que antes eran erróneas, un término $f : (A \wedge B) \Rightarrow C$ puede ser combinado como $f \langle a, b \rangle$ ó $f \: a \: b$, es decir, es posible sortear cierta rigidez impuesta por el sistema de tipos.
+	Por otro lado, los isomorfismos hacen que las pruebas sean más naturales, por ejemplo, para probar, $A \wedge (A \Rightarrow  B) \Rightarrow B$, deberíamos primero introducir la hipótesis $A \wedge A \Rightarrow  B$, y luego descomponerla en $A$ y $A \Rightarrow B$, en cambio, utilizando el isomorfismo de curry transformamos el objetivo en $(A \Rightarrow A \Rightarrow  B) \Rightarrow B$ y luego introducimos directamente las hipótesis $A$ y $A \Rightarrow B$.
+	
+	\section{Estado del arte}
+	\subsection{Isomorfismos de tipos}
+	
+	Para poder abstraernos de la forma y centrarnos en el significado de los programas, es necesario establecer cuáles son las formas que son combinables y cómo combinarlas.
+	Para ello nos valdremos de la noción de isomorfismo entre tipos.
+	El primer paso es considerar dos proposiciones $A$ y $B$ como isomorfas si existen dos pruebas $A \Rightarrow B$ y $B \Rightarrow A$, tal que al componerlas, en ambos sentidos, obtenemos como resultado la identidad.
+	Di Cosmo \cite{MSCSSurvey05} caracterizó los conjuntos mínimos de isomorfismos que permiten construir todos los demás a partir de reglas de congruencia y transitividad.
+	Se escribe $A \equiv B$ cuando $A$ y $B$ sean isomorfos.
+	
+	% mostrar tabla de isos
+	
+	\subsection{Sistema I}
+	Sistema I \cite{system-i} es un lenguaje de pruebas para el fragmento de la lógica con $\Rightarrow$ y $\wedge$, que se corresponde con lambda cálculo simplemente tipado con pares.
+	El conjunto de isomorfismos que abarca este sistema es denominado $Th^1_\times$.
+	El primer paso para la internalización de los isomorfismos es la definición de una nueva regla de tipado llamada $(\equiv)$
+	
+	\[ \frac{A \equiv B \quad \Gamma \vdash r:A}{\Gamma \vdash r:B} (\equiv) \]
+	
+	Esta regla permite emplear términos $r:A$ en cualquier lugar que se necesite un cualquier tipo isomorfo a $A$. Por ejemplo:
+	$\langle r, s \rangle \; t$
+	% TODO: mostrar derivacion de tipo
+	
+	La introducción de una relación de equivalencia en el nivel de los tipos necesariamente deberá tener consecuencias en el nivel de los términos.
+	Con las reglas de reducción usuales, un término como el del ejemplo anterior estaría en forma normal.
+	Entonces el siguiente paso es extender la relación de reducción con	isomorfismos a nivel términos.
+	Estas nuevas reglas permiten desatascar los términos que tipamos usando $(\equiv)$.
+	Por ejemplo, $\langle r, s \rangle \; t \leftrightarrows \langle r t, s t \rangle$
+	Es importante destacar que dependiendo del conjunto de isomorfismos de términos que se incluyen se obtienen sistemas de cálculo con distintas propiedades, incluir demasiados puede desencadenar en no terminación, y si se incluyen pocas pueden aparecer eliminaciones en formas normales.
+	
+	Se presentan las reglas propuestas por Sistema I, las cuales fueron elegidas con el objetivo de obtener un cálculo fuertemente normalizante y consistente:
+	
+	% mostrar isos de termino y reglas de tipado
+	
+	El siguiente paso surge de notar que las nuevas reglas introducen problemas en la reducción clásica.
+	Por un lado, las reglas de proyección $\pi_1$ y $\pi_2$ indexan el par a través de la posición de los elementos, pero el isomorfismo $\textsc{comm}$ permite cambiar el orden de un par, permitiendo así proyectar cualquiera de los dos elementos:
+	
+	\begin{align*}
+		\langle r, s \rangle& \hookrightarrow_{\pi_1} r \\
+		\langle r, s \rangle& \leftrightarrows_{\textsc{comm}} \langle s, r \rangle \hookrightarrow_{\pi_1} s
+	\end{align*}
+	
+	Esto supone un problema para la preservación de tipos.
+	La solución es indexar el elemento a través de su tipo, por lo que se define una nueva regla:
+	
+	\[ \text{si} \; r:A \quad \pi_A \langle r, s \rangle \hookrightarrow_{\pi} r \]
+	
+	Una consecuencia importante es que esta regla introduce no determinismo en el cálculo.
+	Si $r$ y $s$ tienen tipo $A$, entonces $\pi_A \langle r, s \rangle$ puede reducir indistintamente a cualesquiera de los dos términos.
+	
+	% explica como se pueden encodear los pares
+	
+	La $\beta$-reducción clásica también entra en conflicto con la preservación de tipos.
+	Por ejemplo, el término $(\lambda x^A . \lambda y^B . r)ts$ donde $t:B$ y $s:A$ está bien tipado, pero para reducirlo correctamente primero se deben aplicar equivalencias para intercambiar el orden de $t$ y $s$.
+	Sin embargo, no hay nada que impida aplicar la regla $\beta$, lo cual podría terminar reduciendo a un tipo equivocado.
+	Para solucionar esto, se modifica la $\beta$-reducción:
+	
+	\[ \text{si} \; s:A \quad (\lambda x^A.r) s \hookrightarrow_{\beta} r[s/x] \]
+	
+	Por último se define la relación de reducción módulo isomorfismos:
+	
+	\[ \rightsquigarrow \; = \; \leftrightarrows^* \circ \hookrightarrow \circ \leftrightarrows^* \]
+	
+	Es decir, que primero los términos son transformados a una forma equivalente donde sea posible aplicar las eliminaciones, y luego se aplican las $\beta$-reducciones y proyecciones.
+	
+	
+	\subsection{SIP}
+	Sistema I Polimórfico, es una extensión que agrega polimorfismos a Sistema I, tomas algunos de los isomorfismos del conjunto axiomático $Th^2_\times$.
 
-\maketitle
-\tableofcontents
-
-\begin{abstract}
-
-\end{abstract}
-
-
-\chapter{Introducción}
-
-Los sistemas de tipos permiten especificar el comportamiento de los programas. Por ejemplo, el tipo $(A \times B) \rightarrow C$ representa los programas que permiten obtener un valor de tipo $C$ a partir de un par de valores de tipo $A$ y $B$. Por otro lado, el tipo $A \rightarrow B \rightarrow C$ representa los programas que primero acepta un valor de tipo $A$, luego uno de tipo $B$ y finalmente devuelve un valor de tipo $C$. Estas dos especificaciones son distintas en su forma pero parecen tener el mismo significado semántico. Esto se debe al isomorfismo de Curry.
-
-Debido a la estrecha relación entre la programación y la lógica, se observa un comportamiento análogo cuando se trabaja con pruebas. Por ejemplo, una prueba de $(A \wedge B) \Rightarrow C$ no constituye una prueba de $A \Rightarrow B \Rightarrow C$, y viceversa, a pesar de que ambas tienen el mismo significado.
-
-\section{Motivación}
-
-Tanto los sistemas de tipos como los sistemas de pruebas distinguen elementos que tienen diferente forma aunque tengan el mismo significado, como pueden ser las pruebas de las conjunciones $A \wedge B$ y $B \wedge A$, por lo cual una prueba de una no constituye una prueba de la otra, a pesar de que se puede demostrar mediante la existencia de un isomorfismo que dichas proposiciones son equivalentes.
-
-Programas con tipos isomorfos representan el mismo tipo de problema, por lo que tratarlos como si fueran idénticos tiene aplicaciones interesantes. Por ejemplo, desde el punto de vista de los programas, nos permite construir expresiones de formas que antes eran erróneas, un término $f : (A \wedge B) \Rightarrow C$ puede ser combinado como $f \langle a, b \rangle$ ó $f \: a \: b$, es decir, es posible sortear cierta rigidez impuesta por el sistema de tipos.
-Por otro lado, los isomorfismos hacen que las pruebas sean más naturales, por ejemplo, para probar, $A \wedge (A \Rightarrow  B) \Rightarrow B$, deberíamos primero introducir la hipótesis $A \wedge A \Rightarrow  B$, y luego descomponerla en $A$ y $A \Rightarrow B$, en cambio utilizando el isomorfismo de curry transformamos el objetivo en $(A \Rightarrow A \Rightarrow  B) \Rightarrow B$ y luego introducimos directamente las hipótesis $A$ y $A \Rightarrow B$.
-
-\section{Estado del arte}
-\subsection{Isomorfismos de tipos}
-
-Para poder abstraernos de la forma y centrarnos en el significado de los
-programas, es necesario establecer cuáles son las formas que son combinables
-y cómo combinarlas. Para ello nos valdremos de la noción de isomorfismo
-entre tipos. El primer paso es considerar dos proposiciones $A$ y $B$ como isomorfas si existen dos pruebas $A \Rightarrow B$ y $B \Rightarrow A$, tal que al componerlas, en ambos sentidos, obtenemos como resultado la identidad. Di Cosmo \cite{dicosmo} caracterizó los conjuntos mínimos de isomorfismos que permiten construir todos los demás.
-
-% mostrar tabla de isos
-
-\subsection{Sistema I}
-% explicar lo que es, corresponde a Th1
-% mostrar isos de termino y reglas de tipado
-
-\subsection{SIP}
-% explicar lo que es, corresponde a Th2
-
-\subsection{$\lambda^+$}
-% explicar que introduce el split, es necesario agregar o eliminar isos para lograr la reduccion 
-
-\section{Estructura del trabajo}
-
-\chapter{Preliminares}
-
-\section{Intuitionistic Type Theory}
-\section{Tipos dependientes}
-\subsection{Lambda cube}
-\section{Propositions as Types}
-\section{Agda}
-\section{Representación nameless De Bruijn}
-\section{Substituciones explicitas}
-[Explicit Substitutions](http://pauillac.inria.fr/~levy/pubs/90popljfp.pdf)
-
-
-\chapter{Aportes}
-\section{Formalización}
-\subsection{Tipos intrínsecos}
-Explicar la diferencia entre Curry style y Church style, y como nos ayuda tener tipos intrínsecos. Acá hay muchas referencias [https://plfa.github.io/DeBruijn/] (https://plfa.github.io/DeBruijn/).
-\subsection{STLC con pares y top}
-Formalizar tipos, términos y relación de reducción.
-\subsection{Isomorfismo de términos}
-Explicar los isos nuevos que voy a agregar. Formalizar iso tipos y relación de iso.
-
-\subsection{Preservación de tipos}
-
-\section{Progreso}
-
-\subsection{Formas normales, neutrales y valores}
-\subsection{Relación de reducción}
-
-\section{Normalización Fuerte}
-
-\subsection{Prueba para STLC con pares y top}
-Primero mostrar la prueba sin isomorfismos. Puedo y extendiéndola de a poco como en el apunte de Beta Ziliani
-\subsection{Diferencias con la prueba de Girard}
-Capitulo 5.6 como referencia
-
-[https://www.ps.uni-saarland.de/~schaefer/thesis/draft-screen.pdf] 
-
-(https://www.ps.uni-saarland.de/~schaefer/thesis/draft-screen.pdf)
-\subsection{Prueba para Sistema I}
-\subsection{Well-founded \& Accessibility}
-Explicar que lo que hicimos en realidad es probar que la inducción sobre la relación de reducción está bien fundada [https://agdapad.quasicoherent.io/~AgdaPadova/html/transcript10.html] (https://agdapad.quasicoherent.io/~AgdaPadova/html/transcript10.html). Mostrar eval.
-
-\section{Conclusiones}
-
-
-\section{Trabajo futuro}
-\subsection{Inferencia de tipos}
-\subsection{Formalizar SIP}
-
-
-\printbibliography
-
+	\subsection{$\lambda^+$}
+	$\lambda^+$ \cite{lambda-plus} es una implementación en Haskell de una extensión que agrega naturales y recursión general a Sistema I.
+	% explicar que introduce el split, es necesario agregar o eliminar isos para lograr la reduccion 
+	
+	
+	\section{Estructura del trabajo}
+	
+	\chapter{Preliminares}
+	
+	\section{Intuitionistic Type Theory}
+	\section{Tipos dependientes}
+	\subsection{Lambda cube}
+	\section{Propositions as Types}
+	\section{Agda}
+	\section{Representación nameless De Bruijn}
+	\section{Substituciones explicitas}
+	[Explicit Substitutions](http://pauillac.inria.fr/~levy/pubs/90popljfp.pdf)
+	
+	
+	\chapter{Aportes}
+	\section{Formalización}
+	\subsection{Tipos intrínsecos}
+	Explicar la diferencia entre Curry style y Church style, y como nos ayuda tener tipos intrínsecos. Acá hay muchas referencias
+	[https://plfa.github.io/DeBruijn/] (https://plfa.github.io/DeBruijn/).
+	\subsection{STLC con pares y top}
+	Formalizar tipos, términos y relación de reducción.
+	\subsection{Isomorfismo de términos}
+	Explicar los isos nuevos que voy a agregar. Formalizar iso tipos y relación de iso.
+	
+	\subsection{Preservación de tipos}
+	
+	\section{Progreso}
+	
+	\subsection{Formas normales, neutrales y valores}
+	\subsection{Relación de reducción}
+	
+	\section{Normalización Fuerte}
+	
+	\subsection{Prueba para STLC con pares y top}
+	Primero mostrar la prueba sin isomorfismos. Puedo y extendiéndola de a poco como en el apunte de Beta Ziliani
+	\subsection{Diferencias con la prueba de Girard}
+	Capitulo 5.6 como referencia
+	
+	[https://www.ps.uni-saarland.de/~schaefer/thesis/draft-screen.pdf] 
+	
+	(https://www.ps.uni-saarland.de/~schaefer/thesis/draft-screen.pdf)
+	\subsection{Prueba para Sistema I}
+	\subsection{Well-founded \& Accessibility}
+	Explicar que lo que hicimos en realidad es probar que la inducción sobre la relación de reducción está bien fundada
+	[https://agdapad.quasicoherent.io/~AgdaPadova/html/transcript10.html]
+	(https://agdapad.quasicoherent.io/~AgdaPadova/html/transcript10.html).
+	Mostrar eval.
+	
+	\section{Conclusiones}
+	
+	
+	\section{Trabajo futuro}
+	\subsection{Inferencia de tipos}
+	\subsection{Formalizar SIP}
+	
+	
+	\printbibliography
+	
 \end{document}
+
+
