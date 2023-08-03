@@ -1,5 +1,5 @@
 \documentclass[]{report}
-\usepackage[a4paper,width=150mm,top=25mm,bottom=25mm]{geometry}
+\usepackage[a4paper]{geometry}
 \usepackage[spanish]{babel}
 \usepackage{hyperref}
 \usepackage{amssymb}
@@ -315,7 +315,7 @@
 		row sep=3em, column sep=2.4em,
 		text height=1.5ex,
 		text depth=0.25ex]{
-						& \lambda\omega             &              & \lambda\Pi\omega             \\
+						& \lambda\omega             &              & \lambda C					  \\
 			\lambda 2   &                           & \lambda\Pi 2                                \\
 						& \lambda\underline{\omega} &              & \lambda\Pi\underline{\omega} \\
 			\lambda{\to}&                           & \lambda\Pi 								  \\
@@ -337,10 +337,58 @@
 	\caption{Lambda cube}
 	\end{figure}
 	
-	\section{Intuitionistic Type Theory}
-	% explicar que Martin-Löf extendio el isimorfismo de curry-howard a tipos de pendientes.
-	
 	\section{Propositions as Types}
+	El paradigma de ``proposiciones como tipos'' describe la correspondencia entre la lógica y los lenguajes de programación.
+	Básicamente, dice que para a cada proposición en la lógica le corresponde un tipo, y viceversa.
+	De hecho, esta relación es más profunda, ya que a cada prueba de una proposición dada, le corresponde un programa del tipo correspondiente, y viceversa.
+	Es decir, ``pruebas como programas''.
+	Incluso es más profunda aún, en el sentido de que para cada forma de simplificar una prueba, existe una forma correspondiente de evaluar un programa, y viceversa. Por lo que tenemos, ``simplificación de pruebas como evaluación de programas''.
+	
+	Tal como lo explica Wadler en su artículo \cite{pas}, no se trata de una simple biyección entre proposiciones y tipos, sino un verdadero isomorfismo que preserva la compleja estructura de pruebas y programas, simplificaciones y evaluaciones.
+	
+	Este principio surge de las observaciones realizadas por Curry sobre la lógica proposicional, y más tarde extendidas por Howard a la lógica de predicados.
+	La clave de esta extensión es la introducción de los tipos dependientes para representar los predicados y cuantificadores en la lógica de predicados.
+
+	Las correspondencias que surgen de esta interpretación pueden resumirse de la siguiente forma:
+	
+	\begin{itemize}
+		\item La conjunción $A \wedge B$ corresponde al par $A \times B$.
+		Una prueba de la proposición $A \wedge B$ consiste de una prueba de $A$ y una prueba de $B$.
+		
+		\item La disyunción $A \vee B$ corresponde la suma disyunta $A + B$.
+		Una prueba de la proposición $A \vee B$ consiste de una prueba de $A$ o una prueba de $B$.
+		
+		\item La implicación $A \Rightarrow B$ corresponde al espacio de funciones $A \rightarrow B$.
+		Una prueba de la proposición $A \Rightarrow B$ consiste de una función que dada una prueba de $A$ devuelve una prueba de $B$.
+		
+		\item El cuantificador existencial $\exists x:A.B$ corresponde al tipo $\Sigma x:A.B$.
+		Básicamente, esto es una familia de tipo indexada por $a : A$ donde a cada término $a$ le corresponde un tipo $B(a)$.
+		Los elementos canónicos de $\Sigma x:A.B$ son pares dependientes $\langle a, b \rangle$ donde $a:A$ y $b:B(a)$.
+		Cuando $B(a)$ es una función constante, este tipo es equivalente al producto cartesiano $A \times B$.
+		
+		
+		\item El cuantificador universal $\forall x:A.B$ corresponde $\Pi x:A.B$, al igual que para el tipo $\Sigma$, $B$ está indexado por los términos de tipo $A$.
+		Los elementos canónicos de $\Pi x:A.B$ son funciones dependientes $a \rightarrow B(a)$.
+		Cuando $B(a)$ es una función constante, el tipo $\Pi$ es equivalente al tipo de las funciones ordinarias $A \rightarrow B$.
+	\end{itemize}
+	
+
+	\section{Intuitionistic Type Theory}
+	La teoría de tipos intuicionista, también llamada teoría de tipos de Martin-Löf propone un sistema lógico formal y los fundamentos filosóficos para las matemáticas constructivas.
+	
+	Directamente influenciado por las ideas de Howard, Martin-Löf se basó en el principio de proposiciones como tipos y el constructivismo matemático.
+	Este constructivismo requiere que las pruebas contengan un ``testigo'', una prueba de una proposición dada es un programa, por lo tanto, las proposiciones son verdaderas cuando su tipo está habitado por algún término.
+	Las pruebas son términos que atestiguan la veracidad del teorema, y pueden ser manipulados como cualquier otro término del lenguaje.
+	
+	Esto tiene algunas consecuencias interesantes, por ejemplo, en la lógica clásica, a las proposiciones se les asigna valores de verdad sin importar si existe evidencia directa de que sea verdadera o falsa.
+	Esto es lo que comúnmente se denomina ``principio del tercero excluido'', ya que excluye la posibilidad de un tercer valor distinto de verdadero o falso.
+	Por lo tanto, no es posible probar $A \vee \not A$ en la lógica intuicionista.
+
+	
+	Se puede pensar a la teoría de tipos intuicionista como un lenguaje de programación funcional donde el sistema de tipos es tan rico que prácticamente cualquier propiedad concebible de un programa puede expresarse como un tipo.
+	Todas las funciones de este lenguaje deben ser totales y computables, por lo que todos los programas deben necesariamente cumplir con la propiedad de terminación.
+	
+	Filosófica y prácticamente, esta teoría de tipos es un marco fundamental donde las matemáticas constructivas y la programación son, en un sentido profundo, lo mismo.
 	
 	
 	\section{Agda}
@@ -440,6 +488,7 @@
 	[https://plfa.github.io/DeBruijn/] (https://plfa.github.io/DeBruijn/).
 	\subsection{STLC con pares y top}
 	Formalizar tipos, términos y relación de reducción.
+	Las substituciones están basadas en http://strictlypositive.org/ren-sub.pdf
 	\subsection{Isomorfismo de términos}
 	Explicar los isos nuevos que voy a agregar. Formalizar iso tipos y relación de iso.
 	
