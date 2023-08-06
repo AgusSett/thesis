@@ -6,6 +6,7 @@
 \usepackage{amsmath}
 \usepackage{listings}
 \usepackage{ebproof}
+\usepackage{float}
 \usepackage{agda}
 \usepackage{newunicodechar}
 \newunicodechar{≡}{\ensuremath{\mathnormal\equiv}}
@@ -140,13 +141,43 @@
 	
 	Se presentan las reglas propuestas por Sistema I, las cuales fueron elegidas con el objetivo de obtener un cálculo fuertemente normalizante y consistente:
 	
-	\begin{align}
-		\langle r,s \rangle &\rightleftarrows \langle s,r \rangle \tag{\textsc{comm}} \\
-		\langle r, \langle s,t \rangle \rangle &\rightleftarrows \langle \langle r, s \rangle, t \rangle \tag{\textsc{asso}} \\
-		\lambda x^A \langle r,s \rangle &\rightleftarrows \langle \lambda x^A.r, \lambda x^A.s \rangle \tag{$\textsc{dist}_{\lambda}$} \\
-		\langle r,s \rangle t &\rightleftarrows \langle r t, s t \rangle \tag{$\textsc{dist}_{app}$} \\
-		r \langle s, t \rangle &\rightleftarrows r s t \tag{\textsc{curry}}
-	\end{align}
+	\begin{figure}[ht!]
+		\centering
+		\begin{align}
+			\langle r,s \rangle &\rightleftarrows \langle s,r \rangle \tag{\textsc{comm}} \\
+			\langle r, \langle s,t \rangle \rangle &\rightleftarrows \langle \langle r, s \rangle, t \rangle \tag{\textsc{asso}} \\
+			\lambda x^A \langle r,s \rangle &\rightleftarrows \langle \lambda x^A.r, \lambda x^A.s \rangle \tag{$\textsc{dist}_{\lambda}$} \\
+			\langle r,s \rangle t &\rightleftarrows \langle r t, s t \rangle \tag{$\textsc{dist}_{app}$} \\
+			r \langle s, t \rangle &\rightleftarrows r s t \tag{\textsc{curry}}
+		\end{align}
+		
+		\begin{prooftree}
+			\hypo{\lambda x.t \rightleftarrows \lambda x.r}
+			\infer1{ t \rightleftarrows r }
+		\end{prooftree} \quad
+		\begin{prooftree}
+			\hypo{ts \rightleftarrows rs}
+			\infer1{ t \rightleftarrows r }
+		\end{prooftree} \quad
+		\begin{prooftree}
+			\hypo{st \rightleftarrows sr}
+			\infer1{ t \rightleftarrows r }
+		\end{prooftree} \\ \vspace{1em}
+		\begin{prooftree}
+			\hypo{\langle t, s \rangle \rightleftarrows \langle r, s \rangle}
+			\infer1{ t \rightleftarrows r }
+		\end{prooftree} \quad
+		\begin{prooftree}
+			\hypo{\langle s, t \rangle \rightleftarrows \langle s, r \rangle}
+			\infer1{ t \rightleftarrows r }
+		\end{prooftree} \quad
+		\begin{prooftree}
+			\hypo{\pi_A t \rightleftarrows \pi_A r}
+			\infer1{ t \rightleftarrows r }
+		\end{prooftree}
+		
+		\caption{Reglas de equivalencia entre términos}
+	\end{figure}
 	
 	\begin{figure}[ht!]
 		\centering
@@ -203,8 +234,10 @@
 	
 	Una consecuencia importante es que esta regla introduce no determinismo en el cálculo.
 	Si $r$ y $s$ tienen tipo $A$, entonces $\pi_A \langle r, s \rangle$ puede reducir indistintamente a cualesquiera de los dos términos.
-	
-	% explica como se pueden encodear los pares
+	Sin embargo, es posible codificar una proyección determinista incluso cuando ambos términos son del mismo tipo, por ejemplo, el par $\langle r, s \rangle: A \times A$
+	se codifica como $\langle \lambda x^1.r, \lambda x^2.s \rangle : 1 \Rightarrow A \times 2 \Rightarrow A$.
+	Y la proyección $\pi_1 \langle r, s \rangle$ se codifica como $(\pi_{1 \Rightarrow A} \langle \lambda x^1.r, \lambda x^2.s \rangle) y^1$, donde 1 y 2 son dos tipos distintos, y $y^1$ es cualquier elemento de tipo 1. De forma análoga se codifica $\pi_2$.
+
 	
 	La $\beta$-reducción clásica también entra en conflicto con la preservación de tipos.
 	Por ejemplo, el término $(\lambda x^A . \lambda y^B . r)ts$ donde $t:B$ y $s:A$ está bien tipado, pero para reducirlo correctamente primero se deben aplicar equivalencias para intercambiar el orden de $t$ y $s$.
@@ -222,14 +255,59 @@
 	
 	\subsection{SIP}
 	Sistema I Polimórfico \cite{sip}, es una extensión que agrega polimorfismos a Sistema I, tomas algunos de los isomorfismos del conjunto axiomático $Th^2_\times$.
-	Desde el punto de vista de la lógica, agrega el conector $\forall$, y en cuanto a la programación, agrega la gramática
-	de tipos y términos correspondientes a Sistema F con pares.
+	Desde el punto de vista de la lógica, agrega el conector $\forall$, y en cuanto a la programación, agrega la gramática de tipos y términos correspondientes a Sistema F con pares.
 	
 	El trabajo presenta la técnica utilizada para obtener las equivalencias de términos inducidas por un isomorfismo de tipos.
 	Dado un isomorfismo de tipos con dos constructores involucrados, se construyen términos aplicando de diferentes maneras las reglas de tipado relacionadas con los constructores.
 	Para cualquier par de conectivas, tenemos cuatro posibles formas de combinar sus reglas de tipado: introducción-introducción, introducción-eliminación, eliminación-introducción, y eliminación-eliminación.
 	Cada una induce una equivalencia, y cada lado de la equivalencia estará dado por el orden en que se apliquen las conectivas.
-	%TODO: agregar un ejemplo
+	
+	Por ejemplo, el isomorfismo $A \Rightarrow (B \times C) \equiv (A \Rightarrow B) \times (A \Rightarrow C)$ emplea los conectores $\rightarrow$ y $\times$, SIP incluye las siguientes dos equivalencias:
+	
+	\begin{itemize}
+		\item Introducción de $\rightarrow$ e introducción de $\times$: $\lambda x.\langle r,s \rangle \leftrightarrow \langle \lambda x.r, \lambda x.s \rangle$
+
+		\begin{center}
+			\begin{prooftree}
+				\hypo{\Gamma, x:A \vdash r:B}
+				\hypo{\Gamma, x:A \vdash s:C}
+				\infer2[($\times_i$)]{ \Gamma, x:A \vdash \langle r, s \rangle : B \times C }
+				\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x. \langle r, s \rangle : A \Rightarrow B \times C }
+			\end{prooftree}
+			\\
+			\vspace{1em}
+			\begin{prooftree}
+				\hypo{\Gamma, x:A \vdash r:B}
+				\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x.r : A \Rightarrow B }
+				\hypo{\Gamma, x:A \vdash s:C}
+				\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x.s : A \Rightarrow C }
+				\infer2[($\times_i$)]{ \Gamma \vdash \langle \lambda x.r, \lambda x.s \rangle : (A \Rightarrow B) \times (A \Rightarrow C) }
+				\infer1[($\equiv$)]{ \Gamma \vdash \langle \lambda x.r, \lambda x.s \rangle : A \Rightarrow (B \times C) }
+			\end{prooftree}
+		\end{center}
+		
+		\item Eliminación de $\rightarrow$ e introducción de $\times$: $\langle r,s \rangle t \leftrightarrow \langle rt, st \rangle$
+		
+		\begin{center}
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r: A \Rightarrow B}
+				\hypo{\Gamma \vdash s: A \Rightarrow C}
+				\infer2[($\times_i$)]{ \Gamma \vdash \langle r, s \rangle : (A \Rightarrow B) \times (A \Rightarrow C) }
+				\infer1[($\equiv$)]{ \Gamma \vdash \langle r, s \rangle : A \Rightarrow (B \times C) }
+				\hypo{\Gamma \vdash t: A}
+				\infer2[($\Rightarrow_e$)]{ \Gamma \vdash \langle r, s \rangle t : B \times C }
+			\end{prooftree}
+			\\
+			\vspace{1em}
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r: A \Rightarrow B} \hypo{\Gamma \vdash t: A}
+				\infer2[($\Rightarrow_e$)]{ \Gamma \vdash rt : B }
+				\hypo{\Gamma \vdash s: A \Rightarrow C} \hypo{\Gamma \vdash t: A}
+				\infer2[($\Rightarrow_e$)]{ \Gamma \vdash st : C }
+				\infer2[($\times_i$)]{ \Gamma \vdash \langle rt, st \rangle :  B \times C }
+			\end{prooftree}
+		\end{center}
+	\end{itemize}
 	
 
 	\subsection{$\lambda^+$}
@@ -240,9 +318,7 @@
 	Un detalle interesante es la adición de una nueva regla llamada $\textsc{slit}$ que no surge de ningún isomorfismo, sino que es necesaria para reducir términos que de otra forma quedarían atascados.
 	Esto muestra que desde el punto de vista de la implementación, puede ser necesario agregar nuevas equivalencias de términos para lograr reducir a una forma normal.
 	% explicar que introduce el split, es necesario agregar o eliminar isos para lograr la reduccion 
-	
-	
-	\section{Estructura del trabajo}
+
 	
 	\chapter{Preliminares}
 	
@@ -306,36 +382,62 @@
 		
 	
 	\subsection{Lambda cube}
-	% mostrar los distintos tipos de calculos que surgen en cada dimension
+	Hasta ahora se presentaron distintos tipos de cálculo lambda que podemos agrupar en dos categorías, el simplemente tipado ($\lambda_{\to}$), y el cálculo lambda polimórfico, también denominado \textit{Sistema F} o cálculo lambda de segundo orden ($\lambda 2$).
 	
-	\begin{figure}[h!]
+	La diferencia fundamental entre estos dos son las dependencias entre tipos y términos que se permiten.
+	Por ejemplo $\lambda_{\to}$ solo permite que las abstracciones liguen términos, es decir, los términos solo pueden depender de otros términos.
+	Luego, $\lambda 2$ añade nuevas reglas de tipado que permiten construir términos que dependen de tipos.
+	La inclusión de tipos dependiente, es decir, construcciones que permiten a los tipos depender de términos, da como resultado un cálculo denominado $\lambda\Pi$.
+	Si se incluyen estas tres dependencias, es decir, términos que depender de términos o tipos y tipos que dependen de términos, se obtiene el cálculo lambda dependiente de segundo orden ($\lambda\Pi 2$).
+	
+	Notar como cada dependencia es, en cierta forma, ortogonal a las demás, y cada cálculo obtenido a medida que se añaden dependencias, es un superconjunto de los cálculos anteriores, es decir, se obtienen generalizaciones más grandes.
+	Se pueden visualizar las distintas dimensiones utilizando el cubo lambda \cite{lambda_cube}:
+	
+	\begin{figure}[H]
 		\centering
-	\begin{tikzpicture}
-		\matrix (m) [matrix of math nodes,
-		row sep=3em, column sep=2.4em,
-		text height=1.5ex,
-		text depth=0.25ex]{
-						& \lambda\omega             &              & \lambda C					  \\
-			\lambda 2   &                           & \lambda\Pi 2                                \\
-						& \lambda\underline{\omega} &              & \lambda\Pi\underline{\omega} \\
-			\lambda{\to}&                           & \lambda\Pi 								  \\
-		};
-		\path[-{Latex[length=2.5mm, width=1.5mm]}]
-		(m-1-2) edge (m-1-4)
-		(m-2-1) edge (m-2-3)
-				edge (m-1-2)
-		(m-3-2) edge (m-1-2)
-				edge (m-3-4)
-		(m-4-1) edge (m-2-1)
-				edge (m-3-2)
-				edge (m-4-3)
-		(m-3-4) edge (m-1-4)
-		(m-2-3) edge (m-1-4)
-		(m-4-3) edge (m-3-4)
-				edge (m-2-3);
-	\end{tikzpicture}
-	\caption{Lambda cube}
+		\begin{tikzpicture}
+			\matrix (m) [matrix of math nodes,
+			row sep=3em, column sep=2.4em,
+			text height=1.5ex,
+			text depth=0.25ex]{
+							& \lambda\omega             &              & \lambda C					  \\
+				\lambda 2   &                           & \lambda\Pi 2                                \\
+							& \lambda\underline{\omega} &              & \lambda\Pi\underline{\omega} \\
+				\lambda_{\to}&                           & \lambda\Pi 								  \\
+			};
+			\path[-{Latex[length=2.5mm, width=1.5mm]}]
+			(m-1-2) edge (m-1-4)
+			(m-2-1) edge (m-2-3)
+					edge (m-1-2)
+			(m-3-2) edge (m-1-2)
+					edge (m-3-4)
+			(m-4-1) edge (m-2-1)
+					edge (m-3-2)
+					edge (m-4-3)
+			(m-3-4) edge (m-1-4)
+			(m-2-3) edge (m-1-4)
+			(m-4-3) edge (m-3-4)
+					edge (m-2-3);
+		\end{tikzpicture}
+		\caption{El cubo lambda representa las dependencias entre tipos y términos como dimensiones ortogonales, las flechas corresponde a la relación $\subsetneq$.}
 	\end{figure}
+	
+	\begin{itemize}
+		\item $(\uparrow)$: términos que dependen de tipos.
+		El polimorfismo incrementa el poder de cálculo del sistema, ya que permite la auto-aplicación preservando la propiedad de terminación, por lo tanto, es posible representar cualquier función recursiva primitiva.
+		\item $(\rightarrow)$: tipos que dependen de términos.
+		La inclusión de tipos dependientes no aumenta el poder de cálculo, pero permite expresar mediante en el sistema de tipos propiedades sobre los programas.
+		Como se explicará más adelante, los tipos dependientes permiten dar un salto a un sistema, que desde el punto de vista de la lógica, es equivalente a la lógica de predicados.
+		\item $(\nearrow)$: tipos que dependen de tipos.
+		Corresponde a los constructores de tipos, es decir, operadores que permiten crear nuevos tipos a partir de otros tipos más básicos.
+		El cálculo $\lambda\omega$, que permite representar funciones polimórficas y constructores de tipos, es considerado como la base de muchos lenguajes funcionales.
+	\end{itemize}
+	
+	El sistema que incluye a todos los demás, es denominado Cálculo de Construcciones ($\lambda C$), esta posee el mayor poder de cómputo y expresividad.
+	Si bien los sistemas de tipos imponen restricciones sobre las construcciones que son posibles en los sistemas de cálculo, permiten obtener propiedades interesantes.
+	Por ejemplo, la propiedad de terminación es necesaria para que la lógica representada por el cálculo sea consistente.
+	En particular, $\lambda C$ tiene un sistema de tipos lo suficientemente expresivo como para representar la lógica de predicados de alto orden, mientras que es lo suficientemente restrictivo como para que dicha lógica sea consistente.
+	
 	
 	\section{Propositions as Types}
 	El paradigma de ``proposiciones como tipos'' describe la correspondencia entre la lógica y los lenguajes de programación.
@@ -374,7 +476,7 @@
 	
 
 	\section{Intuitionistic Type Theory}
-	La teoría de tipos intuicionista, también llamada teoría de tipos de Martin-Löf propone un sistema lógico formal y los fundamentos filosóficos para las matemáticas constructivas.
+	La teoría de tipos intuicionista, también llamada teoría de tipos de Martin-Löf \cite{ITT} propone un sistema lógico formal y los fundamentos filosóficos para las matemáticas constructivas.
 	
 	Directamente influenciado por las ideas de Howard, Martin-Löf se basó en el principio de proposiciones como tipos y el constructivismo matemático.
 	Este constructivismo requiere que las pruebas contengan un ``testigo'', una prueba de una proposición dada es un programa, por lo tanto, las proposiciones son verdaderas cuando su tipo está habitado por algún término.
@@ -413,7 +515,7 @@
 	\[ (\lambda y. (\lambda x. x y)) x \rightarrow_{\beta} (\lambda x. x y)[y := x] \rightarrow \lambda z. z x \]
 	
 	Utilizar variables con nombres hace que la implementación se vuelva más engorrosa e ineficiente.
-	Una alternativa más adecuada es la representación de DeBruijn, que reemplaza los nombres por números naturales llamados \textit{índices de DeBruijn}.
+	Una alternativa más adecuada es la representación de DeBruijn \cite{debrujin_index}, que reemplaza los nombres por números naturales llamados \textit{índices de DeBruijn}.
 	Por ejemplo, la forma de escribir el término del primer ejemplo con índices es la siguiente:
 	
 	\[ \textcolor{red}{\lambda} (\textcolor{blue}{\lambda\; 0} \; (\textcolor{orange}{\lambda\; 0})) (\textcolor{green}{\lambda}\; \textcolor{red}{1} \; \textcolor{green}{0}) \]
@@ -489,8 +591,13 @@
 	\subsection{STLC con pares y top}
 	Formalizar tipos, términos y relación de reducción.
 	Las substituciones están basadas en http://strictlypositive.org/ren-sub.pdf
+	
+	Archivos: Type, Term (sin regla eqiv), Subs (sin lemas), Reduction
+	
 	\subsection{Isomorfismo de términos}
 	Explicar los isos nuevos que voy a agregar. Formalizar iso tipos y relación de iso.
+	
+	Archivos: IsoType, IsoTerm, Term (regla eqiv)
 	
 	\subsection{Preservación de tipos}
 	
@@ -498,6 +605,7 @@
 	
 	\subsection{Formas normales, neutrales y valores}
 	\subsection{Relación de reducción}
+	Archivos: Progress, Eval (sin SN)
 	
 	\section{Normalización Fuerte}
 	
@@ -510,11 +618,15 @@
 	
 	(https://www.ps.uni-saarland.de/~schaefer/thesis/draft-screen.pdf)
 	\subsection{Prueba para Sistema I}
+	
+	Archivos: StrongNorm
+	
 	\subsection{Well-founded \& Accessibility}
 	Explicar que lo que hicimos en realidad es probar que la inducción sobre la relación de reducción está bien fundada
 	[https://agdapad.quasicoherent.io/~AgdaPadova/html/transcript10.html]
 	(https://agdapad.quasicoherent.io/~AgdaPadova/html/transcript10.html).
-	Mostrar eval.
+	
+	Archivos: Eval (con SN)
 	
 	\section{Conclusiones}
 	
