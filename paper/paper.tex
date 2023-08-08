@@ -40,8 +40,7 @@
 	\chapter{Introducción}
 	Los sistemas de tipos permiten especificar el comportamiento de los programas.
 	Por ejemplo, el tipo $(A \times B) \rightarrow C$ representa los programas que permiten obtener un valor de tipo $C$ a partir de un par de valores de tipo $A$ y $B$. Por otro lado, el tipo $A \rightarrow B \rightarrow C$ representa los programas que primero acepta un valor de tipo $A$, luego uno de tipo $B$ y finalmente devuelve un valor de tipo $C$.
-	Estas dos especificaciones son distintas en su forma pero parecen tener el mismo significado semántico.Esto se debe
-	al isomorfismo de Curry.
+	Estas dos especificaciones son distintas en su forma pero parecen tener el mismo significado semántico. Esto se debe al isomorfismo de Curry.
 	Debido a la estrecha relación entre la programación y la lógica, se observa un comportamiento análogo cuando se trabaja con pruebas.
 	Por ejemplo, una prueba de $(A \wedge B) \Rightarrow C$ no constituye una prueba de $A \Rightarrow B \Rightarrow C$, y viceversa, a pesar de que ambas tienen el mismo significado.
 	
@@ -50,7 +49,7 @@
 	Tanto los sistemas de tipos como los sistemas de pruebas distinguen elementos que tienen diferente forma aunque tengan el mismo significado, como pueden ser las pruebas de las conjunciones $A \wedge B$ y $B \wedge A$, por lo cual una prueba de una no constituye una prueba de la otra, a pesar de que se puede demostrar mediante la existencia de un isomorfismo que dichas proposiciones son equivalentes.
 	
 	Programas con tipos isomorfos representan el mismo tipo de problema, por lo que tratarlos como si fueran idénticos tiene aplicaciones interesantes.
-	Por ejemplo, desde el punto de vista de los programas, nos permite construir expresiones de formas que antes eran erróneas, un término $f : (A \wedge B) \Rightarrow C$ puede ser combinado como $f \langle a, b \rangle$ ó $f \: a \: b$, es decir, es posible sortear cierta rigidez impuesta por el sistema de tipos.
+	Desde el punto de vista de los programas, nos permite construir expresiones que antes no eran posibles, por ejemplo, un término $f : (A \times B) \rightarrow C$ puede ser combinado como $f \langle a, b \rangle$ ó $f \: a \: b$, es decir, es posible evadir cierta rigidez impuesta por el sistema de tipos.
 	Por otro lado, los isomorfismos hacen que las pruebas sean más naturales, por ejemplo, para probar, $A \wedge (A \Rightarrow  B) \Rightarrow B$, deberíamos primero introducir la hipótesis $A \wedge A \Rightarrow  B$, y luego descomponerla en $A$ y $A \Rightarrow B$, en cambio, utilizando el isomorfismo de curry transformamos el objetivo en $(A \Rightarrow A \Rightarrow  B) \Rightarrow B$ y luego introducimos directamente las hipótesis $A$ y $A \Rightarrow B$.
 	
 	\section{Estado del arte}
@@ -59,10 +58,38 @@
 	Para poder abstraernos de la forma y centrarnos en el significado de los programas, es necesario establecer cuáles son las formas que son combinables y cómo combinarlas.
 	Para ello nos valdremos de la noción de isomorfismo entre tipos.
 	El primer paso es considerar dos proposiciones $A$ y $B$ como isomorfas si existen dos pruebas $A \Rightarrow B$ y $B \Rightarrow A$, tal que al componerlas, en ambos sentidos, obtenemos como resultado la identidad.
+	Por ejemplo, para probar que $A \Rightarrow (B \times C) \equiv (A \Rightarrow B) \times (A \Rightarrow C)$ es efectivamente un isomorfismo, se define un término $curry$ que dada una función devuelve su forma currificada, y un término $uncurry$ que realiza la operación inversa:
+	
+	\[ curry = \lambda x^{(A \times B) \Rightarrow C}. \lambda a^A . \lambda b^B . x\langle a,b \rangle \]
+	\[ uncurry = \lambda x^{A \Rightarrow B \Rightarrow C}. \lambda y^{A \times B} . x(\pi_1 y)(\pi_2 y) \]
+	
+	Luego, se demuestra por extensionalidad que para cualquier par $\langle u,v \rangle$ y función $f$ se cumple $uncurry \circ curry = id_{(A \times B) \Rightarrow C}$:
+	
+	\begin{align*}
+		 & (uncurry \circ curry) f \langle u,v \rangle \\
+		=& \\
+		 & uncurry (curry \; f) \langle u,v \rangle \\
+		=& \\
+		 & uncurry ((\lambda x^{(A \times B) \Rightarrow C}. \lambda a^A . \lambda b^B . x\langle a,b \rangle) f)  \langle u,v \rangle \\
+		\hookrightarrow& \\
+		 & uncurry (\lambda a^A . \lambda b^B . f\langle a,b \rangle)  \langle u,v \rangle \\
+		=& \\
+		 & (\lambda x^{A \Rightarrow B \Rightarrow C}. \lambda y^{A \times B} . x(\pi_1 y)(\pi_2 y)) (\lambda a^A . \lambda b^B . f\langle a,b \rangle)  \langle u,v \rangle \\
+		\hookrightarrow& \\
+		& (\lambda y^{A \times B} . (\lambda a^A . \lambda b^B . f\langle a,b \rangle)(\pi_1 y)(\pi_2 y)) \langle u,v \rangle \\
+		\hookrightarrow& \\
+		& (\lambda a^A . \lambda b^B . f\langle a,b \rangle)(\pi_1 \langle u,v \rangle)(\pi_2 \langle u,v \rangle) \\
+		\hookrightarrow& \\
+		& (\lambda a^A . \lambda b^B . f\langle a,b \rangle) u \; v \\
+		\hookrightarrow& \\
+		& f\langle u,v \rangle \\
+	\end{align*}
+	De forma similar se puede probar que $curry \circ uncurry = id_{A \Rightarrow B \Rightarrow C}$
+	
 	Di Cosmo \cite{MSCSSurvey05} caracterizó los conjuntos mínimos de isomorfismos que permiten construir todos los demás a partir de reglas de congruencia y transitividad.
 	Se escribe $A \equiv B$ cuando $A$ y $B$ sean isomorfos.
 	
-	\begin{table}[ht!]
+	\begin{table}[H]
 		\centering
 		\begin{minipage}{0.7\linewidth}
 			\begin{enumerate}
@@ -119,7 +146,7 @@
 	
 	\[ \frac{A \equiv B \quad \Gamma \vdash r:A}{\Gamma \vdash r:B} (\equiv) \]
 	
-	Esta regla permite emplear términos $r:A$ en cualquier lugar que se necesite un cualquier tipo isomorfo a $A$. Por ejemplo:
+	Esta regla permite emplear términos $r:A$ en cualquier lugar que se necesite un tipo isomorfo a $A$. Por ejemplo:
 	
 	\begin{prooftree*}
 		\hypo{ \Gamma\vdash r: A }
@@ -132,14 +159,33 @@
 		\infer2[($\Rightarrow_e$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle \; t : A \times B }
 	\end{prooftree*}
 	
-	La introducción de una relación de equivalencia en el nivel de los tipos necesariamente deberá tener consecuencias en el nivel de los términos.
+	La introducción de una relación de equivalencia en el nivel de los tipos, necesariamente deberá tener consecuencias en el nivel de los términos.
 	Con las reglas de reducción usuales, un término como el del ejemplo anterior estaría en forma normal.
-	Entonces el siguiente paso es extender la relación de reducción con	isomorfismos a nivel términos.
+	Entonces, el siguiente paso es extender la relación de reducción con isomorfismos a nivel términos.
 	Estas nuevas reglas permiten desatascar los términos que tipamos usando $(\equiv)$.
-	Por ejemplo, $\langle r, s \rangle \; t \leftrightarrows \langle r t, s t \rangle$
-	Es importante destacar que dependiendo del conjunto de isomorfismos de términos que se incluyen se obtienen sistemas de cálculo con distintas propiedades, incluir demasiados puede desencadenar en no terminación, y si se incluyen pocas pueden aparecer eliminaciones en formas normales.
+	Por ejemplo, para reducir el término del ejemplo anterior, es necesario definir la siguiente equivalencia de términos $\langle \lambda x^A.r, \lambda x^A.s \rangle \leftrightarrows \lambda x^A. \langle r, s \rangle$:
+	\begin{align*}
+		& \langle \lambda x.r, \lambda x.s \rangle \; t \\
+		\leftrightarrows& \\
+		& (\lambda x^A. \langle r, s \rangle) t \\
+		\hookrightarrow& \\
+		& \langle r[t/x], s[t/x] \rangle
+	\end{align*}
 	
-	Se presentan las reglas propuestas por Sistema I, las cuales fueron elegidas con el objetivo de obtener un cálculo fuertemente normalizante y consistente:
+	Es importante destacar que dependiendo del conjunto de isomorfismos de términos que se incluyen, se obtienen sistemas de cálculo con distintas propiedades, incluir demasiados puede desencadenar en no terminación, y si se incluyen pocos pueden aparecer eliminaciones en formas normales.
+	
+	A continuación, se presentan las reglas propuestas por Sistema I, las cuales fueron elegidas con el objetivo de obtener un cálculo fuertemente normalizante y consistente:
+	
+	\begin{figure}[ht!]
+		\begin{align*}
+			A \times B &\equiv B \times A \\
+			A \times (B \times C) &\equiv (A \times B) \times C \\
+			(A \times B) \Rightarrow C &\equiv A \Rightarrow (B \Rightarrow C) \\
+			A \Rightarrow (B \times C) &\equiv (A \Rightarrow B) \times (A \Rightarrow C)
+		\end{align*}
+		
+		\caption{Isomorfismos de tipo en Sistema I}
+	\end{figure}
 	
 	\begin{figure}[ht!]
 		\centering
@@ -217,8 +263,6 @@
 		\caption{Reglas de tipado}
 	\end{figure}
 	
-	% mostrar isos de termino y reglas de tipado
-	
 	El siguiente paso surge de notar que las nuevas reglas introducen problemas en la reducción clásica.
 	Por un lado, las reglas de proyección $\pi_1$ y $\pi_2$ indexan el par a través de la posición de los elementos, pero el isomorfismo $\textsc{comm}$ permite cambiar el orden de un par, permitiendo así proyectar cualquiera de los dos elementos:
 	
@@ -235,8 +279,8 @@
 	Una consecuencia importante es que esta regla introduce no determinismo en el cálculo.
 	Si $r$ y $s$ tienen tipo $A$, entonces $\pi_A \langle r, s \rangle$ puede reducir indistintamente a cualesquiera de los dos términos.
 	Sin embargo, es posible codificar una proyección determinista incluso cuando ambos términos son del mismo tipo, por ejemplo, el par $\langle r, s \rangle: A \times A$
-	se codifica como $\langle \lambda x^1.r, \lambda x^2.s \rangle : 1 \Rightarrow A \times 2 \Rightarrow A$.
-	Y la proyección $\pi_1 \langle r, s \rangle$ se codifica como $(\pi_{1 \Rightarrow A} \langle \lambda x^1.r, \lambda x^2.s \rangle) y^1$, donde 1 y 2 son dos tipos distintos, y $y^1$ es cualquier elemento de tipo 1. De forma análoga se codifica $\pi_2$.
+	se codifica como $\langle \lambda x^\mathbb{X}.r, \lambda x^\mathbb{Y}.s \rangle : \mathbb{X} \Rightarrow A \times \mathbb{Y} \Rightarrow A$.
+	Y la proyección $\pi_1 \langle r, s \rangle$ se codifica como $(\pi_{\mathbb{X} \Rightarrow A} \langle \lambda x^\mathbb{X}.r, \lambda x^\mathbb{Y}.s \rangle) y^\mathbb{X}$, donde $\mathbb{X}$ y $\mathbb{Y}$ son dos tipos distintos, y $y^\mathbb{X}$ es cualquier elemento de tipo $\mathbb{X}$. De forma análoga se puede codificar $\pi_2$.
 
 	
 	La $\beta$-reducción clásica también entra en conflicto con la preservación de tipos.
@@ -254,7 +298,7 @@
 	
 	
 	\subsection{SIP}
-	Sistema I Polimórfico \cite{sip}, es una extensión que agrega polimorfismos a Sistema I, tomas algunos de los isomorfismos del conjunto axiomático $Th^2_\times$.
+	Sistema I Polimórfico \cite{sip}, es una extensión que agrega polimorfismos a Sistema I, toma algunos de los isomorfismos del conjunto axiomático $Th^2_\times$.
 	Desde el punto de vista de la lógica, agrega el conector $\forall$, y en cuanto a la programación, agrega la gramática de tipos y términos correspondientes a Sistema F con pares.
 	
 	El trabajo presenta la técnica utilizada para obtener las equivalencias de términos inducidas por un isomorfismo de tipos.
@@ -262,10 +306,10 @@
 	Para cualquier par de conectivas, tenemos cuatro posibles formas de combinar sus reglas de tipado: introducción-introducción, introducción-eliminación, eliminación-introducción, y eliminación-eliminación.
 	Cada una induce una equivalencia, y cada lado de la equivalencia estará dado por el orden en que se apliquen las conectivas.
 	
-	Por ejemplo, el isomorfismo $A \Rightarrow (B \times C) \equiv (A \Rightarrow B) \times (A \Rightarrow C)$ emplea los conectores $\rightarrow$ y $\times$, SIP incluye las siguientes dos equivalencias:
+	Por ejemplo, el isomorfismo $A \Rightarrow (B \times C) \equiv (A \Rightarrow B) \times (A \Rightarrow C)$ emplea los conectores $\Rightarrow$ y $\times$, SIP incluye las siguientes dos equivalencias:
 	
 	\begin{itemize}
-		\item Introducción de $\rightarrow$ e introducción de $\times$: $\lambda x.\langle r,s \rangle \leftrightarrow \langle \lambda x.r, \lambda x.s \rangle$
+		\item Introducción de $\Rightarrow$ e introducción de $\times$: $\lambda x.\langle r,s \rangle \leftrightarrows \langle \lambda x.r, \lambda x.s \rangle$
 
 		\begin{center}
 			\begin{prooftree}
@@ -286,7 +330,7 @@
 			\end{prooftree}
 		\end{center}
 		
-		\item Eliminación de $\rightarrow$ e introducción de $\times$: $\langle r,s \rangle t \leftrightarrow \langle rt, st \rangle$
+		\item Eliminación de $\Rightarrow$ e introducción de $\times$: $\langle r,s \rangle t \leftrightarrows \langle rt, st \rangle$
 		
 		\begin{center}
 			\begin{prooftree}
@@ -315,7 +359,7 @@
 	Este trabajo muestra las dificultades de implementar un sistema de tipos módulo isomorfismos y las aplicaciones prácticas de un lenguaje de programación con dichas capacidades.
 	Por ejemplo, utilizando $\textsc{curry}$, $\textsc{comm}$ y $\textsc{asso}$ es posible aplicar parcialmente los argumentos de una función en cualquier orden.
 	
-	Un detalle interesante es la adición de una nueva regla llamada $\textsc{slit}$ que no surge de ningún isomorfismo, sino que es necesaria para reducir términos que de otra forma quedarían atascados.
+	Un detalle interesante es la adición de una nueva regla llamada $\textsc{split}$ que no surge de ningún isomorfismo, sino que es necesaria para reducir términos que de otra forma quedarían atascados.
 	Esto muestra que desde el punto de vista de la implementación, puede ser necesario agregar nuevas equivalencias de términos para lograr reducir a una forma normal.
 	% explicar que introduce el split, es necesario agregar o eliminar isos para lograr la reduccion 
 
@@ -323,7 +367,7 @@
 	\chapter{Preliminares}
 	
 	\section{Tipos dependientes}
-	El ejemplo más común de un tipo dependiente que se suele presentar, es el de los vectores de largo $n$:
+	Un ejemplo clásico que se suele dar a la hora de presentar los tipos dependientes, es el de los vectores de largo $n$:
 	
 	\begin{lstlisting}[mathescape, language=Haskell]
 	data Vec A (n: $\mathbb{N}$) where
@@ -331,7 +375,7 @@
 	  cons : A $\rightarrow$ Vec A n $\rightarrow$ Vec A (suc n)
 	\end{lstlisting}
 	
-	Es importante notar que el segundo parámetro de \verb|Vec| no es el tipo $\mathbb{N}$, sino un elemento de tipo $\mathbb{N}$, por ejemplo, \verb|Vec| $\mathbb{N}$ \verb|3| representa el tipo de los vectores de naturales de largo 3.
+	Es importante notar que el segundo parámetro de \verb|Vec| no es el tipo $\mathbb{N}$, sino un término de tipo $\mathbb{N}$, por ejemplo, \verb|Vec| $\mathbb{N}$ \verb|3| representa el tipo de los vectores de naturales de largo 3.
 	Esto quiere decir que dentro de los tipos pueden aparecer términos, lo cual permite escribir programas más precisos y seguros.
 	
 	Para entender la practicidad de un sistema de tipos con dicho nivel de especificidad, se comparan los siguientes programas:
@@ -346,10 +390,10 @@
 	\end{lstlisting}
 	
 	Notar que el tipo de $zeroesV$ es dependiente e introduce una variable.
-	Si bien la implementación dada para $zeroesL$ es correcta, nada impediría simplemente retornar siempre \verb|[]|, por el contrario, en el caso \verb|(suc n)| de $zeroesV$ se estaría cometiendo un error de tipo, ya que se espera un término de tipo \verb|Vec| $\mathbb{N}$ \verb|(suc n)| y la lista vaciá tiene tipo \verb|Vec| $\mathbb{N}$ \verb|0|.
-	De cierta forma el tipo está guiando la implementación, impidiendo retornar un vector de largo incorrecto.
+	Si bien la implementación dada para $zeroesL$ es correcta, nada impediría simplemente retornar \verb|[]| en todos los casos, por el contrario, en el caso \verb|(suc n)| de $zeroesV$ se estaría cometiendo un error de tipo si se tratara de retornar \verb|[]|, ya que se espera un término de tipo \verb|Vec| $\mathbb{N}$ \verb|(suc n)| y la lista vaciá tiene tipo \verb|Vec| $\mathbb{N}$ \verb|0|.
+	De cierta forma el tipo de las funciones está guiando su implementación, impidiendo, en este caso, retornar un vector de largo incorrecto.
 	
-	Otra compasión que pone en evidencia la correctitud de los lenguajes con tipos dependientes, es la diferencia entre el operador de indexación de listas y vectores.
+	Otra comparación que pone en evidencia la correctitud de los lenguajes con tipos dependientes, es la diferencia entre el operador de indexación de listas y vectores.
 	
 	\begin{lstlisting}[mathescape, language=Haskell]
 	_!!_ : List A $\rightarrow$ $\mathbb{N}$ $\rightarrow$ Maybe A
@@ -358,7 +402,7 @@
 	(x :: xs) !! (suc n) = xs !! n
 	\end{lstlisting}
 	
-	Antes de la implementación de vectores es necesario definir el tipo de datos de los conjuntos finitos:
+	Antes de presentar la implementación para vectores, es necesario definir el tipo de datos de los conjuntos finitos:
 	
 	\begin{lstlisting}[mathescape, language=Haskell]
 	data Fin $\mathbb{N}$ where
@@ -366,7 +410,7 @@
 	  suc  : Fin n $\rightarrow$ Fin (suc n)
 	\end{lstlisting}
 	
-	Cada tipo \verb|Fin n| está habitado por $n$ elementos, estos serían, el elemento \verb|zero| más el constructor \verb|suc| combinado con los $n-1$ elementos de \verb|Fin (n-1)|. Notar que \verb|Fin 0| es un conjunto vacío, es decir que no existe ningún término con dicho tipo.
+	Cada tipo \verb|Fin n| está habitado por $n$ elementos, estos serían, el elemento \verb|zero| más el constructor \verb|suc| combinado con los $n-1$ elementos de \verb|Fin (n-1)|. Notar que \verb|Fin 0| es un conjunto vacío, es decir que no existe ningún término con dicho tipo, o dicho de otra forma, el tipo \verb|Fin 0| no está habitado por ningún término.
 	Luego, un vector de largo $n$ estará indexado por los elementos del conjunto \verb|Fin n|, que tiene cardinalidad exactamente igual a $n$.
 	
 	\begin{lstlisting}[mathescape, language=Haskell]
@@ -375,22 +419,23 @@
 	(cons x v) !!v suc i = v !!v i
 	\end{lstlisting}
 	
-	En la implementación ya no aparece el caso \verb|nil|, porque eso implicaría que $n = 0$, pero el tipo está forzando al argumento \verb|Fin| a tener la misma cantidad de elementos que el vector, por lo que dicho argumento debería ser un elemento de \verb|Fin 0|, el cual es un conjunto vació. Esto es lo que se denomina un ``patrón absurdo''.
+	Notar que en la implementación ya no aparece el caso \verb|nil|, porque eso implicaría que $n = 0$, pero el parámetro $n$ del tipo dependiente está forzando al argumento \verb|Fin| a tener la misma cantidad de elementos que el vector, por lo que dicho argumento debería ser un elemento de \verb|Fin 0|, el cual es un conjunto vació. Esto es lo que se denomina un ``patrón absurdo'', y como es imposible que dicho patrón ocurra, se lo excluye de la implementación.
 	
 	Utilizando estos tipos es imposible tratar de acceder a un elemento que no esté en el rango del vector.
-	Lo más interesante es que los invariantes son verificados estáticamente por el sistema de tipos en tiempo de compilación. Un término que trata de romper alguna invariante, está mal tipado, por lo que ni siquiera es posible construirlo.
-		
+	Lo más interesante es que los invariantes son verificados estáticamente por el sistema de tipos en tiempo de compilación. Un término que trata de romper alguna invariante, estará mal tipado, por lo que no es posible construirlo.
+
 	
 	\subsection{Lambda cube}
-	Hasta ahora se presentaron distintos tipos de cálculo lambda que podemos agrupar en dos categorías, el simplemente tipado ($\lambda_{\to}$), y el cálculo lambda polimórfico, también denominado \textit{Sistema F} o cálculo lambda de segundo orden ($\lambda 2$).
+	Hasta ahora se presentaron distintos tipos de cálculo lambda que se podrían agrupar en dos grandes categorías, el simplemente tipado ($\lambda_{\to}$), y el cálculo lambda polimórfico, también denominado \textit{Sistema F} o cálculo lambda de segundo orden ($\lambda 2$).
 	
-	La diferencia fundamental entre estos dos son las dependencias entre tipos y términos que se permiten.
+	La diferencia fundamental entre estos dos, son las dependencias entre tipos y términos que se permiten.
 	Por ejemplo $\lambda_{\to}$ solo permite que las abstracciones liguen términos, es decir, los términos solo pueden depender de otros términos.
 	Luego, $\lambda 2$ añade nuevas reglas de tipado que permiten construir términos que dependen de tipos.
+	
 	La inclusión de tipos dependiente, es decir, construcciones que permiten a los tipos depender de términos, da como resultado un cálculo denominado $\lambda\Pi$.
 	Si se incluyen estas tres dependencias, es decir, términos que depender de términos o tipos y tipos que dependen de términos, se obtiene el cálculo lambda dependiente de segundo orden ($\lambda\Pi 2$).
 	
-	Notar como cada dependencia es, en cierta forma, ortogonal a las demás, y cada cálculo obtenido a medida que se añaden dependencias, es un superconjunto de los cálculos anteriores, es decir, se obtienen generalizaciones más grandes.
+	Notar como cada dependencia es, en cierta forma, ortogonal a las demás, y cada cálculo obtenido a medida que se añaden dependencias, es un superconjunto de los cálculos anteriores, es decir, se obtienen generalizaciones cada vez más grandes.
 	Se pueden visualizar las distintas dimensiones utilizando el cubo lambda \cite{lambda_cube}:
 	
 	\begin{figure}[H]
@@ -419,7 +464,7 @@
 			(m-4-3) edge (m-3-4)
 					edge (m-2-3);
 		\end{tikzpicture}
-		\caption{El cubo lambda representa las dependencias entre tipos y términos como dimensiones ortogonales, las flechas corresponde a la relación $\subsetneq$.}
+		\caption{El cubo lambda representa las dependencias entre tipos y términos como dimensiones ortogonales, las flechas corresponden a la relación $\subsetneq$.}
 	\end{figure}
 	
 	\begin{itemize}
@@ -430,23 +475,23 @@
 		Como se explicará más adelante, los tipos dependientes permiten dar un salto a un sistema, que desde el punto de vista de la lógica, es equivalente a la lógica de predicados.
 		\item $(\nearrow)$: tipos que dependen de tipos.
 		Corresponde a los constructores de tipos, es decir, operadores que permiten crear nuevos tipos a partir de otros tipos más básicos.
-		El cálculo $\lambda\omega$, que permite representar funciones polimórficas y constructores de tipos, es considerado como la base de muchos lenguajes funcionales.
+		El cálculo $\lambda\omega$, que permite representar funciones polimórficas y constructores de tipos, es considerado como la base de muchos lenguajes de programación funcionales.
 	\end{itemize}
 	
-	El sistema que incluye a todos los demás, es denominado Cálculo de Construcciones ($\lambda C$), esta posee el mayor poder de cómputo y expresividad.
+	El sistema que incluye a todos los demás, es denominado Cálculo de Construcciones ($\lambda C$), este posee el mayor poder de cómputo y expresividad.
 	Si bien los sistemas de tipos imponen restricciones sobre las construcciones que son posibles en los sistemas de cálculo, permiten obtener propiedades interesantes.
-	Por ejemplo, la propiedad de terminación es necesaria para que la lógica representada por el cálculo sea consistente.
+	Por ejemplo, la propiedad de terminación es necesaria para que la lógica representada por estos cálculos sea consistente.
 	En particular, $\lambda C$ tiene un sistema de tipos lo suficientemente expresivo como para representar la lógica de predicados de alto orden, mientras que es lo suficientemente restrictivo como para que dicha lógica sea consistente.
 	
 	
 	\section{Propositions as Types}
 	El paradigma de ``proposiciones como tipos'' describe la correspondencia entre la lógica y los lenguajes de programación.
-	Básicamente, dice que para a cada proposición en la lógica le corresponde un tipo, y viceversa.
+	Básicamente, dice que a cada proposición en la lógica le corresponde un tipo, y viceversa.
 	De hecho, esta relación es más profunda, ya que a cada prueba de una proposición dada, le corresponde un programa del tipo correspondiente, y viceversa.
 	Es decir, ``pruebas como programas''.
-	Incluso es más profunda aún, en el sentido de que para cada forma de simplificar una prueba, existe una forma correspondiente de evaluar un programa, y viceversa. Por lo que tenemos, ``simplificación de pruebas como evaluación de programas''.
+	Incluso, es más profunda aún, en el sentido de que para cada forma de simplificar una prueba, existe una forma correspondiente de evaluar un programa, y viceversa. Por lo que tenemos, ``simplificación de pruebas como evaluación de programas''.
 	
-	Tal como lo explica Wadler en su artículo \cite{pas}, no se trata de una simple biyección entre proposiciones y tipos, sino un verdadero isomorfismo que preserva la compleja estructura de pruebas y programas, simplificaciones y evaluaciones.
+	Tal como lo explica Wadler en su artículo \cite{pas}, no se trata de una simple biyección entre proposiciones y tipos, sino de un verdadero isomorfismo que preserva la compleja estructura de pruebas y programas, simplificaciones y evaluaciones.
 	
 	Este principio surge de las observaciones realizadas por Curry sobre la lógica proposicional, y más tarde extendidas por Howard a la lógica de predicados.
 	La clave de esta extensión es la introducción de los tipos dependientes para representar los predicados y cuantificadores en la lógica de predicados.
@@ -478,19 +523,20 @@
 	\section{Intuitionistic Type Theory}
 	La teoría de tipos intuicionista, también llamada teoría de tipos de Martin-Löf \cite{ITT} propone un sistema lógico formal y los fundamentos filosóficos para las matemáticas constructivas.
 	
-	Directamente influenciado por las ideas de Howard, Martin-Löf se basó en el principio de proposiciones como tipos y el constructivismo matemático.
+	Directamente influenciado por las ideas de Howard, Martin-Löf se basó en el principio de proposiciones como tipos y el constructivismo matemático para el desarrollo de su teoría.
 	Este constructivismo requiere que las pruebas contengan un ``testigo'', una prueba de una proposición dada es un programa, por lo tanto, las proposiciones son verdaderas cuando su tipo está habitado por algún término.
 	Las pruebas son términos que atestiguan la veracidad del teorema, y pueden ser manipulados como cualquier otro término del lenguaje.
+	Vistas como programas, las pruebas son procedimientos que al ejecutarlos permiten obtener valores del tipo indicado por la proposición, por este motivo se dice que las pruebas son constructivas.
 	
 	Esto tiene algunas consecuencias interesantes, por ejemplo, en la lógica clásica, a las proposiciones se les asigna valores de verdad sin importar si existe evidencia directa de que sea verdadera o falsa.
 	Esto es lo que comúnmente se denomina ``principio del tercero excluido'', ya que excluye la posibilidad de un tercer valor distinto de verdadero o falso.
-	Por lo tanto, no es posible probar $A \vee \not A$ en la lógica intuicionista.
+	Sin embargo, puede que no siempre sea posible construir una prueba de dicha proposición para cualquier tipo $A$, por lo tanto, no es posible probar $A \vee \neg A$ en la lógica intuicionista.
 
 	
 	Se puede pensar a la teoría de tipos intuicionista como un lenguaje de programación funcional donde el sistema de tipos es tan rico que prácticamente cualquier propiedad concebible de un programa puede expresarse como un tipo.
 	Todas las funciones de este lenguaje deben ser totales y computables, por lo que todos los programas deben necesariamente cumplir con la propiedad de terminación.
 	
-	Filosófica y prácticamente, esta teoría de tipos es un marco fundamental donde las matemáticas constructivas y la programación son, en un sentido profundo, lo mismo.
+	Filosófica y prácticamente, la teoría de tipos de Martin-Löf es un marco fundamental donde las matemáticas constructivas y la programación son, en un sentido profundo, lo mismo.
 	
 	
 	\section{Agda}
@@ -507,12 +553,12 @@
 	Generalmente, los términos en cálculo lambda se presentan utilizando letras para nombrar las variables, por ejemplo:
 	\[ \lambda z. (\lambda y. y (\lambda x. x)) (\lambda x. z x) \]
 	Esta forma de representación permite ver a simple vista cuáles variables están ligadas y a que abstracción pertenecen, también suelen utilizarse palabras para dar nombres más descriptivos a las variables.
-	Se puede notar que la forma de escribir un término no es única, ya que es posible cambiar los nombres de algunas variables sin alterar su significado, por ejemplo, $\lambda c. (\lambda b. b (\lambda d. d)) (\lambda a. c a)$ es equivalente al del ejemplo anterior.
+	Se puede notar que la forma de escribir un término no es única, ya que es posible cambiar los nombres de algunas variables sin alterar su significado, por ejemplo, el término $\lambda c. (\lambda b. b (\lambda d. d)) (\lambda a. c a)$ es equivalente al del ejemplo anterior.
 	Cuando esto ocurre se dice que los términos son $\alpha$-equivalentes.
 	
 	El principal problema de esta representación es que para implementar la $\beta$-reducción, se debe tener cuidado de no capturar una variable libre cuando se substituye un término en el cuerpo de una abstracción, en caso de que eso ocurra, se renombra la variable capturada con un nuevo nombre fresco.
 	En el siguiente ejemplo la variable $x$ es renombrada a $z$ para evitar la captura:
-	\[ (\lambda y. (\lambda x. x y)) x \rightarrow_{\beta} (\lambda x. x y)[y := x] \rightarrow \lambda z. z x \]
+	\[ (\lambda y. (\lambda x. x y)) x \hookrightarrow_{\beta} (\lambda x. x y)[y := x] = \lambda z. z x \]
 	
 	Utilizar variables con nombres hace que la implementación se vuelva más engorrosa e ineficiente.
 	Una alternativa más adecuada es la representación de DeBruijn \cite{debrujin_index}, que reemplaza los nombres por números naturales llamados \textit{índices de DeBruijn}.
@@ -530,7 +576,7 @@
 	Por ejemplo:
 	\[ (0\; 1\; 3)\{0\mapsto a, 1\mapsto b, i+2\mapsto i\} \rightarrow a\; b\; 1 \]
 	
-	Si se quisiera definir la $\beta$ reducción utilizando esta notación, una primera definición sería:
+	Si se quisiera definir la $\beta$-reducción utilizando esta notación, una primera definición sería:
 	
 	\[ (\lambda a)b \rightarrow_{\beta} a \{ 0 \mapsto b, i+1\mapsto i+1 \} \]
 	
@@ -538,7 +584,7 @@
 	
 	\[ (\lambda a)b \rightarrow_{\beta} a \{ 0 \mapsto b, i+1\mapsto i \} \]
 	
-	El siguiente problema surge al intentar empujar la substitución dentro de una abstracción, en dicho caso, se debe evitar reemplazar el índice 0 por $b$:
+	El siguiente problema surge al intentar empujar la substitución dentro de una abstracción, en dicho caso, se debe evitar reemplazar el índice 0 por $b$, por lo que toda la secuencia se mueve un lugar a la derecha:
 	
 	\[ (\lambda c)\{ 0 \mapsto b, i+1\mapsto i \} = \lambda c \{ 0 \mapsto 0, 1 \mapsto b, i+2\mapsto i+1 \} \]
 	
@@ -548,9 +594,9 @@
 	El siguiente ejemplo muestra la forma correcta de realizar una $\beta$ reducción:
 	
 	\[
-	(\textcolor{red}{\lambda}\; \lambda\; 3\; \textcolor{red}{1}\; (\textcolor{green}{\lambda\; 0}\; \textcolor{red}{2}))\; (\textcolor{blue}{\lambda}\; 4\; \textcolor{blue}{0})
-	\rightarrow_\beta
-	\lambda \; 2\; (\textcolor{blue}{\lambda}\; 5\; \textcolor{blue}{0})\; (\textcolor{green}{\lambda\; 0}\; (\textcolor{blue}{\lambda}\; 6\; \textcolor{blue}{0}))\;
+	(\textcolor{red}{\lambda}\; \lambda\; \textcolor{orange}{3}\; \textcolor{red}{1}\; (\textcolor{green}{\lambda\; 0}\; \textcolor{red}{2}))\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{4}\; \textcolor{blue}{0})
+	\hookrightarrow_\beta
+	\lambda \; \textcolor{orange}{2} \; (\textcolor{blue}{\lambda}\; \textcolor{orange}{5}\; \textcolor{blue}{0})\; (\textcolor{green}{\lambda\; 0}\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{6}\; \textcolor{blue}{0}))\;
 	\]
 	
 	Notar como las variables libres del cuerpo de la abstracción se disminuyen en uno, las variables libres del argumento aumentan en uno por cada $\lambda$ que atraviesan, y las variables ligadas quedan intactas.
@@ -561,7 +607,7 @@
 	\begin{itemize}
 		\item $id$ es la substitución identidad $\{i \mapsto i\}$.
 		\item $\uparrow$ es el operador shift, y suma uno a cada índice $\{i \mapsto i+1\}$.
-		\item $a \cdot s$ es la concatenación del término $a$ a la substitución $s$, $\{0 \mapsto a, i+1 \mapsto s(i)\}$. Por ejemplo $a \cdot s = \{ 0 \mapsto a, 1 \mapsto 0, 2 \mapsto 1, 3 \mapsto 2, \dots \} $
+		\item $a \cdot s$ es la concatenación del término $a$ a la substitución $s$, $\{0 \mapsto a, i+1 \mapsto s(i)\}$. Por ejemplo $a \cdot id = \{ 0 \mapsto a, 1 \mapsto 0, 2 \mapsto 1, 3 \mapsto 2, \dots \} $
 		\item $s \circ t$ corresponde a la composición de substituciones, donde primero se aplica $s$ y luego $t$.
 	\end{itemize}
 	
@@ -572,14 +618,15 @@
 		(\lambda a)[s] &= \lambda a[1 \cdot (s \; \circ \uparrow)]
 	\end{align*}
 	
-	Finalmente, la $\beta$ reducción se define como:
-	\[ (\lambda a)b \rightarrow_{\beta} a[b \cdot id] \]
+	Finalmente, la $\beta$-reducción se define como:
+	\[ (\lambda a)b \hookrightarrow_{\beta} a[b \cdot id] \]
 	
-	El trabajo Abadi también presenta algunas propiedades algebraicas de los operadores:
+	El trabajo Abadi también presenta algunas propiedades algebraicas de los operadores que resultan útiles a la hora de probar propiedades sobre las substituciones:
 	\begin{align*}
-		0\; \cdot \uparrow &= id \\
+		0 \; \cdot \uparrow &= id \\
 		\uparrow \circ\; (a \cdot s) &= s \\
-		0[s]\; \cdot (\uparrow \circ\; s) &= s \\
+		0[s] \cdot (\uparrow \circ\; s) &= s \\
+		(a \cdot s) \circ t &= a[t] \cdot (s \circ t) \\
 	\end{align*}
 	
 	
