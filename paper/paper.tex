@@ -7,14 +7,7 @@
 \usepackage{listings}
 \usepackage{ebproof}
 \usepackage{float}
-\usepackage{agda}
-\usepackage{newunicodechar}
-\newunicodechar{≡}{\ensuremath{\mathnormal\equiv}}
-\newunicodechar{∀}{\ensuremath{\mathnormal\forall}}
-\newunicodechar{⇒}{\ensuremath{\mathnormal\Rightarrow}}
-\newunicodechar{⊤}{\ensuremath{\mathnormal\top}}
-\newunicodechar{₁}{\ensuremath{{}_1}}
-\newunicodechar{₂}{\ensuremath{{}_2}}
+\usepackage[conor]{agda}
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \usepackage[style=alphabetic]{biblatex}
@@ -548,6 +541,7 @@
 	Agda es un lenguaje total, es decir que todos los programas deben terminar, y todos los posibles casos de un pattern matching deben ser cubiertos, de otro modo la lógica sería inconsistente.
 	Por este motivo, no todas las funciones recursivas están permitidas, Agda poseé un mecanismo de comprobación de terminación que acepta aquellas funciones que puede probar mecánicamente su terminación.
 	
+	% TODO: Explicar simbolos, opperadores y Sets (universos)
 	
 	\section{Indices de DeBruijn}
 	Generalmente, los términos en cálculo lambda se presentan utilizando letras para nombrar las variables, por ejemplo:
@@ -632,25 +626,67 @@
 	
 	\chapter{Aportes}
 	\section{Formalización}
-	\subsection{Tipos intrínsecos}
-	Explicar la diferencia entre Curry style y Church style, y como nos ayuda tener tipos intrínsecos. Acá hay muchas referencias
-	[https://plfa.github.io/DeBruijn/] (https://plfa.github.io/DeBruijn/).
-	\subsection{STLC con pares y top}
-	Formalizar tipos, términos y relación de reducción.
-	Las substituciones están basadas en http://strictlypositive.org/ren-sub.pdf
 	
-	Archivos: Type, Term (sin regla eqiv), Subs (sin lemas), Reduction
+	% Explicar que la formalizacion está basada en el libro plfa
+	
+	\subsection{Tipos intrínsecos}
+	% Explicar la diferencia entre Curry style y Church style, y como nos ayuda tener tipos intrínsecos. % Acá hay muchas referencias https://plfa.github.io/DeBruijn/
+	
+	\subsection{Cálculo lambda con pares y tipo Top}
+	
+	En primera instancia se definen los tipos del, se presentan cuatro constructores de tipos.
+	Por un lado, los tipos base son, el tipo atómico \AgdaInductiveConstructor{$\tau$} y el tipo top \AgdaInductiveConstructor{$\top$}.
+	Y, por otro lado, el tipo de las funciones \AgdaInductiveConstructor{$\_\Rightarrow\_$} y los pares \AgdaInductiveConstructor{$\_\times\_$}.
+
+	\begin{codigo}
+		Tipo de dato de los tipos
+		\input{code/type.tex}
+	\end{codigo}
+	
+	Dado que se utiliza la representación de De Brujin, los entornos de tipado, simplemente se formalizan como listas de tipos.
+	Al contrario de las listas normales, los entornos se leen de derecha a izquierda.
+	
+	Luego se formalizan las variables intrínsecamente tipadas, que son representadas por los índices propiamente dichos.
+	
+	\begin{codigo}
+		Tipo de dato de los contextos de tipado
+    	\ExecuteMetaData[code/context.tex]{ctx}
+	\end{codigo}
+	
+	Se escribe \AgdaBound{$\Gamma$} \AgdaInductiveConstructor{$\ni$} \AgdaBound{A}, para el tipo de las variables que tienen tipo \AgdaBound{A} en el entorno de tipado \AgdaBound{$\Gamma$}.
+	Por ejemplo: 
+	
+	\ExecuteMetaData[code/context.tex]{example}
+	
+	\begin{codigo}
+		Tipo de dato de los términos
+		\input{code/term.tex}
+	\end{codigo}
+	
+	\ExecuteMetaData[code/subs.tex]{operators}
+	
+	\ExecuteMetaData[code/subs.tex]{subs}
+	
+	\begin{codigo}
+		Tipo de dato de la relación de reducción
+		\input{code/reduction.tex}
+	\end{codigo}
+	
+	% Formalizar tipos, términos y relación de reducción.
+	% Las substituciones están basadas en http://strictlypositive.org/ren-sub.pdf
+	% Archivos: Type, Term (sin regla eqiv), Subs (sin lemas), Reduction
 	
 	\subsection{Isomorfismo de términos}
-	Explicar los isos nuevos que voy a agregar. Formalizar iso tipos y relación de iso.
-	
-	Archivos: IsoType, IsoTerm, Term (regla eqiv)
+	% Explicar los isos nuevos que voy a agregar. Formalizar iso tipos y relación de iso.
+	% Archivos: IsoType, IsoTerm, Term (regla eqiv)
 	
 	\subsection{Preservación de tipos}
 	
 	\section{Progreso}
 	
 	\subsection{Formas normales, neutrales y valores}
+	
+	
 	\subsection{Relación de reducción}
 	Archivos: Progress, Eval (sin SN)
 	
