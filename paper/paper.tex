@@ -609,7 +609,7 @@
 	\begin{align*}
 		n[s] &= s(n) \\
 		(a\; b)[s] &= a[s]\; b[s] \\
-		(\lambda a)[s] &= \lambda a[1 \cdot (s \; \circ \uparrow)]
+		(\lambda a)[s] &= \lambda a[0 \cdot (s \; \circ \uparrow)]
 	\end{align*}
 	
 	Finalmente, la $\beta$-reducción se define como:
@@ -658,36 +658,79 @@
 	
 	\ExecuteMetaData[code/context.tex]{example}
 	
+	A continuación se presentan los juicios de tipado, debido a que se utilizan tipos intrínsecos, estos corresponden con los términos del lenguaje.
+	
 	\begin{codigo}
 		Tipo de dato de los términos
 		\input{code/term.tex}
 	\end{codigo}
 	
+	Notar que el constructor \AgdaInductiveConstructor{$[\_]\equiv\_$} corresponde a la regla de tipado $(\equiv)$ de Sistema-I.
+	En el constructor \AgdaInductiveConstructor{$\pi$} se observa otro detalle importante, además de tomar como argumento el tipo \AgdaBound{C}, toma un argumento implícito que funciona como evidencia de que el tipo \AgdaBound{C} es o bien igual al tipo \AgdaBound{A}, o bien igual al tipo \AgdaBound{B}. Para ello se utilizan el tipo suma y la igualdad proposicional que están definidos en la librería estándar de Agda.
+	
+	
+	Aquí se presentan las definiciones de los renombres de variables, substitución de variables y operadores del álgebra-$\sigma$ presentados en capítulos anteriores.
+	
 	\ExecuteMetaData[code/subs.tex]{operators}
 	
-	\ExecuteMetaData[code/subs.tex]{subs}
+	Los renombres son simplemente funciones que mapean las variables de un entorno a otro preservando el tipo de las mismas.
+	Por otro lado, las substituciones mapean cada variable de un entorno a un término que tenga el mismo tipo que dicha variable.
+	Se pueden pensar a estas substituciones como las secuencias que se utilizaran para reemplazar las variables libres en los cuerpos de las abstracciones cuando se realice una $\beta$-reducción. 
 	
+	La implementación de las substituciones explícitas se divide en dos partes.
+	Primero se implementa la operación \AgdaFunction{rename} que dado una función de renombrado $\rho$ y un término, aplica el renombre de variables a dicho término.
+	Como ya se mencionó, se debe tener cuidado de no capturar el índice 0 cuando se empuja el renombre dentro de una abstracción.
+	Por este motivo, se define la función \AgdaFunction{ext} que toma un renombre y retorna uno nuevo con los entornos extendidos.
+	Notar que esta definición sigue la forma propuesta por Abadi: $Z \cdot (\rho \; \circ S\_)$
+	
+	\ExecuteMetaData[code/subs.tex]{rename}
+	
+	Una vez implementada la aplicación de renombres, se puede implementar la aplicación de substituciones.
+	Nuevamente y de forma análoga, se define una función \AgdaFunction{exts} que extiende la sustitución cuando se atraviesa una abstracción. $`Z \cdot (\sigma \; \circ \text{rename } S\_)$.
+	
+	Luego se define la substitución simple \AgdaFunction{$\_[\_]$}, que dato un término \AgdaBound{N} cuya primera variable libre es de tipo \AgdaBound{B} y un término \AgdaBound{M} de dicho tipo, cierra el índice 0 de \AgdaBound{N} utilizando \AgdaBound{M}.
+	
+	\ExecuteMetaData[code/subs.tex]{subst}
+	
+	Notar las similitudes entre la definición de \AgdaFunction{rename} y \AgdaFunction{subst}, esto se debe a que los renombres son un caso particular de substitución, donde todos los términos retornados por la substitución son variables.
+	El motivo principal por el cual es necesario implementar \AgdaFunction{rename}, es que si se quisiera definir \AgdaFunction{exts} utilizando \AgdaFunction{subst} (\AgdaSymbol{$\lambda$} \AgdaBound{v} \AgdaSymbol{$\rightarrow$} \AgdaInductiveConstructor{`} (\AgdaInductiveConstructor{S} \AgdaBound{v})) (\AgdaBound{$\sigma$} \AgdaBound{x}), la llamada recursiva sería sobre el término que retorna $\sigma$, por lo que el chequeo de terminación de Agda fallaría.
+	
+	
+	Finalmente, se presenta la relación de reducción.
+	Los constructores \AgdaInductiveConstructor{$\xi$} y \AgdaInductiveConstructor{$\zeta$} representan las reglas de congruencia que permiten construir reducciones sobre sub-términos.
+
 	\begin{codigo}
 		Tipo de dato de la relación de reducción
 		\input{code/reduction.tex}
 	\end{codigo}
 	
+	Es importante destacar que el tipo de \AgdaDatatype{$\_\hookrightarrow\_$}, está indexado por dos términos del mismo tipo \AgdaBound{A}, es decir, no es necesario demostrar que la reducción preserva tipos, ya que es imposible construir una reducción a un término de distinto tipo.
+	Esta es una de las ventajas más importante de utilizar tipos intrínsecos.
+	
 	% Formalizar tipos, términos y relación de reducción.
 	% Las substituciones están basadas en http://strictlypositive.org/ren-sub.pdf
-	% Archivos: Type, Term (sin regla eqiv), Subs (sin lemas), Reduction
+	% Archivos: Type, Term, Subs (sin lemas), Reduction
 	
 	\subsection{Isomorfismo de términos}
+	
+	$Th^1_{\times\top}$
+	
+	\input{code/iso_type.tex}
+	\input{code/iso_term.tex}
+	
 	% Explicar los isos nuevos que voy a agregar. Formalizar iso tipos y relación de iso.
-	% Archivos: IsoType, IsoTerm, Term (regla eqiv)
+	% Archivos: IsoType, IsoTerm
 	
 	\subsection{Preservación de tipos}
 	
 	\section{Progreso}
 	
 	\subsection{Formas normales, neutrales y valores}
+	Explicar que es muy importante definir bien a que estado se quiere llegar, (en este caso forma normal)
 	
 	
 	\subsection{Relación de reducción}
+	Ver si esta bien llama reducción a $\hookrightarrow$ o a $\rightsquigarrow$
 	Archivos: Progress, Eval (sin SN)
 	
 	\section{Normalización Fuerte}
@@ -696,18 +739,15 @@
 	Primero mostrar la prueba sin isomorfismos. Puedo y extendiéndola de a poco como en el apunte de Beta Ziliani
 	\subsection{Diferencias con la prueba de Girard}
 	Capitulo 5.6 como referencia
-	
-	[https://www.ps.uni-saarland.de/~schaefer/thesis/draft-screen.pdf] 
-	
-	(https://www.ps.uni-saarland.de/~schaefer/thesis/draft-screen.pdf)
+	https://www.ps.uni-saarland.de/~schaefer/thesis/draft-screen.pdf
+
 	\subsection{Prueba para Sistema I}
 	
 	Archivos: StrongNorm
 	
 	\subsection{Well-founded \& Accessibility}
 	Explicar que lo que hicimos en realidad es probar que la inducción sobre la relación de reducción está bien fundada
-	[https://agdapad.quasicoherent.io/~AgdaPadova/html/transcript10.html]
-	(https://agdapad.quasicoherent.io/~AgdaPadova/html/transcript10.html).
+	https://agdapad.quasicoherent.io/~AgdaPadova/html/transcript10.html
 	
 	Archivos: Eval (con SN)
 	
