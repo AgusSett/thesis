@@ -713,10 +713,39 @@
 	
 	\subsection{Isomorfismo de términos}
 	
-	$Th^1_{\times\top}$
+	Los isomorfismos de tipos que se incluyen en esta formalización corresponden al conjunto axiomático $Th^1_{\times\top}$.
+	Además de los axiomas, se definen los constructores \AgdaInductiveConstructor{sym} y \AgdaInductiveConstructor{cong} que representan las simetrías y congruencias respectivamente.
 	
-	\input{code/iso_type.tex}
-	\input{code/iso_term.tex}
+	\begin{codigo}
+		Tipo de dato de los isomorfismos de tipos
+		\input{code/iso_type.tex}
+	\end{codigo}
+	
+	Utilizando estos constructores es posible crear cualquier isomorfismo.
+	Notar que no existe una regla para la transitividad, ya que es posible obtenerla aplicando dos veces el constructor \AgdaInductiveConstructor{$[\_]\equiv\_$}. Por ejemplo, el término \AgdaInductiveConstructor{[ trans} \AgdaBound{$iso_1$} \AgdaBound{$iso_2$} \AgdaInductiveConstructor{]$\equiv$} \AgdaBound{t} puede construirse como  \AgdaInductiveConstructor{[} \AgdaBound{$iso_2$} \AgdaInductiveConstructor{]$\equiv$} (\AgdaInductiveConstructor{[} \AgdaBound{$iso_1$} \AgdaInductiveConstructor{]$\equiv$} \AgdaBound{t}).
+	
+	A continuación se presentan los isomorfismos de términos.
+	Esta selección de constructores es el resultado de varias decisiones de diseño basadas principalmente en dos objetivos.
+	
+	En primer lugar, se agregaron todos los isomorfismos necesarios para que ningún término quede atascado y no existan eliminaciones en formas normales, esto tiene como consecuencia que todo término cerrado reduce siempre a un valor. Este punto es más evidente cuando se tiene en cuenta la prueba de progreso presentada más adelante.
+	
+	El segundo objetivo es preservar la propiedad de normalización y evitar complicar demasiado su prueba.
+	Una consecuencia directa de esto son los constructores con el prefijo \AgdaInductiveConstructor{sym-}, todos estos se podrían obtener a partir de los isomorfismos base combinados con un constructor \AgdaInductiveConstructor{sym} tal y como se construyen los isomorfismos de tipos.
+	Sin embargo, incluir el constructor \AgdaInductiveConstructor{sym} genera problemas a la hora de formalizar la prueba de normalización fuerte.
+	Por otro lado, para desatascar algunos términos son necesarias la $\eta$-expansión y una regla $split$ $r \rightleftarrows \langle \pi_A\; r , \pi_B\; r \rangle$ donde $r: A \times B$.
+	Al incluir estas reglas se pierde la propiedad de normalización, ya que nada impediría aplicarlas un número infinito de veces.
+	La solución es definir nuevos constructores que embeben estas reglas, como por ejemplo \AgdaInductiveConstructor{asso-split}.
+	
+	
+	\begin{codigo}
+		Tipo de dato de los isomorfismos de términos
+		\input{code/iso_term.tex}
+	\end{codigo}
+	
+	Al igual que en la relación de reducción, los tipos intrínsecos garantizan que los términos transformados por los isomorfismos preservan sus tipos.
+	Notar como todos los isomorfismos base presentan una regla ($\equiv$) del lado izquierdo, la cual desaparece del lado derecho.
+	Por lo tanto, los isomorfismos solo pueden aplicarse para eliminar un constructor ($\equiv$) del término.
+	Este punto es fundamental para preservar la propiedad de normalización.
 	
 	% Explicar los isos nuevos que voy a agregar. Formalizar iso tipos y relación de iso.
 	% Archivos: IsoType, IsoTerm
@@ -728,6 +757,7 @@
 	\subsection{Formas normales, neutrales y valores}
 	Explicar que es muy importante definir bien a que estado se quiere llegar, (en este caso forma normal)
 	
+	\ExecuteMetaData[code/progress.tex]{normal}
 	
 	\subsection{Relación de reducción}
 	Ver si esta bien llama reducción a $\hookrightarrow$ o a $\rightsquigarrow$

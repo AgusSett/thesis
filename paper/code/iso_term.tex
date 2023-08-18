@@ -103,14 +103,14 @@
 	\AgdaSymbol{=}\AgdaSpace{}%
 	\AgdaBound{B}\AgdaSymbol{\}}\AgdaSpace{}%
 	\AgdaSymbol{=}\AgdaSpace{}%
-	\AgdaInductiveConstructor{proj}\AgdaSpace{}%
+	\AgdaInductiveConstructor{π}\AgdaSpace{}%
 	\AgdaBound{B}\AgdaSpace{}%
 	\AgdaSymbol{\{}\AgdaInductiveConstructor{inj₂}\AgdaSpace{}%
 	\AgdaInductiveConstructor{refl}\AgdaSymbol{\}}\AgdaSpace{}%
 	\AgdaSymbol{(}\AgdaOperator{\AgdaInductiveConstructor{`}}\AgdaSpace{}%
 	\AgdaInductiveConstructor{Z}\AgdaSymbol{)}\AgdaSpace{}%
 	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
-	\AgdaInductiveConstructor{proj}\AgdaSpace{}%
+	\AgdaInductiveConstructor{π}\AgdaSpace{}%
 	\AgdaBound{A}\AgdaSpace{}%
 	\AgdaSymbol{\{}\AgdaInductiveConstructor{inj₁}\AgdaSpace{}%
 	\AgdaInductiveConstructor{refl}\AgdaSymbol{\}}\AgdaSpace{}%
@@ -361,14 +361,14 @@
 	\AgdaOperator{\AgdaInductiveConstructor{⟨}}\AgdaSpace{}%
 	\AgdaBound{r}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{,}}\AgdaSpace{}%
-	\AgdaInductiveConstructor{proj}\AgdaSpace{}%
+	\AgdaInductiveConstructor{π}\AgdaSpace{}%
 	\AgdaBound{B}\AgdaSpace{}%
 	\AgdaSymbol{\{}\AgdaInductiveConstructor{inj₁}\AgdaSpace{}%
 	\AgdaInductiveConstructor{refl}\AgdaSymbol{\}}\AgdaSpace{}%
 	\AgdaBound{s}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{⟩}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{,}}\AgdaSpace{}%
-	\AgdaInductiveConstructor{proj}\AgdaSpace{}%
+	\AgdaInductiveConstructor{π}\AgdaSpace{}%
 	\AgdaBound{C}\AgdaSpace{}%
 	\AgdaSymbol{\{}\AgdaInductiveConstructor{inj₂}\AgdaSpace{}%
 	\AgdaInductiveConstructor{refl}\AgdaSymbol{\}}\AgdaSpace{}%
@@ -411,14 +411,14 @@
 	\AgdaOperator{\AgdaInductiveConstructor{⟩}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaDatatype{⇄}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{⟨}}\AgdaSpace{}%
-	\AgdaInductiveConstructor{proj}\AgdaSpace{}%
+	\AgdaInductiveConstructor{π}\AgdaSpace{}%
 	\AgdaBound{A}\AgdaSpace{}%
 	\AgdaSymbol{\{}\AgdaInductiveConstructor{inj₁}\AgdaSpace{}%
 	\AgdaInductiveConstructor{refl}\AgdaSymbol{\}}\AgdaSpace{}%
 	\AgdaBound{r}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{,}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{⟨}}\AgdaSpace{}%
-	\AgdaInductiveConstructor{proj}\AgdaSpace{}%
+	\AgdaInductiveConstructor{π}\AgdaSpace{}%
 	\AgdaBound{B}\AgdaSpace{}%
 	\AgdaSymbol{\{}\AgdaInductiveConstructor{inj₂}\AgdaSpace{}%
 	\AgdaInductiveConstructor{refl}\AgdaSymbol{\}}\AgdaSpace{}%
@@ -701,14 +701,14 @@
 	\AgdaOperator{\AgdaDatatype{⇄}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{⟨}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{ƛ}}\AgdaSpace{}%
-	\AgdaInductiveConstructor{proj}\AgdaSpace{}%
+	\AgdaInductiveConstructor{π}\AgdaSpace{}%
 	\AgdaBound{A}\AgdaSpace{}%
 	\AgdaSymbol{\{}\AgdaInductiveConstructor{inj₁}\AgdaSpace{}%
 	\AgdaInductiveConstructor{refl}\AgdaSymbol{\}}\AgdaSpace{}%
 	\AgdaBound{r}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{,}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{ƛ}}\AgdaSpace{}%
-	\AgdaInductiveConstructor{proj}\AgdaSpace{}%
+	\AgdaInductiveConstructor{π}\AgdaSpace{}%
 	\AgdaBound{B}\AgdaSpace{}%
 	\AgdaSymbol{\{}\AgdaInductiveConstructor{inj₂}\AgdaSpace{}%
 	\AgdaInductiveConstructor{refl}\AgdaSymbol{\}}\AgdaSpace{}%
@@ -820,23 +820,6 @@
 	\AgdaFunction{σ-uncurry}\AgdaSpace{}%
 	\AgdaBound{r}\<%
 	\\
-	%
-	\\[\AgdaEmptyExtraSkip]%
-	%
-	\>[2]\AgdaComment{--eta\ :\ ∀\ \{Γ\ A\ B\}\ →\ \{r\ :\ Γ\ ⊢\ A\ ⇒\ B\}}\<%
-	\\
-	%
-	\>[2]\AgdaComment{--\ \ →\ r\ ⇄\ ƛ\ rename\ S\AgdaUnderscore{}\ r\ ·\ `\ Z}\<%
-	\\
-	\>[0]\<%
-	\\
-	%
-	\>[2]\AgdaComment{--split\ :\ ∀\ \{Γ\ A\ B\}\ →\ \{r\ :\ Γ\ ⊢\ A\ ×\ B\}}\<%
-	\\
-	%
-	\>[2]\AgdaComment{--\ \ →\ r\ ⇄\ ⟨\ proj\ A\ \{inj₁\ refl\}\ r\ ,\ proj\ B\ \{inj₂\ refl\}\ r\ ⟩}\<%
-	\\
-	%
 	\\[\AgdaEmptyExtraSkip]%
 	%
 	\>[2]\AgdaInductiveConstructor{id-×}\AgdaSpace{}%
@@ -1565,7 +1548,7 @@
 	%
 	\\[\AgdaEmptyExtraSkip]%
 	%
-	\>[2]\AgdaInductiveConstructor{ξ-proj}\AgdaSpace{}%
+	\>[2]\AgdaInductiveConstructor{ξ-π}\AgdaSpace{}%
 	\AgdaSymbol{:}\AgdaSpace{}%
 	\AgdaSymbol{∀}\AgdaSpace{}%
 	\AgdaSymbol{\{}\AgdaBound{Γ}\AgdaSpace{}%
@@ -1590,12 +1573,12 @@
 	\\
 	%
 	\>[4]\AgdaSymbol{→}\AgdaSpace{}%
-	\AgdaInductiveConstructor{proj}\AgdaSpace{}%
+	\AgdaInductiveConstructor{π}\AgdaSpace{}%
 	\AgdaBound{C}\AgdaSpace{}%
 	\AgdaSymbol{\{}\AgdaBound{p}\AgdaSymbol{\}}\AgdaSpace{}%
 	\AgdaBound{L}\AgdaSpace{}%
 	\AgdaOperator{\AgdaDatatype{⇄}}\AgdaSpace{}%
-	\AgdaInductiveConstructor{proj}\AgdaSpace{}%
+	\AgdaInductiveConstructor{π}\AgdaSpace{}%
 	\AgdaBound{C}\AgdaSpace{}%
 	\AgdaSymbol{\{}\AgdaBound{p}\AgdaSymbol{\}}\AgdaSpace{}%
 	\AgdaBound{L'}\<%
