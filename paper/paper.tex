@@ -486,7 +486,7 @@
 	
 	Tal como lo explica Wadler en su artículo \cite{pas}, no se trata de una simple biyección entre proposiciones y tipos, sino de un verdadero isomorfismo que preserva la compleja estructura de pruebas y programas, simplificaciones y evaluaciones.
 	
-	Este principio surge de las observaciones realizadas por Curry sobre la lógica proposicional, y más tarde extendidas por Howard a la lógica de predicados.
+	Este principio surge de las observaciones realizadas por Curry\cite{Curry} sobre la lógica proposicional, y más tarde extendidas por Howard\cite{Howard} a la lógica de predicados.
 	La clave de esta extensión es la introducción de los tipos dependientes para representar los predicados y cuantificadores en la lógica de predicados.
 
 	Las correspondencias que surgen de esta interpretación pueden resumirse de la siguiente forma:
@@ -630,6 +630,24 @@
 	% Explicar que la formalizacion está basada en el libro plfa
 	
 	\subsection{Tipos intrínsecos}
+	
+	Existen dos enfoques fundamentales para el cálculo lambda tipado.
+
+	Por un lado, se pueden definir primero los términos y luego los tipos, por lo tanto los términos existen independientemente de los tipos y tienen significado por sí solos.
+	Tiene sentido definir entonces el subconjunto de términos para los cuales existe alguna derivación de tipos, es decir, los términos ``bien tipados''.
+	De hecho, para un término dado pueden existir más de un tipo posible, por ejemplo, la función identidad $\lambda x.x$ puede ser tipada como $A \rightarrow A$ o como $B \rightarrow B$.
+	Desde este punto de vista, los juicios de tipos aseguran que los términos poseen ciertas propiedades.
+	Este estilo se suele llamar ``tipos a la Curry''.
+	
+	Por otro lado, es posible definir los tipos en primer lugar y luego los términos.
+	Aquí no tiene sentido hablar de términos ``bien tipados'', ya que no pueden existir los términos ``mal tipados''.
+	Por lo tanto, todo el significado recae sobre los juicios de tipo, en lugar de los términos.
+	En cierta forma, los términos y las reglas de tipo están entrelazados.
+	A este enfoque se lo denomina ``tipos a la Church''.
+	
+	Reynolds\cite{reynolds_1998} acuñó las expresiones \textit{intrínsecos} y \textit{extrínsecos} para referirse a estos dos enfoques.
+	
+	Gran parte de la formalización presentada en este trabajo está basada y adaptada a partir de un libro de Philip Wadler\cite{plfa}.
 	% Explicar la diferencia entre Curry style y Church style, y como nos ayuda tener tipos intrínsecos. % Acá hay muchas referencias https://plfa.github.io/DeBruijn/
 	
 	\subsection{Cálculo lambda con pares y tipo Top}
@@ -745,23 +763,101 @@
 	Al igual que en la relación de reducción, los tipos intrínsecos garantizan que los términos transformados por los isomorfismos preservan sus tipos.
 	Notar como todos los isomorfismos base presentan una regla ($\equiv$) del lado izquierdo, la cual desaparece del lado derecho.
 	Por lo tanto, los isomorfismos solo pueden aplicarse para eliminar un constructor ($\equiv$) del término.
-	Este punto es fundamental para preservar la propiedad de normalización.
+	Este último punto es fundamental para preservar la propiedad de normalización.
 	
 	% Explicar los isos nuevos que voy a agregar. Formalizar iso tipos y relación de iso.
 	% Archivos: IsoType, IsoTerm
 	
 	\subsection{Preservación de tipos}
 	
+	Es importante destacar que la representación con tipos intrínsecos provee implícitamente la propiedad de preservación.
+	Tanto los isomorfismos de términos como la relación de reducción, y por lo tanto, la substitución, solo relacionan términos del mismo tipo.
+	En consecuencia, no puede darse el caso en el que un término reduce a otro de un tipo distinto.
+	
+
 	\section{Progreso}
 	
 	\subsection{Formas normales, neutrales y valores}
-	Explicar que es muy importante definir bien a que estado se quiere llegar, (en este caso forma normal)
 	
-	\ExecuteMetaData[code/progress.tex]{normal}
+	\begin{codigo}
+		Tipo de dato de los valores
+		\ExecuteMetaData[code/progress.tex]{value}
+	\end{codigo}
 	
-	\subsection{Relación de reducción}
-	Ver si esta bien llama reducción a $\hookrightarrow$ o a $\rightsquigarrow$
-	Archivos: Progress, Eval (sin SN)
+	La propiedad de progreso dice que todo término puede o bien dar un paso de reducción, o bien se encuentra en un estado final.
+	Si solo se consideran términos cerrados, es decir, que no contienen variables libres, los estados finales son los valores.
+	Existen tres posibles tipos de valores, los pares de valores, las abstracciones y el término $\star$.
+	
+	Sin embargo, en este caso, se implementa el orden de reducción aplicativo, por lo tanto, se deben reducir los cuerpos de las abstracciones.
+	Cuando se reduce debajo de las abstracciones es posible encontrar variables libres, por este motivo los estados finales que se deben considerar son formas normales.
+	
+	Se dice que un término se encuentra en forma normal cuando no puede ser reducido, es decir, un par de términos en forma normal, una abstracción donde el cuerpo está en forma normal, el término $\star$, o puede ser una forma neutral.
+	
+	Se dice que un término está en forma neutral cuando no puede ser reducido y no es un valor, es decir, puede ser una variable, una proyección donde el cuerpo es neutral, o una aplicación donde la función es neutral y el argumento está en forma normal.
+	
+	\begin{codigo}
+		Caracterización inductiva de las formas normales y neutrales
+		\ExecuteMetaData[code/progress.tex]{normal}
+	\end{codigo}
+	
+	Notar como las definiciones de \AgdaInductiveConstructor{$\Uparrow$} y \AgdaInductiveConstructor{$\Downarrow$} son mutuamente recursivas.
+	
+	Se puede observar que en la definición de las formas neutrales, el único constructor que no es recursivo es el de las variables.
+	Para poder construir una forma neutral, necesariamente se debe utilizar el caso base de la variable.
+	Por lo tanto, un término está en forma neutral si y solo si contiene variables libres.
+	Luego, es fácil ver que todo término cerrado en forma normal es un valor.
+	
+	\begin{codigo}
+		Todo término cerrado en forma normal es un valor
+		\ExecuteMetaData[code/progress.tex]{proof}
+	\end{codigo}
+	
+	\subsection{Estrategia de reducción}
+	
+	La formalización de progreso implementa una estrategia de reducción \textit{strong call-by-value}, es decir, reduce primero los argumentos de las aplicaciones antes de la $\beta$-reducción, y además, reduce debajo de los lambdas.
+	
+	Se define un nuevo tipo de datos \AgdaDatatype{Progress}, que representa los tres posibles resultados de aplicar la prueba de progreso sobre un término, este puede dar un paso de reducción $\hookrightarrow$, puede aplicar un isomorfismo $\rightleftarrows$, o puede encontrar en forma normal, en cuyo caso no es posible seguir reduciéndolo.
+	
+	\begin{codigo}
+		Propiedad de progreso
+		\ExecuteMetaData[code/progress.tex]{progress}
+	\end{codigo}
+	
+	La definición de \AgdaFunction{progress} muestra claramente como cada isomorfismo de término se corresponde con un caso donde es necesario eliminar una regla $(\equiv)$ para poder continuar con la reducción.
+	En esta formalización, la reducción es dirigida por sintaxis.
+	En la representación de tipos intrínsecos, la sintaxis del lenguaje contiene los isomorfismos de tipos.
+	Por lo tanto, tiene sentido que entonces los isomorfismos de términos también sean dirigidos por sintaxis.
+	% TODO: ver si esto tiene sentido
+	
+	Otra observación interesante es que gracias al paradigma de proposiciones como tipos, la prueba de progreso es también un programa que podemos aplicar sobre un término para obtener el siguiente paso de reducción.
+	
+	\section{Evaluación}
+	
+	A través de la aplicación sucesiva de la prueba de progreso se define la evaluación.
+	Para ello se define la relación \AgdaDatatype{$\_\rightsquigarrow\_$}, que representa la clausura reflexiva y transitiva de la unión entre las relaciones \AgdaDatatype{$\_\hookrightarrow\_$} y \AgdaDatatype{$\_\rightleftarrows\_$}.
+	
+	\begin{codigo}
+		Relación de reducción
+		\ExecuteMetaData[code/eval.tex]{relation}
+	\end{codigo}
+	
+	La evaluación se define sobre términos cerrados, de modo que siempre reduzcan a un valor.
+	La definición aplica la prueba de progreso para obtener el nuevo término sobre el cual hacer el llamado recursivo y el paso que extiende la relación \AgdaDatatype{$\_\rightsquigarrow\_$}.
+	
+	Debido a que el llamado recursivo se hace sobre el término resultante luego de un paso, Agda no tiene forma de determinar que dicho término es estructuralmente más pequeño que el argumento inicial.
+	Por lo tanto, es necesario añadir un argumento de tipo \AgdaDatatype{$\mathbb{N}$} para que la definición cumpla con el chequeo de terminación.
+	Luego, la evaluación realizará a lo sumo $n$ pasos, por este motivo se utiliza el tipo \AgdaDatatype{Maybe}, en caso de que el término no converja a un valor luego de $n$ pasos, simplemente se retorna nothing.
+	
+	
+	Notar que si esto funcionara, implicaría que todo término reduce a un valor, es decir, se cumpliría la propiedad de normalización fuerte.
+	
+	\begin{codigo}
+		Evaluación
+		\ExecuteMetaData[code/eval.tex]{eval}
+	\end{codigo}
+	
+	%Ver si esta bien llama reducción a $\hookrightarrow$ o a $\rightsquigarrow$
+	%Archivos: Progress, Eval (sin SN)
 	
 	\section{Normalización Fuerte}
 	
@@ -772,6 +868,8 @@
 	https://www.ps.uni-saarland.de/~schaefer/thesis/draft-screen.pdf
 
 	\subsection{Prueba para Sistema I}
+	
+	%\input{code/strong_norm.tex}
 	
 	Archivos: StrongNorm
 	
