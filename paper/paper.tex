@@ -627,32 +627,31 @@
 	\chapter{Aportes}
 	\section{Formalización}
 	
-	% Explicar que la formalizacion está basada en el libro plfa
-	
 	\subsection{Tipos intrínsecos}
 	
-	Existen dos enfoques fundamentales para el cálculo lambda tipado.
+	Existen dos enfoques fundamentales para la introducción de sistemas de tipos en el cálculo lambda.
 
 	Por un lado, se pueden definir primero los términos y luego los tipos, por lo tanto los términos existen independientemente de los tipos y tienen significado por sí solos.
-	Tiene sentido definir entonces el subconjunto de términos para los cuales existe alguna derivación de tipos, es decir, los términos ``bien tipados''.
+	Tiene sentido entonces definir el subconjunto de términos para los cuales existe alguna derivación de tipos, a este subconjunto se lo denomina términos ``bien tipados''.
 	De hecho, para un término dado pueden existir más de un tipo posible, por ejemplo, la función identidad $\lambda x.x$ puede ser tipada como $A \rightarrow A$ o como $B \rightarrow B$.
 	Desde este punto de vista, los juicios de tipos aseguran que los términos poseen ciertas propiedades.
-	Este estilo se suele llamar ``tipos a la Curry''.
+	Este estilo es llamado ``tipos a la Curry''.
 	
 	Por otro lado, es posible definir los tipos en primer lugar y luego los términos.
 	Aquí no tiene sentido hablar de términos ``bien tipados'', ya que no pueden existir los términos ``mal tipados''.
 	Por lo tanto, todo el significado recae sobre los juicios de tipo, en lugar de los términos.
 	En cierta forma, los términos y las reglas de tipo están entrelazados.
+	Aquí, las derivaciones de tipos son únicas, puesto que los términos $\lambda x^A.x$ y $\lambda x^B.x$ se consideran distintos.
 	A este enfoque se lo denomina ``tipos a la Church''.
 	
-	Reynolds\cite{reynolds_1998} acuñó las expresiones \textit{intrínsecos} y \textit{extrínsecos} para referirse a estos dos enfoques.
+	Reynolds \cite{reynolds_1998} acuñó las expresiones \textit{tipos intrínsecos} y \textit{tipos extrínsecos} para referirse a cada uno de estos dos enfoques.
 	
-	Gran parte de la formalización presentada en este trabajo está basada y adaptada a partir de un libro de Philip Wadler\cite{plfa}.
+	Gran parte de la formalización presentada en este trabajo está basada y adaptada a partir de un libro de Philip Wadler \cite{plfa}.
 	% Explicar la diferencia entre Curry style y Church style, y como nos ayuda tener tipos intrínsecos. % Acá hay muchas referencias https://plfa.github.io/DeBruijn/
 	
 	\subsection{Cálculo lambda con pares y tipo Top}
 	
-	En primera instancia se definen los tipos del, se presentan cuatro constructores de tipos.
+	En primera instancia se definen los tipos del lenguaje, existen cuatro constructores de tipos.
 	Por un lado, los tipos base son, el tipo atómico \AgdaInductiveConstructor{$\tau$} y el tipo top \AgdaInductiveConstructor{$\top$}.
 	Y, por otro lado, el tipo de las funciones \AgdaInductiveConstructor{$\_\Rightarrow\_$} y los pares \AgdaInductiveConstructor{$\_\times\_$}.
 
@@ -667,7 +666,7 @@
 	Luego se formalizan las variables intrínsecamente tipadas, que son representadas por los índices propiamente dichos.
 	
 	\begin{codigo}
-		Tipo de dato de los contextos de tipado
+		Tipo de dato de los contextos de tipado y variables intrínsecamente tipadas.
     	\ExecuteMetaData[code/context.tex]{ctx}
 	\end{codigo}
 	
@@ -676,7 +675,7 @@
 	
 	\ExecuteMetaData[code/context.tex]{example}
 	
-	A continuación se presentan los juicios de tipado, debido a que se utilizan tipos intrínsecos, estos corresponden con los términos del lenguaje.
+	A continuación se presentan los juicios de tipado, debido a que se utilizan tipos intrínsecos, estos también representaran a los términos del lenguaje.
 	
 	\begin{codigo}
 		Tipo de dato de los términos
@@ -687,7 +686,7 @@
 	En el constructor \AgdaInductiveConstructor{$\pi$} se observa otro detalle importante, además de tomar como argumento el tipo \AgdaBound{C}, toma un argumento implícito que funciona como evidencia de que el tipo \AgdaBound{C} es o bien igual al tipo \AgdaBound{A}, o bien igual al tipo \AgdaBound{B}. Para ello se utilizan el tipo suma y la igualdad proposicional que están definidos en la librería estándar de Agda.
 	
 	
-	Aquí se presentan las definiciones de los renombres de variables, substitución de variables y operadores del álgebra-$\sigma$ presentados en capítulos anteriores.
+	Aquí se introducen las definiciones de los renombres de variables, substitución de variables y operadores del álgebra-$\sigma$ presentados en capítulos anteriores.
 	
 	\ExecuteMetaData[code/subs.tex]{operators}
 	
@@ -697,23 +696,24 @@
 	
 	La implementación de las substituciones explícitas se divide en dos partes.
 	Primero se implementa la operación \AgdaFunction{rename} que dado una función de renombrado $\rho$ y un término, aplica el renombre de variables a dicho término.
-	Como ya se mencionó, se debe tener cuidado de no capturar el índice 0 cuando se empuja el renombre dentro de una abstracción.
+	Se debe tener cuidado de no capturar el índice 0 cuando se empuja el renombre debajo de una abstracción.
 	Por este motivo, se define la función \AgdaFunction{ext} que toma un renombre y retorna uno nuevo con los entornos extendidos.
 	Notar que esta definición sigue la forma propuesta por Abadi: $Z \cdot (\rho \; \circ S\_)$
 	
 	\ExecuteMetaData[code/subs.tex]{rename}
 	
 	Una vez implementada la aplicación de renombres, se puede implementar la aplicación de substituciones.
-	Nuevamente y de forma análoga, se define una función \AgdaFunction{exts} que extiende la sustitución cuando se atraviesa una abstracción. $`Z \cdot (\sigma \; \circ \text{rename } S\_)$.
+	De forma análoga, se define una función \AgdaFunction{exts} que extiende la sustitución cuando se atraviesa una abstracción.
+	Utilizando la notación del álgebra-$\sigma$, se puede observar que aquí también se sigue la misma estructura: $`Z \cdot (\sigma \; \circ \text{rename } S\_)$.
 	
-	Luego se define la substitución simple \AgdaFunction{$\_[\_]$}, que dato un término \AgdaBound{N} cuya primera variable libre es de tipo \AgdaBound{B} y un término \AgdaBound{M} de dicho tipo, cierra el índice 0 de \AgdaBound{N} utilizando \AgdaBound{M}.
+	Luego se define la substitución simple \AgdaOperator{\AgdaFunction{$\_[\_]$}}, que dato un término \AgdaBound{N} cuya primera variable libre es de tipo \AgdaBound{B} y un término \AgdaBound{M} de tipo \AgdaBound{B}, cierra el índice 0 de \AgdaBound{N} utilizando \AgdaBound{M}.
 	
 	\ExecuteMetaData[code/subs.tex]{subst}
 	
 	Notar las similitudes entre la definición de \AgdaFunction{rename} y \AgdaFunction{subst}, esto se debe a que los renombres son un caso particular de substitución, donde todos los términos retornados por la substitución son variables.
-	El motivo principal por el cual es necesario implementar \AgdaFunction{rename}, es que si se quisiera definir \AgdaFunction{exts} utilizando \AgdaFunction{subst} (\AgdaSymbol{$\lambda$} \AgdaBound{v} \AgdaSymbol{$\rightarrow$} \AgdaInductiveConstructor{`} (\AgdaInductiveConstructor{S} \AgdaBound{v})) (\AgdaBound{$\sigma$} \AgdaBound{x}), la llamada recursiva sería sobre el término que retorna $\sigma$, por lo que el chequeo de terminación de Agda fallaría.
-	
-	
+	Esta implementación está basada en la técnica de McBride \cite{ren-sub}, donde los renombres de variables y substituciones son dos instancias de una misma operación de recorrido.
+	El motivo principal por el cual es necesario implementar \AgdaFunction{rename}, es que si se quisiera definir \AgdaFunction{exts} utilizando \AgdaFunction{subst} (\AgdaSymbol{$\lambda$} \AgdaBound{v} \AgdaSymbol{$\rightarrow$} \AgdaInductiveConstructor{`} (\AgdaInductiveConstructor{S} \AgdaBound{v})) (\AgdaBound{$\sigma$} \AgdaBound{x}), la llamada recursiva sería sobre el término retornado por $\sigma$, de modo que el chequeo de terminación de Agda fallaría.
+
 	Finalmente, se presenta la relación de reducción.
 	Los constructores \AgdaInductiveConstructor{$\xi$} y \AgdaInductiveConstructor{$\zeta$} representan las reglas de congruencia que permiten construir reducciones sobre sub-términos.
 
@@ -722,7 +722,8 @@
 		\input{code/reduction.tex}
 	\end{codigo}
 	
-	Es importante destacar que el tipo de \AgdaDatatype{$\_\hookrightarrow\_$}, está indexado por dos términos del mismo tipo \AgdaBound{A}, es decir, no es necesario demostrar que la reducción preserva tipos, ya que es imposible construir una reducción a un término de distinto tipo.
+	Es importante destacar que el tipo de \AgdaDatatype{$\_\hookrightarrow\_$}, está indexado por dos términos del mismo tipo \AgdaBound{A}.
+	Por lo tanto, no es necesario demostrar que la reducción preserva tipos, ya que es imposible construir una reducción que arribe a un término de distinto tipo.
 	Esta es una de las ventajas más importante de utilizar tipos intrínsecos.
 	
 	% Formalizar tipos, términos y relación de reducción.
@@ -740,18 +741,18 @@
 	\end{codigo}
 	
 	Utilizando estos constructores es posible crear cualquier isomorfismo.
-	Notar que no existe una regla para la transitividad, ya que es posible obtenerla aplicando dos veces el constructor \AgdaInductiveConstructor{$[\_]\equiv\_$}. Por ejemplo, el término \AgdaInductiveConstructor{[ trans} \AgdaBound{$iso_1$} \AgdaBound{$iso_2$} \AgdaInductiveConstructor{]$\equiv$} \AgdaBound{t} puede construirse como  \AgdaInductiveConstructor{[} \AgdaBound{$iso_2$} \AgdaInductiveConstructor{]$\equiv$} (\AgdaInductiveConstructor{[} \AgdaBound{$iso_1$} \AgdaInductiveConstructor{]$\equiv$} \AgdaBound{t}).
+	Notar que no existe una regla para la transitividad, ya que es posible obtenerla aplicando dos veces el constructor \AgdaInductiveConstructor{$[\_]\equiv\_$}. Por ejemplo, el término \AgdaInductiveConstructor{[ trans} \AgdaBound{$iso_1$} \AgdaBound{$iso_2$} \AgdaInductiveConstructor{]$\equiv$} \AgdaBound{t} puede ser construido como \AgdaInductiveConstructor{[} \AgdaBound{$iso_2$} \AgdaInductiveConstructor{]$\equiv$} (\AgdaInductiveConstructor{[} \AgdaBound{$iso_1$} \AgdaInductiveConstructor{]$\equiv$} \AgdaBound{t}).
 	
 	A continuación se presentan los isomorfismos de términos.
 	Esta selección de constructores es el resultado de varias decisiones de diseño basadas principalmente en dos objetivos.
 	
 	En primer lugar, se agregaron todos los isomorfismos necesarios para que ningún término quede atascado y no existan eliminaciones en formas normales, esto tiene como consecuencia que todo término cerrado reduce siempre a un valor. Este punto es más evidente cuando se tiene en cuenta la prueba de progreso presentada más adelante.
 	
-	El segundo objetivo es preservar la propiedad de normalización y evitar complicar demasiado su prueba.
+	El segundo objetivo es preservar la propiedad de normalización y evitar que su prueba se torne demasiado compleja.
 	Una consecuencia directa de esto son los constructores con el prefijo \AgdaInductiveConstructor{sym-}, todos estos se podrían obtener a partir de los isomorfismos base combinados con un constructor \AgdaInductiveConstructor{sym} tal y como se construyen los isomorfismos de tipos.
 	Sin embargo, incluir el constructor \AgdaInductiveConstructor{sym} genera problemas a la hora de formalizar la prueba de normalización fuerte.
-	Por otro lado, para desatascar algunos términos son necesarias la $\eta$-expansión y una regla $split$ $r \rightleftarrows \langle \pi_A\; r , \pi_B\; r \rangle$ donde $r: A \times B$.
-	Al incluir estas reglas se pierde la propiedad de normalización, ya que nada impediría aplicarlas un número infinito de veces.
+	Por otro lado, para desatascar algunos términos, es necesario incluir la $\eta$-expansión y una regla \textsc{split} $r \rightleftarrows \langle \pi_A\; r , \pi_B\; r \rangle$ donde $r: A \times B$.
+	Si se incluyen estas reglas directamente, se pierde la propiedad de normalización, ya que por ejemplo nada impediría aplicar la $\eta$-expansión un número infinito de veces.
 	La solución es definir nuevos constructores que embeben estas reglas, como por ejemplo \AgdaInductiveConstructor{asso-split}.
 	
 	
@@ -772,26 +773,26 @@
 	
 	Es importante destacar que la representación con tipos intrínsecos provee implícitamente la propiedad de preservación.
 	Tanto los isomorfismos de términos como la relación de reducción, y por lo tanto, la substitución, solo relacionan términos del mismo tipo.
-	En consecuencia, no puede darse el caso en el que un término reduce a otro de un tipo distinto.
+	En consecuencia, no puede darse el caso en el que un término reduzca, de forma errónea, a otro de un tipo distinto.
 	
 
 	\section{Progreso}
 	
 	\subsection{Formas normales, neutrales y valores}
 	
+	La propiedad de progreso dice que todo término puede o bien dar un paso de reducción, o bien se encuentra en un estado final.
+	Si solo se consideran términos cerrados, es decir, que no contienen variables libres, los estados finales son los valores.
+	Existen tres constructores para los valores, estos son, los pares de valores, las abstracciones y el término $\star$.
+	
 	\begin{codigo}
 		Tipo de dato de los valores
 		\ExecuteMetaData[code/progress.tex]{value}
 	\end{codigo}
 	
-	La propiedad de progreso dice que todo término puede o bien dar un paso de reducción, o bien se encuentra en un estado final.
-	Si solo se consideran términos cerrados, es decir, que no contienen variables libres, los estados finales son los valores.
-	Existen tres posibles tipos de valores, los pares de valores, las abstracciones y el término $\star$.
-	
 	Sin embargo, en este caso, se implementa el orden de reducción aplicativo, por lo tanto, se deben reducir los cuerpos de las abstracciones.
 	Cuando se reduce debajo de las abstracciones es posible encontrar variables libres, por este motivo los estados finales que se deben considerar son formas normales.
 	
-	Se dice que un término se encuentra en forma normal cuando no puede ser reducido, es decir, un par de términos en forma normal, una abstracción donde el cuerpo está en forma normal, el término $\star$, o puede ser una forma neutral.
+	Se dice que un término se encuentra en forma normal cuando no puede ser reducido, en este caso, los cuatro constructores son, un par de términos en forma normal, una abstracción donde el cuerpo está en forma normal, el término $\star$, o una forma neutral.
 	
 	Se dice que un término está en forma neutral cuando no puede ser reducido y no es un valor, es decir, puede ser una variable, una proyección donde el cuerpo es neutral, o una aplicación donde la función es neutral y el argumento está en forma normal.
 	
@@ -803,7 +804,7 @@
 	Notar como las definiciones de \AgdaInductiveConstructor{$\Uparrow$} y \AgdaInductiveConstructor{$\Downarrow$} son mutuamente recursivas.
 	
 	Se puede observar que en la definición de las formas neutrales, el único constructor que no es recursivo es el de las variables.
-	Para poder construir una forma neutral, necesariamente se debe utilizar el caso base de la variable.
+	Para poder construir una forma neutral, necesariamente se debe utilizar el caso base de la variable al menos una vez.
 	Por lo tanto, un término está en forma neutral si y solo si contiene variables libres.
 	Luego, es fácil ver que todo término cerrado en forma normal es un valor.
 	
@@ -814,9 +815,9 @@
 	
 	\subsection{Estrategia de reducción}
 	
-	La formalización de progreso implementa una estrategia de reducción \textit{strong call-by-value}, es decir, reduce primero los argumentos de las aplicaciones antes de la $\beta$-reducción, y además, reduce debajo de los lambdas.
+	La formalización de progreso implementa una estrategia de reducción \textit{strong call-by-value}, es decir, reduce primero los argumentos de las aplicaciones antes de aplicar la $\beta$-reducción, y además, reduce debajo de los lambdas.
 	
-	Se define un nuevo tipo de datos \AgdaDatatype{Progress}, que representa los tres posibles resultados de aplicar la prueba de progreso sobre un término, este puede dar un paso de reducción $\hookrightarrow$, puede aplicar un isomorfismo $\rightleftarrows$, o puede encontrar en forma normal, en cuyo caso no es posible seguir reduciéndolo.
+	Se define un nuevo tipo de datos \AgdaDatatype{Progress}, que representa los tres posibles resultados de aplicar la prueba de progreso sobre un término, estos son, dar un paso de reducción $\hookrightarrow$, aplicar un isomorfismo $\rightleftarrows$, o puede encontrarse en forma normal, en cuyo caso no es posible seguir reduciéndolo.
 	
 	\begin{codigo}
 		Propiedad de progreso
@@ -824,32 +825,33 @@
 	\end{codigo}
 	
 	La definición de \AgdaFunction{progress} muestra claramente como cada isomorfismo de término se corresponde con un caso donde es necesario eliminar una regla $(\equiv)$ para poder continuar con la reducción.
-	En esta formalización, la reducción es dirigida por sintaxis.
-	En la representación de tipos intrínsecos, la sintaxis del lenguaje contiene los isomorfismos de tipos.
-	Por lo tanto, tiene sentido que entonces los isomorfismos de términos también sean dirigidos por sintaxis.
+	En la formalización, el lenguaje es dirigido por sintaxis.
+	Cuando se representan los términos usando tipos intrínsecos, la sintaxis del lenguaje contiene los isomorfismos de tipos.
+	Por lo tanto, tiene sentido que los isomorfismos de términos también sean dirigidos por sintaxis.
 	% TODO: ver si esto tiene sentido
 	
-	Otra observación interesante es que gracias al paradigma de proposiciones como tipos, la prueba de progreso es también un programa que podemos aplicar sobre un término para obtener el siguiente paso de reducción.
+	Otra observación interesante es que gracias al paradigma de proposiciones como tipos, la prueba de la propiedad de progreso es también un programa que puede ser aplicado sobre un término para obtener el siguiente paso de reducción.
 	
 	\section{Evaluación}
 	
-	A través de la aplicación sucesiva de la prueba de progreso se define la evaluación.
-	Para ello se define la relación \AgdaDatatype{$\_\rightsquigarrow\_$}, que representa la clausura reflexiva y transitiva de la unión entre las relaciones \AgdaDatatype{$\_\hookrightarrow\_$} y \AgdaDatatype{$\_\rightleftarrows\_$}.
+	A través de la aplicación sucesiva de la prueba de progreso se puede definir la evaluación.
+	Para esto, se define la relación \AgdaDatatype{$\_\rightsquigarrow\_$}, que representa la clausura reflexiva y transitiva de la unión entre las relaciones \AgdaDatatype{$\_\hookrightarrow\_$} y \AgdaDatatype{$\_\rightleftarrows\_$}.
 	
 	\begin{codigo}
 		Relación de reducción
 		\ExecuteMetaData[code/eval.tex]{relation}
 	\end{codigo}
 	
-	La evaluación se define sobre términos cerrados, de modo que siempre reduzcan a un valor.
-	La definición aplica la prueba de progreso para obtener el nuevo término sobre el cual hacer el llamado recursivo y el paso que extiende la relación \AgdaDatatype{$\_\rightsquigarrow\_$}.
+	La evaluación se define sobre términos cerrados, de modo que estos siempre reduzcan a un valor.
+	La definición aplica la prueba de progreso para obtener el nuevo término sobre el cual hacer el llamado recursivo y el paso de reducción que extenderá la relación \AgdaDatatype{$\_\rightsquigarrow\_$}.
 	
 	Debido a que el llamado recursivo se hace sobre el término resultante luego de un paso, Agda no tiene forma de determinar que dicho término es estructuralmente más pequeño que el argumento inicial.
-	Por lo tanto, es necesario añadir un argumento de tipo \AgdaDatatype{$\mathbb{N}$} para que la definición cumpla con el chequeo de terminación.
-	Luego, la evaluación realizará a lo sumo $n$ pasos, por este motivo se utiliza el tipo \AgdaDatatype{Maybe}, en caso de que el término no converja a un valor luego de $n$ pasos, simplemente se retorna nothing.
+	De hecho, probar la terminación de la evaluación, implicaría que todo término reduce a un valor en una cantidad finita de pasos, es decir, se estaría probando la propiedad de normalización.
+	La prueba de dicha propiedad no es trivial, y se presentará en los siguientes capítulos.
 	
-	
-	Notar que si esto funcionara, implicaría que todo término reduce a un valor, es decir, se cumpliría la propiedad de normalización fuerte.
+	Por este motivo, es necesario añadir un argumento de tipo \AgdaDatatype{$\mathbb{N}$} para que la definición sea aceptada por el chequeo de terminación de Agda.
+	De este modo, la evaluación realizará a lo sumo $n$ llamadas recursivas. Además, se utiliza \AgdaDatatype{Maybe} en el tipo de retorno, en caso de que el término no converja a un valor luego de $n$ pasos, simplemente se retorna \AgdaInductiveConstructor{nothing}.
+
 	
 	\begin{codigo}
 		Evaluación
@@ -877,6 +879,7 @@
 	Explicar que lo que hicimos en realidad es probar que la inducción sobre la relación de reducción está bien fundada
 	https://agdapad.quasicoherent.io/~AgdaPadova/html/transcript10.html
 	
+	%\ExecuteMetaData[code/eval.tex]{eval2}
 	Archivos: Eval (con SN)
 	
 	\section{Conclusiones}
