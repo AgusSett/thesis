@@ -43,6 +43,7 @@ data Steps {A} : ∅ ⊢ A → Set where
 
   steps : {L N : ∅ ⊢ A}
     → L ⇝ N
+    → Value N
       ----------
     → Steps L
 
@@ -53,11 +54,11 @@ eval´ : ∀ {A}
   → SN L
   → Steps L
 eval´ L _ with progress L
-eval´ L _      | done VL       =  steps (L ∎)
+eval´ L _      | done ⇑L       =  steps (L ∎) (closed⇑→Value ⇑L)
 eval´ L (sn f) | step⇄ {M} L⇄M with eval´ M (f (inj₂ L⇄M))
-...               | steps M⇝N  =  steps (L ⇄⟨ L⇄M ⟩ M⇝N)
+...               | steps M⇝N fin  =  steps (L ⇄⟨ L⇄M ⟩ M⇝N) fin
 eval´ L (sn f) | step↪ {M} L↪M with eval´ M (f (inj₁ L↪M))
-...               | steps M⇝N  =  steps (L ↪⟨ L↪M ⟩ M⇝N)
+...               | steps M⇝N fin  =  steps (L ↪⟨ L↪M ⟩ M⇝N) fin
 
 eval : ∀ {A} → (L : ∅ ⊢ A) → Steps L
 eval L = eval´ L (strong-norm L)
@@ -66,16 +67,16 @@ open import Type
 open import Relation.Binary.PropositionalEquality using (refl)
 
 
--- This was computed using C-c C-n `eval (([ curry ]≡ proj (⊤ ⇒ ⊤ ⇒ ⊤) {inj₁ refl} ([ sym dist ]≡ (ƛ ([ sym dist ]≡ (ƛ ⟨ ⋆ , ⋆ ⟩))))) · ⟨ ⋆ , ⋆ ⟩)`
-_ : (([ curry ]≡ proj (⊤ ⇒ ⊤ ⇒ ⊤) {inj₁ refl} ([ sym dist ]≡ (ƛ ([ sym dist ]≡ (ƛ ⟨ ⋆ , ⋆ ⟩))))) · ⟨ ⋆ , ⋆ ⟩) ⇝ (⋆ {∅})
+-- This was computed using C-c C-n `eval (([ curry ]≡ π (⊤ ⇒ ⊤ ⇒ ⊤) {inj₁ refl} ([ sym dist ]≡ (ƛ ([ sym dist ]≡ (ƛ ⟨ ⋆ , ⋆ ⟩))))) · ⟨ ⋆ , ⋆ ⟩)`
+_ : (([ curry ]≡ π (⊤ ⇒ ⊤ ⇒ ⊤) {inj₁ refl} ([ sym dist ]≡ (ƛ ([ sym dist ]≡ (ƛ ⟨ ⋆ , ⋆ ⟩))))) · ⟨ ⋆ , ⋆ ⟩) ⇝ (⋆ {∅})
 _ =
   begin
-    [ curry ]≡ proj (⊤ ⇒ ⊤ ⇒ ⊤) ([ sym dist ]≡ (ƛ ([ sym dist ]≡ (ƛ ⟨ ⋆ , ⋆ ⟩)))) · ⟨ ⋆ , ⋆ ⟩
-      ⇄⟨ ξ-·₁ (ξ-≡ (ξ-proj (ξ-≡ (ζ sym-dist-ƛ)))) ⟩
-    [ curry ]≡ proj (⊤ ⇒ ⊤ ⇒ ⊤) ([ sym dist ]≡ (ƛ ⟨ ƛ ⋆ , ƛ ⋆ ⟩)) · ⟨ ⋆ , ⋆ ⟩
-      ⇄⟨ ξ-·₁ (ξ-≡ (ξ-proj sym-dist-ƛ)) ⟩
-    [ curry ]≡ proj (⊤ ⇒ ⊤ ⇒ ⊤) ⟨ ƛ (ƛ ⋆) , ƛ (ƛ ⋆) ⟩ · ⟨ ⋆ , ⋆ ⟩
-      ↪⟨ ξ-·₁ (ξ-≡ β-proj₁) ⟩
+    [ curry ]≡ π (⊤ ⇒ ⊤ ⇒ ⊤) ([ sym dist ]≡ (ƛ ([ sym dist ]≡ (ƛ ⟨ ⋆ , ⋆ ⟩)))) · ⟨ ⋆ , ⋆ ⟩
+      ⇄⟨ ξ-·₁ (ξ-≡ (ξ-π (ξ-≡ (ζ sym-dist-ƛ)))) ⟩
+    [ curry ]≡ π (⊤ ⇒ ⊤ ⇒ ⊤) ([ sym dist ]≡ (ƛ ⟨ ƛ ⋆ , ƛ ⋆ ⟩)) · ⟨ ⋆ , ⋆ ⟩
+      ⇄⟨ ξ-·₁ (ξ-≡ (ξ-π sym-dist-ƛ)) ⟩
+    [ curry ]≡ π (⊤ ⇒ ⊤ ⇒ ⊤) ⟨ ƛ (ƛ ⋆) , ƛ (ƛ ⋆) ⟩ · ⟨ ⋆ , ⋆ ⟩
+      ↪⟨ ξ-·₁ (ξ-≡ β-π₁) ⟩
     [ curry ]≡ (ƛ (ƛ ⋆)) · ⟨ ⋆ , ⋆ ⟩
       ⇄⟨ ξ-·₁ curry ⟩
     (ƛ ⋆) · ⟨ ⋆ , ⋆ ⟩
@@ -101,31 +102,31 @@ encode : ∀ {Γ A B} → (r : Γ ⊢ A) (s : Γ ⊢ B) → Γ ⊢ ((One ⇒ One
 encode r s = ⟨ ⟦ r ⟧ One , ⟦ s ⟧ Two ⟩
 
 π₁ : ∀ {Γ A B} → (Γ ⊢ ((One ⇒ One) ⇒ A) × ((Two ⇒ Two) ⇒ B)) → Γ ⊢ A
-π₁ {A = A} x = One ⟪ proj ((One ⇒ One) ⇒ A) {inj₁ refl} x ⟫
+π₁ {A = A} x = One ⟪ π ((One ⇒ One) ⇒ A) {inj₁ refl} x ⟫
 
 encode-π₁ : ∀ {A} → π₁ {∅ , A , A} (encode (` Z) (` S Z)) ⇝ ` Z
 encode-π₁ {A} =
   begin
-    proj ((One ⇒ One) ⇒ A) ⟨ ƛ ` (S Z) , ƛ ` (S (S Z)) ⟩ · (ƛ ` Z)
-      ↪⟨ ξ-·₁ β-proj₁ ⟩
+    π ((One ⇒ One) ⇒ A) ⟨ ƛ ` (S Z) , ƛ ` (S (S Z)) ⟩ · (ƛ ` Z)
+      ↪⟨ ξ-·₁ β-π₁ ⟩
     (ƛ ` (S Z)) · (ƛ ` Z)
       ↪⟨ β-ƛ ⟩
     ` Z
   ∎
 
-⟨a,a⟩-π₁ : ∀ {A} → proj {∅ , A , A} A ⟨ ` Z , ` S Z ⟩ ⇝ ` Z
+⟨a,a⟩-π₁ : ∀ {A} → π {∅ , A , A} A ⟨ ` Z , ` S Z ⟩ ⇝ ` Z
 ⟨a,a⟩-π₁ {A} =
   begin
-    proj A ⟨ ` Z , ` S Z ⟩
-      ↪⟨ β-proj₁ ⟩
+    π A ⟨ ` Z , ` S Z ⟩
+      ↪⟨ β-π₁ ⟩
     ` Z
   ∎
 
-⟨a,a⟩-π₂ : ∀ {A} → proj {∅ , A , A} A ⟨ ` Z , ` S Z ⟩ ⇝ ` S Z
+⟨a,a⟩-π₂ : ∀ {A} → π {∅ , A , A} A ⟨ ` Z , ` S Z ⟩ ⇝ ` S Z
 ⟨a,a⟩-π₂ {A} =
   begin
-    proj A ⟨ ` Z , ` S Z ⟩
-      ↪⟨ β-proj₂ ⟩
+    π A ⟨ ` Z , ` S Z ⟩
+      ↪⟨ β-π₂ ⟩
     ` S Z
   ∎
 
@@ -166,10 +167,10 @@ _ =
   ∎
 
 _ : ∀ {Γ A B} → Γ , B , A ⊢ A
-_ = (ƛ proj _ {inj₁ refl} ([ comm ]≡ (` Z))) · ⟨ ` (S Z) , ` Z ⟩
+_ = (ƛ π _ {inj₁ refl} ([ comm ]≡ (` Z))) · ⟨ ` (S Z) , ` Z ⟩
 
 _ : ∀ {Γ A B} → Γ  ⊢ A × B ⇒ B
-_ = (ƛ proj _ {inj₁ refl} ([ comm ]≡ (` Z)))
+_ = (ƛ π _ {inj₁ refl} ([ comm ]≡ (` Z)))
 
 _ : ∀ {Γ A B} → Γ ⊢ A ⇒ B ⇒ (A × B)
 _ = ƛ ƛ ⟨ ` (S Z) , ` Z ⟩
@@ -178,7 +179,7 @@ _ : ∀ {Γ A B} → Γ ⊢ (A ⇒ B ⇒ A) × (A ⇒ B ⇒ B)
 _ = [ sym dist ]≡ (ƛ [ sym dist ]≡ (ƛ ⟨ ` (S Z) , ` Z ⟩))
 
 test : ∀ {Γ} → Γ ⊢ ⊤
-test = proj _ {inj₁ refl} ([ sym dist ]≡ ([ curry ]≡ (ƛ ƛ ⟨ ` (S Z) , ` Z ⟩))) · ⟨ ⋆ , ⋆ ⟩
+test = π _ {inj₁ refl} ([ sym dist ]≡ ([ curry ]≡ (ƛ ƛ ⟨ ` (S Z) , ` Z ⟩))) · ⟨ ⋆ , ⋆ ⟩
 
 --- 
 

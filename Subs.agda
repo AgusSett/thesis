@@ -34,7 +34,7 @@ rename ρ (` x)          =  ` (ρ x)
 rename ρ (ƛ N)          =  ƛ (rename (ext ρ) N)
 rename ρ (L · M)        =  (rename ρ L) · (rename ρ M)
 rename ρ ⟨ M , N ⟩      =  ⟨ rename ρ M , rename ρ N ⟩
-rename ρ (proj C {p} L) =  proj C {p} (rename ρ L)
+rename ρ (π C {p} L)    =  π C {p} (rename ρ L)
 rename ρ ⋆              =  ⋆
 rename ρ ([ iso ]≡ N)   =  [ iso ]≡ rename ρ N
 
@@ -43,15 +43,16 @@ exts : ∀ {Γ Δ A}
   → Subst Γ Δ
     ---------------------------------
   → Subst (Γ , A) (Δ , A)
-exts σ Z      =  ` Z
-exts σ (S x)  =  rename S_ (σ x)
+--exts σ Z      =  ` Z
+--exts σ (S x)  =  rename S_ (σ x)
+exts σ = ` Z • λ x → rename S_ (σ x)
 
 subst : ∀ {Γ Δ} → Subst Γ Δ → (∀ {C} → Γ ⊢ C → Δ ⊢ C)
 subst σ (` k)          =  σ k
 subst σ (ƛ N)          =  ƛ (subst (exts σ) N)
 subst σ (L · M)        =  (subst σ L) · (subst σ M)
 subst σ ⟨ M , N ⟩      =  ⟨ subst σ M , subst σ N ⟩
-subst σ (proj C {p} L) =  proj C {p} (subst σ L)
+subst σ (π C {p} L)    =  π C {p} (subst σ L)
 subst σ ⋆              =  ⋆
 subst σ ([ iso ]≡ N)   =  [ iso ]≡ subst σ N
 
@@ -98,7 +99,7 @@ sub-id {N = ⋆}                  = refl
 sub-id {Σ = Σ} {N = ƛ N}        = cong ƛ_ (sub-id {Σ = Σ , _} {N = N})
 sub-id {Σ = Σ} {N = a · b}      = cong₂ _·_ (sub-id {Σ = Σ} {N = a}) (sub-id {Σ = Σ} {N = b})
 sub-id {Σ = Σ} {N = ⟨ a , b ⟩}  = cong₂ ⟨_,_⟩ (sub-id {Σ = Σ} {N = a}) (sub-id {Σ = Σ} {N = b})
-sub-id {Σ = Σ} {N = proj _ N}   = cong (proj _) (sub-id {Σ = Σ} {N = N})
+sub-id {Σ = Σ} {N = π _ N}      = cong (π _) (sub-id {Σ = Σ} {N = N})
 sub-id {Σ = Σ} {N = [ iso ]≡ N} = cong ([ iso ]≡_) (sub-id {Σ = Σ} {N = N})
 
 ------------------------------------------------------------------------
@@ -114,13 +115,13 @@ Z-weaken-var {Σ = _ , _} {v = S v} = cong (rename S_) (Z-weaken-var {v = v})
 
 Z-weaken : ∀{Γ Σ A B}{N : (Γ , B) ,* Σ ⊢ A}
     → ⟪ exts* (` Z • ids ∘ S_) ⟫ N ≡ N
-Z-weaken {N = ` v} = Z-weaken-var {v = v}
-Z-weaken {N = ⋆} = refl
-Z-weaken {N = ƛ N}  = cong ƛ_ (Z-weaken {Σ = _ , _} {N = N} )
-Z-weaken {N = a · b}  = cong₂ _·_ (Z-weaken {N = a} ) (Z-weaken {N = b} )
+Z-weaken {N = ` v}        = Z-weaken-var {v = v}
+Z-weaken {N = ⋆}          = refl
+Z-weaken {N = ƛ N}        = cong ƛ_ (Z-weaken {Σ = _ , _} {N = N} )
+Z-weaken {N = a · b}      = cong₂ _·_ (Z-weaken {N = a} ) (Z-weaken {N = b} )
 Z-weaken {N = ⟨ a , b ⟩}  = cong₂ ⟨_,_⟩ (Z-weaken {N = a} ) (Z-weaken {N = b} )
-Z-weaken {N = proj _ N}  = cong (proj _) (Z-weaken {N = N} )
-Z-weaken {N = [ iso ]≡ N}  = cong ([ iso ]≡_) (Z-weaken {N = N} )
+Z-weaken {N = π _ N}      = cong (π _) (Z-weaken {N = N} )
+Z-weaken {N = [ iso ]≡ N} = cong ([ iso ]≡_) (Z-weaken {N = N} )
 
 ------------------------------------------------------------------------
 -- ⟪ ids ∘ ρ ⟫ N ≡ rename ρ N
@@ -128,8 +129,8 @@ Z-weaken {N = [ iso ]≡ N}  = cong ([ iso ]≡_) (Z-weaken {N = N} )
 
 rename-subst-ids-var : ∀{Γ Δ Σ A}{v : Γ ,* Σ ∋ A}{ρ : Rename Γ Δ}
     → exts* (ids ∘ ρ) v ≡ ` ((ext* ρ) v)
-rename-subst-ids-var {Σ = ∅} {v = Z}               = refl
-rename-subst-ids-var {Σ = ∅} {v = S v}             = refl
+rename-subst-ids-var {Σ = ∅} {v = Z}              = refl
+rename-subst-ids-var {Σ = ∅} {v = S v}            = refl
 rename-subst-ids-var {Σ = Σ , _} {v = Z}           = refl
 rename-subst-ids-var {Σ = Σ , _} {v = S v} {ρ = ρ} = cong (rename S_) (rename-subst-ids-var {v = v} {ρ = ρ})
 
@@ -140,7 +141,7 @@ rename-subst-ids {N = ⋆}                  = refl
 rename-subst-ids {N = ƛ n} {ρ = ρ}        = cong ƛ_ (rename-subst-ids {N = n} {ρ = ρ})
 rename-subst-ids {N = a · b} {ρ = ρ}      = cong₂ _·_ (rename-subst-ids {N = a} {ρ = ρ}) (rename-subst-ids {N = b} {ρ = ρ})
 rename-subst-ids {N = ⟨ a , b ⟩} {ρ = ρ}  = cong₂ ⟨_,_⟩ (rename-subst-ids {N = a} {ρ = ρ}) (rename-subst-ids {N = b} {ρ = ρ})
-rename-subst-ids {N = proj _ n} {ρ = ρ}   = cong (proj _) (rename-subst-ids {N = n} {ρ = ρ})
+rename-subst-ids {N = π _ n} {ρ = ρ}      = cong (π _) (rename-subst-ids {N = n} {ρ = ρ})
 rename-subst-ids {N = [ iso ]≡ n} {ρ = ρ} = cong ([ iso ]≡_) (rename-subst-ids {N = n} {ρ = ρ})
 
 ------------------------------------------------------------------------
@@ -160,7 +161,7 @@ subst-weaken {N = ⋆} {σ = σ}          = refl
 subst-weaken {N = ƛ n} {σ = σ}        = cong ƛ_ (subst-weaken {N = n} {σ = σ})
 subst-weaken {N = a · b} {σ = σ}      = cong₂ _·_ (subst-weaken {N = a} {σ = σ}) (subst-weaken {N = b} {σ = σ})
 subst-weaken {N = ⟨ a , b ⟩} {σ = σ}  = cong₂ ⟨_,_⟩ (subst-weaken {N = a} {σ = σ}) (subst-weaken {N = b} {σ = σ})
-subst-weaken {N = proj _ n} {σ = σ}   = cong (proj _) (subst-weaken {N = n} {σ = σ})
+subst-weaken {N = π _ n} {σ = σ}      = cong (π _) (subst-weaken {N = n} {σ = σ})
 subst-weaken {N = [ iso ]≡ n} {σ = σ} = cong ([ iso ]≡_) (subst-weaken {N = n} {σ = σ})
 
 ------------------------------------------------------------------------
@@ -180,7 +181,7 @@ rename-shift-weaken {N = ⋆}                  = refl
 rename-shift-weaken {N = ƛ N} {ρ = ρ}        = cong ƛ_ (rename-shift-weaken {N = N} {ρ = ρ})
 rename-shift-weaken {N = a · b} {ρ = ρ}      = cong₂ _·_ (rename-shift-weaken {N = a} {ρ = ρ}) (rename-shift-weaken {N = b} {ρ = ρ})
 rename-shift-weaken {N = ⟨ a , b ⟩} {ρ = ρ}  = cong₂ ⟨_,_⟩ (rename-shift-weaken {N = a} {ρ = ρ}) (rename-shift-weaken {N = b} {ρ = ρ})
-rename-shift-weaken {N = proj _ N} {ρ = ρ}   = cong (proj _) (rename-shift-weaken {N = N} {ρ = ρ})
+rename-shift-weaken {N = π _ N} {ρ = ρ}      = cong (π _) (rename-shift-weaken {N = N} {ρ = ρ})
 rename-shift-weaken {N = [ iso ]≡ N} {ρ = ρ} = cong ([ iso ]≡_) (rename-shift-weaken {N = N} {ρ = ρ})
 
 ------------------------------------------------------------------------
@@ -205,7 +206,7 @@ subst-shift-weaken {N = ⋆}                  = refl
 subst-shift-weaken {N = ƛ N} {σ = σ}        = cong ƛ_ (subst-shift-weaken {N = N} {σ = σ})
 subst-shift-weaken {N = a · b} {σ = σ}      = cong₂ _·_ (subst-shift-weaken {N = a} {σ = σ}) (subst-shift-weaken {N = b} {σ = σ})
 subst-shift-weaken {N = ⟨ a , b ⟩} {σ = σ}  = cong₂ ⟨_,_⟩ (subst-shift-weaken {N = a} {σ = σ}) (subst-shift-weaken {N = b} {σ = σ})
-subst-shift-weaken {N = proj _ N} {σ = σ}   = cong (proj _) (subst-shift-weaken {N = N} {σ = σ})
+subst-shift-weaken {N = π _ N} {σ = σ}      = cong (π _) (subst-shift-weaken {N = N} {σ = σ})
 subst-shift-weaken {N = [ iso ]≡ N} {σ = σ} = cong ([ iso ]≡_) (subst-shift-weaken {N = N} {σ = σ})
 
 ------------------------------------------------------------------------
@@ -231,7 +232,7 @@ subst-split {N = ⋆}                          = refl
 subst-split {N = ƛ n} {σ = σ} {ρ = ρ}        = cong ƛ_ (subst-split {N = n} {σ = σ} {ρ = ρ})
 subst-split {N = a · b} {σ = σ} {ρ = ρ}      = cong₂ _·_ (subst-split {N = a} {σ = σ} {ρ = ρ}) (subst-split {N = b} {σ = σ} {ρ = ρ})
 subst-split {N = ⟨ a , b ⟩} {σ = σ} {ρ = ρ}  = cong₂ ⟨_,_⟩ (subst-split {N = a} {σ = σ} {ρ = ρ}) (subst-split {N = b} {σ = σ} {ρ = ρ})
-subst-split {N = proj _ N} {σ = σ} {ρ = ρ}   = cong (proj _) (subst-split {N = N} {σ = σ} {ρ = ρ})
+subst-split {N = π _ N} {σ = σ} {ρ = ρ}      = cong (π _) (subst-split {N = N} {σ = σ} {ρ = ρ})
 subst-split {N = [ iso ]≡ N} {σ = σ} {ρ = ρ} = cong ([ iso ]≡_) (subst-split {N = N} {σ = σ} {ρ = ρ})
 
 ------------------------------------------------------------------------
@@ -252,7 +253,7 @@ rename-subst {M = ⋆}                          = refl
 rename-subst {M = ƛ n} {ρ = ρ} {σ = σ}        = cong ƛ_ (rename-subst {M = n} {ρ = ρ} {σ = σ})
 rename-subst {M = a · b} {ρ = ρ} {σ = σ}      = cong₂ _·_ (rename-subst {M = a} {ρ = ρ} {σ = σ}) (rename-subst {M = b} {ρ = ρ} {σ = σ})
 rename-subst {M = ⟨ a , b ⟩} {ρ = ρ} {σ = σ}  = cong₂ ⟨_,_⟩ (rename-subst {M = a} {ρ = ρ} {σ = σ}) (rename-subst {M = b} {ρ = ρ} {σ = σ})
-rename-subst {M = proj _ n} {ρ = ρ} {σ = σ}   = cong (proj _) (rename-subst {M = n} {ρ = ρ} {σ = σ})
+rename-subst {M = π _ n} {ρ = ρ} {σ = σ}      = cong (π _) (rename-subst {M = n} {ρ = ρ} {σ = σ})
 rename-subst {M = [ iso ]≡ n} {ρ = ρ} {σ = σ} = cong ([ iso ]≡_) (rename-subst {M = n} {ρ = ρ} {σ = σ})
 
 ------------------------------------------------------------------------
@@ -278,7 +279,7 @@ rename-subst-commute {N = ⋆}                  = refl
 rename-subst-commute {N = ƛ N} {ρ = ρ}        = cong ƛ_ (rename-subst-commute {N = N} {ρ = ρ})
 rename-subst-commute {N = a · b} {ρ = ρ}      = cong₂ _·_ (rename-subst-commute {N = a} {ρ = ρ}) (rename-subst-commute {N = b} {ρ = ρ})
 rename-subst-commute {N = ⟨ a , b ⟩} {ρ = ρ}  = cong₂ ⟨_,_⟩ (rename-subst-commute {N = a} {ρ = ρ}) (rename-subst-commute {N = b} {ρ = ρ})
-rename-subst-commute {N = proj _ N} {ρ = ρ}   = cong (proj _) (rename-subst-commute {N = N} {ρ = ρ})
+rename-subst-commute {N = π _ N} {ρ = ρ}      = cong (π _) (rename-subst-commute {N = N} {ρ = ρ})
 rename-subst-commute {N = [ iso ]≡ N} {ρ = ρ} = cong ([ iso ]≡_) (rename-subst-commute {N = N} {ρ = ρ})
 
 ------------------------------------------------------------------------
@@ -310,7 +311,7 @@ subst-commute {N = ⋆}                  = refl
 subst-commute {N = ƛ N} {σ = σ}        = cong ƛ_ (subst-commute {N = N} {σ = σ})
 subst-commute {N = a · b} {σ = σ}      = cong₂ _·_ (subst-commute {N = a} {σ = σ}) (subst-commute {N = b} {σ = σ})
 subst-commute {N = ⟨ a , b ⟩} {σ = σ}  = cong₂ ⟨_,_⟩ (subst-commute {N = a} {σ = σ}) (subst-commute {N = b} {σ = σ})
-subst-commute {N = proj _ N} {σ = σ}   = cong (proj _) (subst-commute {N = N} {σ = σ})
+subst-commute {N = π _ N} {σ = σ}      = cong (π _) (subst-commute {N = N} {σ = σ})
 subst-commute {N = [ iso ]≡ N} {σ = σ} = cong ([ iso ]≡_) (subst-commute {N = N} {σ = σ})
 
 
@@ -350,7 +351,7 @@ subst-cong⇒₁-commute {N = ⋆}                  = refl
 subst-cong⇒₁-commute {N = ƛ N} {σ = σ}        = cong ƛ_ (subst-cong⇒₁-commute {Σ = _ , _} {N = N} {σ = σ})
 subst-cong⇒₁-commute {N = a · b} {σ = σ}      = cong₂ _·_ (subst-cong⇒₁-commute {N = a} {σ = σ}) (subst-cong⇒₁-commute {N = b} {σ = σ})
 subst-cong⇒₁-commute {N = ⟨ a , b ⟩} {σ = σ}  = cong₂ ⟨_,_⟩ (subst-cong⇒₁-commute {N = a} {σ = σ}) (subst-cong⇒₁-commute {N = b} {σ = σ})
-subst-cong⇒₁-commute {N = proj _ N} {σ = σ}   = cong (proj _) (subst-cong⇒₁-commute {N = N} {σ = σ})
+subst-cong⇒₁-commute {N = π _ N} {σ = σ}      = cong (π _) (subst-cong⇒₁-commute {N = N} {σ = σ})
 subst-cong⇒₁-commute {N = [ iso ]≡ N} {σ = σ} = cong ([ iso ]≡_) (subst-cong⇒₁-commute {N = N} {σ = σ})
 
 σ-uncurry : ∀ {Γ A B} → Subst (Γ , A × B) (Γ , A , B)
@@ -374,7 +375,7 @@ rename-split {N = [ iso ]≡ N} = cong ([ iso ]≡_) (rename-split {N = N})
 rename-split {N = ƛ N}        = cong ƛ_ (rename-split {Σ = _ , _} {N = N})
 rename-split {N = a · b}      = cong₂ _·_ (rename-split {N = a}) (rename-split {N = b})
 rename-split {N = ⟨ a , b ⟩}  = cong₂ ⟨_,_⟩ (rename-split {N = a}) (rename-split {N = b})
-rename-split {N = proj _ N}   = cong (proj _) (rename-split {N = N})
+rename-split {N = π _ N}      = cong (π _) (rename-split {N = N})
 
 ------------------------------------------------------------------------
 -- ⟪ σ-uncurry ⟫ (⟪ exts σ ⟫ N) ≡ ⟪ exts (exts σ) ⟫ (⟪ σ-uncurry ⟫ N)
@@ -407,10 +408,10 @@ subst-uncurry-commute {N = [ iso ]≡ N} = cong [ iso ]≡_ (subst-uncurry-commu
 subst-uncurry-commute {N = ƛ N}        = cong ƛ_ (subst-uncurry-commute {Σ = _ , _} {N = N})
 subst-uncurry-commute {N = a · b}      = cong₂ _·_ (subst-uncurry-commute {N = a}) (subst-uncurry-commute {N = b})
 subst-uncurry-commute {N = ⟨ a , b ⟩}  = cong₂ ⟨_,_⟩ (subst-uncurry-commute {N = a}) (subst-uncurry-commute {N = b})
-subst-uncurry-commute {N = proj _ N}   = cong (proj _) (subst-uncurry-commute {N = N})
+subst-uncurry-commute {N = π _ N}      = cong (π _) (subst-uncurry-commute {N = N})
 
 σ-curry : ∀ {Γ A B} → Subst (Γ , A , B) (Γ , A × B)
-σ-curry {A = A}{B = B} = proj B {inj₂ refl} (` Z) • proj A {inj₁ refl} (` Z) • ids ∘ S_
+σ-curry {A = A}{B = B} = π B {inj₂ refl} (` Z) • π A {inj₁ refl} (` Z) • ids ∘ S_
 
 ------------------------------------------------------------------------
 -- ⟪ σ-curry ⟫ (⟪ exts (exts σ) ⟫ N) ≡ ⟪ exts σ ⟫ (⟪ σ-curry ⟫ N)
@@ -444,7 +445,7 @@ subst-curry-commute {N = [ iso ]≡ N} = cong [ iso ]≡_ (subst-curry-commute {
 subst-curry-commute {N = ƛ N}        = cong ƛ_ (subst-curry-commute {Σ = _ , _} {N = N})
 subst-curry-commute {N = a · b}      = cong₂ _·_ (subst-curry-commute {N = a}) (subst-curry-commute {N = b})
 subst-curry-commute {N = ⟨ a , b ⟩}  = cong₂ ⟨_,_⟩ (subst-curry-commute {N = a}) (subst-curry-commute {N = b})
-subst-curry-commute {N = proj _ N}   = cong (proj _) (subst-curry-commute {N = N})
+subst-curry-commute {N = π _ N}      = cong (π _) (subst-curry-commute {N = N})
 
 ------------------------------------------------------------------------
 -- ⟪ σ-curry ⟫ (rename S_ (⟪ exts σ ⟫ N)) ≡ ⟪ exts σ ⟫ (⟪ σ-curry ⟫ (rename S_ N))
@@ -475,7 +476,7 @@ exts-ext {N = [ iso ]≡ N} = cong [ iso ]≡_ (exts-ext {N = N})
 exts-ext {N = ƛ N}        = cong ƛ_ (exts-ext {Σ = _ , _} {N = N})
 exts-ext {N = a · b}      = cong₂ _·_ (exts-ext {N = a}) (exts-ext {N = b})
 exts-ext {N = ⟨ a , b ⟩}  = cong₂ ⟨_,_⟩ (exts-ext {N = a}) (exts-ext {N = b})
-exts-ext {N = proj _ N}   = cong (proj _) (exts-ext {N = N})
+exts-ext {N = π _ N}      = cong (π _) (exts-ext {N = N})
 
 ------------------------------------------------------------------------
 -- ⟪ σ-cong⇒₁ iso ⟫ (rename (ext ρ) N) ≡ rename (ext (ext ρ)) (⟪ σ-cong⇒₁ iso ⟫ N)
@@ -518,45 +519,45 @@ rename-curryη-commute {B = B} {N = N} {ρ = ρ}
     = subst-curryη-commute {N = N} {σ = ids ∘ ρ}
 
 ------------------------------------------------------------------------
--- ⟪ proj B u • ids ⟫ (⟪ exts (proj A u • ids ∘ ρ) ⟫ N) ≡ ⟪ u • ids ∘ ρ ⟫ (⟪ σ-curry ⟫ N)
+-- ⟪ π B u • ids ⟫ (⟪ exts (π A u • ids ∘ ρ) ⟫ N) ≡ ⟪ u • ids ∘ ρ ⟫ (⟪ σ-curry ⟫ N)
 ------------------------------------------------------------------------
 
 subst-curry-split-var : ∀{Γ Δ Σ A B C}{v : (Γ , A , B) ,* Σ ∋ C}{u : Δ ⊢ A × B}{ρ : Rename Γ Δ}
-    → ⟪ exts* (proj B {inj₂ refl} u • ids) ⟫ (⟪ exts* (exts (proj A {inj₁ refl} u • ids ∘ ρ)) ⟫ (` v)) ≡ ⟪ exts* (u • ids ∘ ρ) ⟫ (⟪ exts* σ-curry ⟫ (` v))
+    → ⟪ exts* (π B {inj₂ refl} u • ids) ⟫ (⟪ exts* (exts (π A {inj₁ refl} u • ids ∘ ρ)) ⟫ (` v)) ≡ ⟪ exts* (u • ids ∘ ρ) ⟫ (⟪ exts* σ-curry ⟫ (` v))
 subst-curry-split-var {Σ = ∅} {v = Z}              = refl
 subst-curry-split-var {Σ = ∅} {A = A} {v = S Z}{u} =
-  cong (proj A) (trans (subst-weaken {Σ = ∅} {N = u}) (sub-id {Σ = ∅} {N = u}))
+  cong (π A) (trans (subst-weaken {Σ = ∅} {N = u}) (sub-id {Σ = ∅} {N = u}))
 subst-curry-split-var {Σ = ∅} {A = A} {v = S (S v)}       = refl
 subst-curry-split-var {Σ = _ , _} {v = Z}                 = refl
 subst-curry-split-var {Σ = _ , _} {A = A} {v = S v}{u}{ρ} =
   begin
-    _ ≡⟨ subst-shift-weaken {Σ = ∅} {N = exts* (exts (proj A u • ids ∘ ρ)) v} ⟩
+    _ ≡⟨ subst-shift-weaken {Σ = ∅} {N = exts* (exts (π A u • ids ∘ ρ)) v} ⟩
     _ ≡⟨ cong (rename S_) (subst-curry-split-var {v = v}) ⟩
     _ ≡˘⟨ subst-shift-weaken {Σ = ∅} {N = ⟪ exts* σ-curry ⟫ (` v)} ⟩
     _
   ∎
 
 subst-curry-split : ∀{Γ Δ Σ A B C}{N : (Γ , A , B) ,* Σ ⊢ C}{u : Δ ⊢ A × B}{ρ : Rename Γ Δ}
-    → ⟪ exts* (proj B {inj₂ refl} u • ids) ⟫ (⟪ exts* (exts (proj A {inj₁ refl} u • ids ∘ ρ)) ⟫ N) ≡ ⟪ exts* (u • ids ∘ ρ) ⟫ (⟪ exts* σ-curry ⟫ N)
+    → ⟪ exts* (π B {inj₂ refl} u • ids) ⟫ (⟪ exts* (exts (π A {inj₁ refl} u • ids ∘ ρ)) ⟫ N) ≡ ⟪ exts* (u • ids ∘ ρ) ⟫ (⟪ exts* σ-curry ⟫ N)
 subst-curry-split {N = ` v}        = subst-curry-split-var {v = v}
 subst-curry-split {N = ⋆}          = refl
 subst-curry-split {N = [ iso ]≡ N} = cong [ iso ]≡_ (subst-curry-split {N = N})
 subst-curry-split {N = ƛ N}        = cong ƛ_ (subst-curry-split {Σ = _ , _} {N = N})
 subst-curry-split {N = a · b}      = cong₂ _·_ (subst-curry-split {N = a}) (subst-curry-split {N = b})
 subst-curry-split {N = ⟨ a , b ⟩}  = cong₂ ⟨_,_⟩ (subst-curry-split {N = a}) (subst-curry-split {N = b})
-subst-curry-split {N = proj _ N}   = cong (proj _) (subst-curry-split {N = N})
+subst-curry-split {N = π _ N}      = cong (π _) (subst-curry-split {N = N})
 
 ------------------------------------------------------------------------
--- ⟪ proj A u • ids ∘ ρ ⟫ N ≡ ⟪ u • ids ∘ ρ ⟫ (⟪ σ-curry ⟫ (rename S_ N))
+-- ⟪ π A u • ids ∘ ρ ⟫ N ≡ ⟪ u • ids ∘ ρ ⟫ (⟪ σ-curry ⟫ (rename S_ N))
 ------------------------------------------------------------------------
 
 subst-shift-curry-split : ∀{Γ Δ A B C}{N : Γ , A ⊢ C}{u : Δ ⊢ A × B}{ρ : Rename Γ Δ}
-    → ⟪ proj A {inj₁ refl} u • ids ∘ ρ ⟫ N ≡ ⟪ (u • ids ∘ ρ) ⟫ (⟪ σ-curry ⟫ (rename S_ N))
+    → ⟪ π A {inj₁ refl} u • ids ∘ ρ ⟫ N ≡ ⟪ (u • ids ∘ ρ) ⟫ (⟪ σ-curry ⟫ (rename S_ N))
 subst-shift-curry-split {A = A}{B = B}{N = N}{u}{ρ} =
   begin
-   _ ≡˘⟨ sub-id {Σ = ∅} {N = ⟪ proj A u • ids ∘ ρ ⟫ N} ⟩
-   _ ≡˘⟨ subst-weaken {Σ = ∅} {N = ⟪ proj A u • ids ∘ ρ ⟫ N} ⟩
-   _ ≡˘⟨ cong (⟪ proj B u • ids ⟫) (subst-shift-weaken {Σ = ∅} {N = N}) ⟩
+   _ ≡˘⟨ sub-id {Σ = ∅} {N = ⟪ π A u • ids ∘ ρ ⟫ N} ⟩
+   _ ≡˘⟨ subst-weaken {Σ = ∅} {N = ⟪ π A u • ids ∘ ρ ⟫ N} ⟩
+   _ ≡˘⟨ cong (⟪ π B u • ids ⟫) (subst-shift-weaken {Σ = ∅} {N = N}) ⟩
    _ ≡⟨ subst-curry-split {Σ = ∅} {N = rename S_ N} {u} {ρ} ⟩
    _
   ∎
@@ -585,7 +586,7 @@ subst-cong⇒₁-split {N = [ iso ]≡ N} = cong [ iso ]≡_ (subst-cong⇒₁-s
 subst-cong⇒₁-split {N = ƛ N}        = cong ƛ_ (subst-cong⇒₁-split {Σ = _ , _} {N = N})
 subst-cong⇒₁-split {N = a · b}      = cong₂ _·_ (subst-cong⇒₁-split {N = a}) (subst-cong⇒₁-split {N = b})
 subst-cong⇒₁-split {N = ⟨ a , b ⟩}  = cong₂ ⟨_,_⟩ (subst-cong⇒₁-split {N = a}) (subst-cong⇒₁-split {N = b})
-subst-cong⇒₁-split {N = proj _ N}   = cong (proj _) (subst-cong⇒₁-split {N = N})
+subst-cong⇒₁-split {N = π _ N}      = cong (π _) (subst-cong⇒₁-split {N = N})
 
 ------------------------------------------------------------------------
 -- ⟪ u₁ • ids ∘ ρ₁ ⟫ (⟪ exts (u • ids ∘ ρ) ⟫ (⟪ σ-uncurry ⟫ N)) ≡ ⟪ ⟨ rename ρ₁ u , u₁ ⟩ • ids ∘ ρ₁ ∘ ρ ⟫ N
@@ -612,4 +613,5 @@ subst-uncurry-split {N = [ iso ]≡ N} = cong [ iso ]≡_ (subst-uncurry-split {
 subst-uncurry-split {N = ƛ N}        = cong ƛ_ (subst-uncurry-split {Σ = _ , _} {N = N})
 subst-uncurry-split {N = a · b}      = cong₂ _·_ (subst-uncurry-split {N = a}) (subst-uncurry-split {N = b})
 subst-uncurry-split {N = ⟨ a , b ⟩}  = cong₂ ⟨_,_⟩ (subst-uncurry-split {N = a}) (subst-uncurry-split {N = b})
-subst-uncurry-split {N = proj _ N}   = cong (proj _) (subst-uncurry-split {N = N})
+subst-uncurry-split {N = π _ N}      = cong (π _) (subst-uncurry-split {N = N})
+ 
