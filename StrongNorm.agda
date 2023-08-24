@@ -73,11 +73,11 @@ rename↪ {t = ⟨ a , b ⟩} (ξ-⟨,⟩₁ step) with rename↪ step
 ... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ ξ-⟨,⟩₁ step , refl ﹚ ﹚
 rename↪ {t = ⟨ a , b ⟩} (ξ-⟨,⟩₂ step) with rename↪ step
 ... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ ξ-⟨,⟩₂ step , refl ﹚ ﹚
-rename↪ {t = proj _ ⟨ a , b ⟩} β-proj₁ = ﹙ a , ﹙ β-proj₁ , refl ﹚ ﹚
-rename↪ {t = proj _ ⟨ a , b ⟩} β-proj₂ = ﹙ b , ﹙ β-proj₂ , refl ﹚ ﹚
-rename↪ {t = proj _ t} (ξ-proj step) with rename↪ step
-rename↪ {t = proj _ {inj₁ x} t} (ξ-proj _) | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ ξ-proj step , refl ﹚ ﹚
-rename↪ {t = proj _ {inj₂ y} t} (ξ-proj _) | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ ξ-proj step , refl ﹚ ﹚
+rename↪ {t = π _ ⟨ a , b ⟩} β-π₁ = ﹙ a , ﹙ β-π₁ , refl ﹚ ﹚
+rename↪ {t = π _ ⟨ a , b ⟩} β-π₂ = ﹙ b , ﹙ β-π₂ , refl ﹚ ﹚
+rename↪ {t = π _ t} (ξ-π step) with rename↪ step
+rename↪ {t = π _ {inj₁ x} t} (ξ-π _) | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ ξ-π step , refl ﹚ ﹚
+rename↪ {t = π _ {inj₂ y} t} (ξ-π _) | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ ξ-π step , refl ﹚ ﹚
 rename↪ {t = [ _ ]≡ t} (ξ-≡ step) with rename↪ step
 ... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ ξ-≡ step , refl ﹚ ﹚
 
@@ -92,7 +92,7 @@ SN*-rename : ∀{Γ Δ A} {t : Γ ⊢ A} → (ρ : Rename Γ Δ) → SN* ⟦_⟧
 ⟦⟧-rename {t = ` v} ρ tt      = tt
 ⟦⟧-rename {t = a · b} ρ tt    = tt
 ⟦⟧-rename {t = ⋆} ρ tt        = tt
-⟦⟧-rename {t = proj _ t} ρ tt = tt
+⟦⟧-rename {t = π _ t} ρ tt    = tt
 ⟦⟧-rename {t = [ _ ]≡ t} ρ tt = tt
 
 SN*-rename ρ (sn* Lt SNt) =
@@ -129,13 +129,13 @@ lemma-⟨,⟩ SN*a SN*b = sn* ﹙ SN*a , SN*b ﹚ λ step → aux SN*a SN*b step
         aux SN*a (sn* Lb SNb) (inj₂ (ξ-⟨,⟩₂ step)) = lemma-⟨,⟩ SN*a (SNb (inj₂ step))
 
 
-lemma-proj : ∀ {Γ A B C p} → {t : Γ ⊢ A × B} → SN* ⟦_⟧ t → SN* ⟦_⟧ (proj C {p} t)
-lemma-proj SN*t = sn* tt (aux SN*t)
-  where aux : ∀ {Γ A B C p t'} → {t : Γ ⊢ A × B} → SN* ⟦_⟧ t → (proj C {p} t) ↪ t' ⊎ proj C {p} t ⇄ t' → SN* ⟦_⟧ t'
-        aux (sn* Lt SNt)             (inj₁ (ξ-proj step)) = lemma-proj (SNt (inj₁ step))
-        aux (sn* ﹙ SN*t' , _ ﹚ SNt) (inj₁ β-proj₁)       = SN*t'
-        aux (sn* ﹙ _ , SN*t' ﹚ SNt) (inj₁ β-proj₂)       = SN*t'
-        aux (sn* Lt SNt)             (inj₂ (ξ-proj step)) = lemma-proj (SNt (inj₂ step))
+lemma-π : ∀ {Γ A B C p} → {t : Γ ⊢ A × B} → SN* ⟦_⟧ t → SN* ⟦_⟧ (π C {p} t)
+lemma-π SN*t = sn* tt (aux SN*t)
+  where aux : ∀ {Γ A B C p t'} → {t : Γ ⊢ A × B} → SN* ⟦_⟧ t → (π C {p} t) ↪ t' ⊎ π C {p} t ⇄ t' → SN* ⟦_⟧ t'
+        aux (sn* Lt SNt)             (inj₁ (ξ-π step)) = lemma-π (SNt (inj₁ step))
+        aux (sn* ﹙ SN*t' , _ ﹚ SNt) (inj₁ β-π₁)       = SN*t'
+        aux (sn* ﹙ _ , SN*t' ﹚ SNt) (inj₁ β-π₂)       = SN*t'
+        aux (sn* Lt SNt)             (inj₂ (ξ-π step)) = lemma-π (SNt (inj₂ step))
 
 open import IsoType using (dist; curry)
 
@@ -172,10 +172,10 @@ lemma-S {t = t} SNt ρ =
 
 lemma-curry : ∀ {Γ Δ A B C} → {t : Γ , A , B ⊢ C} {u : Δ ⊢ A × B} → ⟦ ƛ ƛ t ⟧ → SN* ⟦_⟧ u → (ρ : Rename Γ Δ) → SN* ⟦_⟧ (⟪ u • (λ x → ids (ρ x)) ⟫ (⟪ σ-curry ⟫ t))
 lemma-curry {A = A} {B = B} {t = t} {u = u} Lt SNu ρ =
-  case Lt {ρ = ρ} {u = proj A {inj₁ refl} u} (lemma-proj SNu) of λ {(sn* Lr _) →
+  case Lt {ρ = ρ} {u = π A {inj₁ refl} u} (lemma-π SNu) of λ {(sn* Lr _) →
     transport (SN* ⟦_⟧)
       (subst-curry-split {Σ = ∅} {N = t})
-      (Lr {ρ = λ x → x} {u = proj B {inj₂ refl} u} (lemma-proj SNu))}
+      (Lr {ρ = λ x → x} {u = π B {inj₂ refl} u} (lemma-π SNu))}
 
 lemma-uncurry : ∀ {Γ Δ A B C} → {t : Γ , A × B ⊢ C} {u : Δ ⊢ A} → ⟦ ƛ t ⟧ → SN* ⟦_⟧ u → (ρ : Rename Γ Δ) → SN* ⟦_⟧ (⟪ u • (λ x → ids (ρ x)) ⟫ (ƛ ⟪ σ-uncurry ⟫ t))
 lemma-uncurry {A = A} {B = B} {t = t} {u = u} Lt SNu ρ =
@@ -199,8 +199,8 @@ lemma-≡ SN*t = sn* tt (aux SN*t)
         ---
         aux (sn* ﹙ SNr , sn* ﹙ SNs , SNt ﹚ _ ﹚ _) (inj₂ asso)     = lemma-⟨,⟩ (lemma-⟨,⟩ SNr SNs) SNt
         aux (sn* ﹙ sn* ﹙ SNr , SNs ﹚ _ , SNt ﹚ _) (inj₂ sym-asso) = lemma-⟨,⟩ SNr (lemma-⟨,⟩ SNs SNt)
-        aux (sn* ﹙ SNr , SNs ﹚ _) (inj₂ asso-split)     = lemma-⟨,⟩ (lemma-⟨,⟩ SNr (lemma-proj SNs)) (lemma-proj SNs)
-        aux (sn* ﹙ SNr , SNs ﹚ _) (inj₂ sym-asso-split) = lemma-⟨,⟩ (lemma-proj SNr) (lemma-⟨,⟩ (lemma-proj SNr) SNs)
+        aux (sn* ﹙ SNr , SNs ﹚ _) (inj₂ asso-split)     = lemma-⟨,⟩ (lemma-⟨,⟩ SNr (lemma-π SNs)) (lemma-π SNs)
+        aux (sn* ﹙ SNr , SNs ﹚ _) (inj₂ sym-asso-split) = lemma-⟨,⟩ (lemma-π SNr) (lemma-⟨,⟩ (lemma-π SNr) SNs)
         ---
         aux (sn* ﹙ (sn* Lr SNr) , (sn* Ls SNs) ﹚ _) (inj₂ dist-ƛ) =
           lemma-ƛ
@@ -224,8 +224,8 @@ lemma-≡ SN*t = sn* tt (aux SN*t)
               (lemma-ƛ (λ SNu → case Lt SNu of λ {(sn* ﹙ _ , SNs ﹚ _) → SNs}) SNs)}
         aux (sn* Lt SNt) (inj₂ sym-dist-ƛ-split) =
           lemma-⟨,⟩
-            (lemma-ƛ (λ SNu → lemma-proj (Lt SNu)) (lemma-proj (lemma-sub (sn* Lt SNt))))
-            (lemma-ƛ (λ SNu → lemma-proj (Lt SNu)) (lemma-proj (lemma-sub (sn* Lt SNt))))
+            (lemma-ƛ (λ SNu → lemma-π (Lt SNu)) (lemma-π (lemma-sub (sn* Lt SNt))))
+            (lemma-ƛ (λ SNu → lemma-π (Lt SNu)) (lemma-π (lemma-sub (sn* Lt SNt))))
         ---
         aux (sn* Lt _) (inj₂ (curry {A = A}{B = B}{r = r})) =
           lemma-ƛ
@@ -236,14 +236,14 @@ lemma-≡ SN*t = sn* tt (aux SN*t)
         aux (sn* Lt _) (inj₂ (curry-η {A = A}{B = B}{r = r})) =
           lemma-ƛ
             (λ {_}{ρ}{u} SNu →
-              -- SN* ⟦_⟧ (⟪ u • ids ∘ ρ ⟫ (⟪ σ-curry (rename S_ r) ⟫) · proj B u)
+              -- SN* ⟦_⟧ (⟪ u • ids ∘ ρ ⟫ (⟪ σ-curry (rename S_ r) ⟫) · π B u)
               lemma-·
-                (transport (SN* ⟦_⟧) (subst-shift-curry-split {N = r}) (Lt {ρ = ρ} {u = proj A {inj₁ refl} u} (lemma-proj SNu)))
-                (lemma-proj SNu))
-            -- SN* ⟦_⟧ (⟪ σ-curry (rename S_ r) ⟫ · proj B (` Z))
+                (transport (SN* ⟦_⟧) (subst-shift-curry-split {N = r}) (Lt {ρ = ρ} {u = π A {inj₁ refl} u} (lemma-π SNu)))
+                (lemma-π SNu))
+            -- SN* ⟦_⟧ (⟪ σ-curry (rename S_ r) ⟫ · π B (` Z))
             (lemma-·
-              (transport (SN* ⟦_⟧) (sym (subst-weaken {Σ = ∅} {N = r})) (Lt {ρ = S_} {u = proj A (` Z)} (lemma-proj lemma-var)))
-              (lemma-proj lemma-var))
+              (transport (SN* ⟦_⟧) (sym (subst-weaken {Σ = ∅} {N = r})) (Lt {ρ = S_} {u = π A (` Z)} (lemma-π lemma-var)))
+              (lemma-π lemma-var))
         aux (sn* Lt _) (inj₂ (uncurry {r = r})) =
           lemma-ƛ
             -- SN* ⟦_⟧ (⟪ u • ids ∘ ρ ⟫ (ƛ ⟪ σ-uncurry r ⟫))
@@ -308,7 +308,7 @@ adequacy : ∀ {Γ Δ A} {σ : Subst Γ Δ} → (t : Γ ⊢ A) → Γ ⊨ σ →
 adequacy (` v) Lσ         = Lσ v
 adequacy ⋆ Lσ             = lemma-top
 adequacy ⟨ a , b ⟩ Lσ     = lemma-⟨,⟩ (adequacy a Lσ) (adequacy b Lσ)
-adequacy (proj _ x) Lσ    = lemma-proj (adequacy x Lσ)
+adequacy (π _ x) Lσ       = lemma-π (adequacy x Lσ)
 adequacy (a · b) Lσ       = lemma-· (adequacy a Lσ) (adequacy b Lσ)
 adequacy ([ iso ]≡ n) Lσ  = lemma-≡ (adequacy n Lσ)
 adequacy {σ = σ} (ƛ n) Lσ =

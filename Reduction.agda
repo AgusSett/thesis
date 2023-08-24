@@ -41,22 +41,22 @@ data _↪_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
       -------------------------
     → ⟨ V , N ⟩ ↪ ⟨ V , N' ⟩
 
-  ξ-proj : ∀ {Γ A B C p} {L L' : Γ ⊢ A × B}
+  ξ-π : ∀ {Γ A B C p} {L L' : Γ ⊢ A × B}
     → L ↪ L'
       ---------------------
-    → proj C {p} L ↪ proj C {p} L'
+    → π C {p} L ↪ π C {p} L'
 
-  β-proj₁ : ∀ {Γ A B} {V : Γ ⊢ A} {W : Γ ⊢ B}
+  β-π₁ : ∀ {Γ A B} {V : Γ ⊢ A} {W : Γ ⊢ B}
 --    → Value V
 --    → Value W
       ----------------------
-    → proj A {inj₁ refl} ⟨ V , W ⟩ ↪ V
+    → π A {inj₁ refl} ⟨ V , W ⟩ ↪ V
 
-  β-proj₂ : ∀ {Γ A B} {V : Γ ⊢ A} {W : Γ ⊢ B}
+  β-π₂ : ∀ {Γ A B} {V : Γ ⊢ A} {W : Γ ⊢ B}
 --    → Value V
 --    → Value W
       ----------------------
-    → proj B {inj₂ refl} ⟨ V , W ⟩ ↪ W
+    → π B {inj₂ refl} ⟨ V , W ⟩ ↪ W
 
   ξ-≡ : ∀ {Γ A B} {N : Γ ⊢ A} {N' : Γ ⊢ A} {iso : A ≡ B}
     → N ↪ N'
@@ -76,8 +76,8 @@ data _↪_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
 ↪[] (ζ step) = ζ (↪[] step)
 ↪[] (ξ-⟨,⟩₁ step) = ξ-⟨,⟩₁ (↪[] step)
 ↪[] (ξ-⟨,⟩₂ step) = ξ-⟨,⟩₂ (↪[] step)
-↪[] (ξ-proj step) = ξ-proj (↪[] step)
-↪[] β-proj₁ = β-proj₁
-↪[] β-proj₂ = β-proj₂
+↪[] (ξ-π step) = ξ-π (↪[] step)
+↪[] β-π₁ = β-π₁
+↪[] β-π₂ = β-π₂
 ↪[] (ξ-≡ step) = ξ-≡ (↪[] step)
  

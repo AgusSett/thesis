@@ -67,19 +67,12 @@ data _⊢_ : Context → Type → Set where
       -----------
     → Γ ⊢ A × B
 
-  proj : ∀ {Γ A B}
+  π : ∀ {Γ A B}
     → (C : Type)
     → {proof : (C ≋ A) ⊎ (C ≋ B)}
     → Γ ⊢ A × B 
       -----------
     → Γ ⊢ C
-
-{-
-π : ∀ {Γ A B} → (C : Type) → {proof : True (C ≟ A) ⊎ True (C ≟ B)} → Γ ⊢ A × B 
-    → Γ ⊢ C
-π C {inj₁ x} A×B = proj C (inj₁ (toWitness x)) A×B
-π C {inj₂ x} A×B = proj C (inj₂ (toWitness x)) A×B
--}
 
 data Value : ∀ {Γ A} → Γ ⊢ A → Set where
 
@@ -104,50 +97,68 @@ data Value : ∀ {Γ A} → Γ ⊢ A → Set where
     → Value ⟨ V , W ⟩
 
 
-data Neutral : ∀ {Γ A} → Γ ⊢ A → Set
-data Normal  : ∀ {Γ A} → Γ ⊢ A → Set
+data ⇓ : ∀ {Γ A} → Γ ⊢ A → Set
+data ⇑ : ∀ {Γ A} → Γ ⊢ A → Set
 
-data Neutral where
+-- Neutral M = Normal M × ¬ Value M
+data ⇓ where
 
   `_  : ∀ {Γ A} (x : Γ ∋ A)
       -------------
-    → Neutral (` x)
+    → ⇓ (` x)
 
   _·_  : ∀ {Γ A B} {L : Γ ⊢ A ⇒ B} {M : Γ ⊢ A}
-    → Neutral L
-    → Normal M
+    → ⇓ L → ⇑ M
       ---------------
-    → Neutral (L · M)
+    → ⇓ (L · M)
   
-  proj : ∀ {Γ A B C p} {L : Γ ⊢ A × B}
-    → Neutral L
+  π : ∀ {Γ A B C p} {L : Γ ⊢ A × B}
+    → ⇓ L
       ---------------
-    → Neutral (proj C {p} L)
+    → ⇓ (π C {p} L)
   
   [_]≡_ : ∀ {Γ A B} {N : Γ ⊢ A}
     → (iso : A ≡ B)
-    → Neutral N
+    → ⇓ N
       ------------------
-    → Neutral ([ iso ]≡ N)
+    → ⇓ ([ iso ]≡ N)
 
-data Normal where
+-- Normal M = ∀ {N} → ¬ (M ⇝ N)
+data ⇑ where
 
   ^_ : ∀ {Γ A} {M : Γ ⊢ A}
-    → Neutral M
+    → ⇓ M
       ---------
-    → Normal M
+    → ⇑ M
 
   N-ƛ : ∀ {Γ A B} {N : Γ , A ⊢ B}
-    → {Normal N}
+    → {⇑ N}
       ------------
-    → Normal (ƛ N)
+    → ⇑ (ƛ N)
   
   ⟨_,_⟩ : ∀ {Γ A B} {V : Γ ⊢ A} {W : Γ ⊢ B}
-    → Normal V
-    → Normal W
+    → ⇑ V
+    → ⇑ W
       ----------------
-    → Normal ⟨ V , W ⟩
+    → ⇑ ⟨ V , W ⟩
   
   N-⋆ : ∀ {Γ}
       ---------------------------
-    → Normal (⋆ {Γ})
+    → ⇑ (⋆ {Γ})
+
+open import Data.Empty using (⊥-elim)
+open import Relation.Nullary using (¬_)
+
+closed→¬⇓ : ∀ {A} → (N : ∅ ⊢ A) → ¬ (⇓ N)
+closed→¬⇓ ⋆          = λ ()
+closed→¬⇓ (ƛ _)      = λ ()
+closed→¬⇓ ⟨ _ , _ ⟩  = λ ()
+closed→¬⇓ ([ _ ]≡ x) = λ { ([ _ ]≡ ⇓x) → closed→¬⇓ x ⇓x }
+closed→¬⇓ (x · _)    = λ { (⇓x · _) → closed→¬⇓ x ⇓x }
+closed→¬⇓ (π _ x)    = λ { (π ⇓x) → closed→¬⇓ x ⇓x }
+
+closed⇑→Value : ∀ {A} → {N : ∅ ⊢ A} → ⇑ N → Value N
+closed⇑→Value N-⋆            = V-⋆
+closed⇑→Value N-ƛ            = V-ƛ
+closed⇑→Value ⟨ a , b ⟩      = V-⟨ closed⇑→Value a , closed⇑→Value b ⟩
+closed⇑→Value {N = N} (^ ⇓N) = ⊥-elim (closed→¬⇓ N ⇓N)

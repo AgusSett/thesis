@@ -22,7 +22,7 @@ data Progress {Γ A} (M : Γ ⊢ A) : Set where
     → Progress M
   
   done :
-      Normal M
+      ⇑ M
       ----------
     → Progress M
 
@@ -97,12 +97,14 @@ progress ⟨ M , N ⟩ with progress M
 ...    | step↪ N↪N' = step↪ (ξ-⟨,⟩₂ N↪N')
 ...    | done NN = done ⟨ NM , NN ⟩
 
-progress (proj _ {p} N) with progress N
-... | step⇄ N⇄N' = step⇄ (ξ-proj N⇄N')
-... | step↪ N↪N' = step↪ (ξ-proj N↪N')
-... | done (^ x) = done (^ proj x)
-progress (proj _ {inj₁ refl} N) | done ⟨ NN , NM ⟩ = step↪ β-proj₁
-progress (proj _ {inj₂ refl} N) | done ⟨ NN , NM ⟩ = step↪ β-proj₂
+progress (π _ {p} N) with progress N
+... | step⇄ N⇄N' = step⇄ (ξ-π N⇄N')
+... | step↪ N↪N' = step↪ (ξ-π N↪N')
+... | done (^ x) = done (^ π x)
+progress (π _ {inj₁ refl} N) | done ⟨ NN , NM ⟩ = step↪ β-π₁
+progress (π _ {inj₂ refl} N) | done ⟨ NN , NM ⟩ = step↪ β-π₂
+
+
 
 
 _ : ∀ {Γ A B} → Γ ⊢ (A × B ⇒ B × A)

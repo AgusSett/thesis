@@ -29,9 +29,9 @@ data _⇄_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
   sym-asso : ∀ {Γ A B C} → {r : Γ ⊢ A} → {s : Γ ⊢ B} → {t : Γ ⊢ C}
     → [ sym asso ]≡ ⟨ ⟨ r , s ⟩ , t ⟩ ⇄ ⟨ r , ⟨ s , t ⟩ ⟩
   asso-split : ∀ {Γ A B C} → {r : Γ ⊢ A} → {s : Γ ⊢ B × C}
-    → [ asso ]≡ ⟨ r , s ⟩ ⇄ ⟨ ⟨ r , proj B {inj₁ refl} s ⟩ , proj C {inj₂ refl} s ⟩
+    → [ asso ]≡ ⟨ r , s ⟩ ⇄ ⟨ ⟨ r , π B {inj₁ refl} s ⟩ , π C {inj₂ refl} s ⟩
   sym-asso-split : ∀ {Γ A B C} → {r : Γ ⊢ A × B} → {s : Γ ⊢ C}
-    → [ sym asso ]≡ ⟨ r , s ⟩ ⇄ ⟨ proj A {inj₁ refl} r , ⟨ proj B {inj₂ refl} r , s ⟩ ⟩
+    → [ sym asso ]≡ ⟨ r , s ⟩ ⇄ ⟨ π A {inj₁ refl} r , ⟨ π B {inj₂ refl} r , s ⟩ ⟩
 
   ------------------------------------------------------------------------
   -- ⟨ ƛ r , ƛ s ⟩ ⇄ ƛ ⟨ r , s ⟩
@@ -47,7 +47,7 @@ data _⇄_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
   sym-dist-ƛ : ∀ {Γ A B C} → {r : Γ , C ⊢ A} → {s : Γ , C ⊢ B}
     → [ sym dist ]≡ (ƛ ⟨ r , s ⟩) ⇄ ⟨ ƛ r , ƛ s ⟩
   sym-dist-ƛ-split : ∀ {Γ A B C} → {r : Γ , C ⊢ A × B}
-    → [ sym dist ]≡ (ƛ r) ⇄ ⟨ ƛ proj A {inj₁ refl} r , ƛ proj B {inj₂ refl} r ⟩
+    → [ sym dist ]≡ (ƛ r) ⇄ ⟨ ƛ π A {inj₁ refl} r , ƛ π B {inj₂ refl} r ⟩
 
   ------------------------------------------------------------------------
   -- r · ⟨ s , t ⟩ ⇄ r · s · t
@@ -63,7 +63,7 @@ data _⇄_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
   --  → r ⇄ ƛ rename S_ r · ` Z
   
   --split : ∀ {Γ A B} → {r : Γ ⊢ A × B}
-  --  → r ⇄ ⟨ proj A {inj₁ refl} r , proj B {inj₂ refl} r ⟩
+  --  → r ⇄ ⟨ π A {inj₁ refl} r , π B {inj₂ refl} r ⟩
 
   id-× : ∀ {Γ A} → {r : Γ ⊢ A} → {t : Γ ⊢ ⊤}
     → [ id-× ]≡ ⟨ r , t ⟩ ⇄ r
@@ -119,9 +119,9 @@ data _⇄_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
     → N ⇄ N'
     → ⟨ M , N ⟩ ⇄ ⟨ M , N' ⟩
 
-  ξ-proj : ∀ {Γ A B C p} {L L' : Γ ⊢ A × B}
+  ξ-π : ∀ {Γ A B C p} {L L' : Γ ⊢ A × B}
     → L ⇄ L'
-    → proj C {p} L ⇄ proj C {p} L'
+    → π C {p} L ⇄ π C {p} L'
   
   ξ-≡ : ∀ {Γ A B} {L L' : Γ ⊢ A} {iso : A ≡ B}
     → L ⇄ L'
@@ -196,7 +196,7 @@ open import Relation.Binary.PropositionalEquality using (cong; cong₂; refl; tr
 ⇄[] (ξ-·₂ step)   = ξ-·₂ (⇄[] step)
 ⇄[] (ξ-⟨,⟩₁ step) = ξ-⟨,⟩₁ (⇄[] step)
 ⇄[] (ξ-⟨,⟩₂ step) = ξ-⟨,⟩₂ (⇄[] step)
-⇄[] (ξ-proj step) = ξ-proj (⇄[] step)
+⇄[] (ξ-π step)    = ξ-π (⇄[] step)
 ⇄[] (ξ-≡ step)    = ξ-≡ (⇄[] step)
 ⇄[] (ζ step)      = ζ (⇄[] step)
 
@@ -258,7 +258,7 @@ rename⇄ {t = ⟨ a , b ⟩} (ξ-⟨,⟩₁ step) with rename⇄ step
 ... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ (ξ-⟨,⟩₁ step) , refl ﹚ ﹚
 rename⇄ {t = ⟨ a , b ⟩} (ξ-⟨,⟩₂ step) with rename⇄ step
 ... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ (ξ-⟨,⟩₂ step) , refl ﹚ ﹚
-rename⇄ {t = proj _ t} (ξ-proj step) with rename⇄ step
-... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ (ξ-proj step) , refl ﹚ ﹚
+rename⇄ {t = π _ t} (ξ-π step) with rename⇄ step
+... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ (ξ-π step) , refl ﹚ ﹚
 rename⇄ {t = [ _ ]≡ t} (ξ-≡ step) with rename⇄ step
 ... | ﹙ _ , ﹙ step , refl ﹚ ﹚ = ﹙ _ , ﹙ (ξ-≡ step) , refl ﹚ ﹚
