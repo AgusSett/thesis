@@ -32,7 +32,8 @@
 	
 	\chapter{Introducción}
 	Los sistemas de tipos permiten especificar el comportamiento de los programas.
-	Por ejemplo, el tipo $(A \times B) \rightarrow C$ representa los programas que permiten obtener un valor de tipo $C$ a partir de un par de valores de tipo $A$ y $B$. Por otro lado, el tipo $A \rightarrow B \rightarrow C$ representa los programas que primero acepta un valor de tipo $A$, luego uno de tipo $B$ y finalmente devuelve un valor de tipo $C$.
+	Por ejemplo, el tipo $(A \times B) \rightarrow C$ representa los programas que permiten obtener un valor de tipo $C$ a partir de un par de valores de tipo $A$ y $B$.
+	Por otro lado, el tipo $A \rightarrow B \rightarrow C$ representa los programas que primero acepta un valor de tipo $A$, luego uno de tipo $B$ y finalmente devuelve un valor de tipo $C$.
 	Estas dos especificaciones son distintas en su forma pero parecen tener el mismo significado semántico. Esto se debe al isomorfismo de Curry.
 	Debido a la estrecha relación entre la programación y la lógica, se observa un comportamiento análogo cuando se trabaja con pruebas.
 	Por ejemplo, una prueba de $(A \wedge B) \Rightarrow C$ no constituye una prueba de $A \Rightarrow B \Rightarrow C$, y viceversa, a pesar de que ambas tienen el mismo significado.
@@ -273,7 +274,8 @@
 	Si $r$ y $s$ tienen tipo $A$, entonces $\pi_A \langle r, s \rangle$ puede reducir indistintamente a cualesquiera de los dos términos.
 	Sin embargo, es posible codificar una proyección determinista incluso cuando ambos términos son del mismo tipo, por ejemplo, el par $\langle r, s \rangle: A \times A$
 	se codifica como $\langle \lambda x^\mathbb{X}.r, \lambda x^\mathbb{Y}.s \rangle : \mathbb{X} \Rightarrow A \times \mathbb{Y} \Rightarrow A$.
-	Y la proyección $\pi_1 \langle r, s \rangle$ se codifica como $(\pi_{\mathbb{X} \Rightarrow A} \langle \lambda x^\mathbb{X}.r, \lambda x^\mathbb{Y}.s \rangle) y^\mathbb{X}$, donde $\mathbb{X}$ y $\mathbb{Y}$ son dos tipos distintos, y $y^\mathbb{X}$ es cualquier elemento de tipo $\mathbb{X}$. De forma análoga se puede codificar $\pi_2$.
+	Y la proyección $\pi_1 \langle r, s \rangle$ se codifica como $(\pi_{\mathbb{X} \Rightarrow A} \langle \lambda x^\mathbb{X}.r, \lambda x^\mathbb{Y}.s \rangle) y^\mathbb{X}$, donde $\mathbb{X}$ y $\mathbb{Y}$ son dos tipos distintos, y $y^\mathbb{X}$ es cualquier elemento de tipo $\mathbb{X}$.
+	De forma análoga se puede codificar $\pi_2$.
 
 	
 	La $\beta$-reducción clásica también entra en conflicto con la preservación de tipos.
@@ -403,7 +405,8 @@
 	  suc  : Fin n $\rightarrow$ Fin (suc n)
 	\end{lstlisting}
 	
-	Cada tipo \verb|Fin n| está habitado por $n$ elementos, estos serían, el elemento \verb|zero| más el constructor \verb|suc| combinado con los $n-1$ elementos de \verb|Fin (n-1)|. Notar que \verb|Fin 0| es un conjunto vacío, es decir que no existe ningún término con dicho tipo, o dicho de otra forma, el tipo \verb|Fin 0| no está habitado por ningún término.
+	Cada tipo \verb|Fin n| está habitado por $n$ elementos, estos serían, el elemento \verb|zero| más el constructor \verb|suc| combinado con los $n-1$ elementos de \verb|Fin (n-1)|.
+	Notar que \verb|Fin 0| es un conjunto vacío, es decir que no existe ningún término con dicho tipo, o dicho de otra forma, el tipo \verb|Fin 0| no está habitado por ningún término.
 	Luego, un vector de largo $n$ estará indexado por los elementos del conjunto \verb|Fin n|, que tiene cardinalidad exactamente igual a $n$.
 	
 	\begin{lstlisting}[mathescape, language=Haskell]
@@ -412,10 +415,12 @@
 	(cons x v) !!v suc i = v !!v i
 	\end{lstlisting}
 	
-	Notar que en la implementación ya no aparece el caso \verb|nil|, porque eso implicaría que $n = 0$, pero el parámetro $n$ del tipo dependiente está forzando al argumento \verb|Fin| a tener la misma cantidad de elementos que el vector, por lo que dicho argumento debería ser un elemento de \verb|Fin 0|, el cual es un conjunto vació. Esto es lo que se denomina un ``patrón absurdo'', y como es imposible que dicho patrón ocurra, se lo excluye de la implementación.
+	Notar que en la implementación ya no aparece el caso \verb|nil|, porque eso implicaría que $n = 0$, pero el parámetro $n$ del tipo dependiente está forzando al argumento \verb|Fin| a tener la misma cantidad de elementos que el vector, por lo que dicho argumento debería ser un elemento de \verb|Fin 0|, el cual es un conjunto vació.
+	Esto es lo que se denomina un ``patrón absurdo'', y como es imposible que dicho patrón ocurra, se lo excluye de la implementación.
 	
 	Utilizando estos tipos es imposible tratar de acceder a un elemento que no esté en el rango del vector.
-	Lo más interesante es que los invariantes son verificados estáticamente por el sistema de tipos en tiempo de compilación. Un término que trata de romper alguna invariante, estará mal tipado, por lo que no es posible construirlo.
+	Lo más interesante es que los invariantes son verificados estáticamente por el sistema de tipos en tiempo de compilación.
+	Un término que trata de romper alguna invariante, estará mal tipado, por lo que no es posible construirlo.
 
 	
 	\subsection{Lambda cube}
@@ -482,7 +487,8 @@
 	Básicamente, dice que a cada proposición en la lógica le corresponde un tipo, y viceversa.
 	De hecho, esta relación es más profunda, ya que a cada prueba de una proposición dada, le corresponde un programa del tipo correspondiente, y viceversa.
 	Es decir, ``pruebas como programas''.
-	Incluso, es más profunda aún, en el sentido de que para cada forma de simplificar una prueba, existe una forma correspondiente de evaluar un programa, y viceversa. Por lo que tenemos, ``simplificación de pruebas como evaluación de programas''.
+	Incluso, es más profunda aún, en el sentido de que para cada forma de simplificar una prueba, existe una forma correspondiente de evaluar un programa, y viceversa.
+	Por lo que tenemos, ``simplificación de pruebas como evaluación de programas''.
 	
 	Tal como lo explica Wadler en su artículo \cite{pas}, no se trata de una simple biyección entre proposiciones y tipos, sino de un verdadero isomorfismo que preserva la compleja estructura de pruebas y programas, simplificaciones y evaluaciones.
 	
@@ -683,7 +689,8 @@
 	\end{codigo}
 	
 	Notar que el constructor \AgdaInductiveConstructor{$[\_]\equiv\_$} corresponde a la regla de tipado $(\equiv)$ de Sistema-I.
-	En el constructor \AgdaInductiveConstructor{$\pi$} se observa otro detalle importante, además de tomar como argumento el tipo \AgdaBound{C}, toma un argumento implícito que funciona como evidencia de que el tipo \AgdaBound{C} es o bien igual al tipo \AgdaBound{A}, o bien igual al tipo \AgdaBound{B}. Para ello se utilizan el tipo suma y la igualdad proposicional que están definidos en la librería estándar de Agda.
+	En el constructor \AgdaInductiveConstructor{$\pi$} se observa otro detalle importante, además de tomar como argumento el tipo \AgdaBound{C}, toma un argumento implícito que funciona como evidencia de que el tipo \AgdaBound{C} es o bien igual al tipo \AgdaBound{A}, o bien igual al tipo \AgdaBound{B}.
+	Para ello se utilizan el tipo suma y la igualdad proposicional que están definidos en la librería estándar de Agda.
 	
 	
 	Aquí se introducen las definiciones de los renombres de variables, substitución de variables y operadores del álgebra-$\sigma$ presentados en capítulos anteriores.
@@ -741,12 +748,14 @@
 	\end{codigo}
 	
 	Utilizando estos constructores es posible crear cualquier isomorfismo.
-	Notar que no existe una regla para la transitividad, ya que es posible obtenerla aplicando dos veces el constructor \AgdaInductiveConstructor{$[\_]\equiv\_$}. Por ejemplo, el término \AgdaInductiveConstructor{[ trans} \AgdaBound{$iso_1$} \AgdaBound{$iso_2$} \AgdaInductiveConstructor{]$\equiv$} \AgdaBound{t} puede ser construido como \AgdaInductiveConstructor{[} \AgdaBound{$iso_2$} \AgdaInductiveConstructor{]$\equiv$} (\AgdaInductiveConstructor{[} \AgdaBound{$iso_1$} \AgdaInductiveConstructor{]$\equiv$} \AgdaBound{t}).
+	Notar que no existe una regla para la transitividad, ya que es posible obtenerla aplicando dos veces el constructor \AgdaInductiveConstructor{$[\_]\equiv\_$}.
+	Por ejemplo, el término \AgdaInductiveConstructor{[ trans} \AgdaBound{$iso_1$} \AgdaBound{$iso_2$} \AgdaInductiveConstructor{]$\equiv$} \AgdaBound{t} puede ser construido como \AgdaInductiveConstructor{[} \AgdaBound{$iso_2$} \AgdaInductiveConstructor{]$\equiv$} (\AgdaInductiveConstructor{[} \AgdaBound{$iso_1$} \AgdaInductiveConstructor{]$\equiv$} \AgdaBound{t}).
 	
 	A continuación se presentan los isomorfismos de términos.
 	Esta selección de constructores es el resultado de varias decisiones de diseño basadas principalmente en dos objetivos.
 	
-	En primer lugar, se agregaron todos los isomorfismos necesarios para que ningún término quede atascado y no existan eliminaciones en formas normales, esto tiene como consecuencia que todo término cerrado reduce siempre a un valor. Este punto es más evidente cuando se tiene en cuenta la prueba de progreso presentada más adelante.
+	En primer lugar, se agregaron todos los isomorfismos necesarios para que ningún término quede atascado y no existan eliminaciones en formas normales, esto tiene como consecuencia que todo término cerrado reduce siempre a un valor.
+	Este punto es más evidente cuando se tiene en cuenta la prueba de progreso presentada más adelante.
 	
 	El segundo objetivo es preservar la propiedad de normalización y evitar que su prueba se torne demasiado compleja.
 	Una consecuencia directa de esto son los constructores con el prefijo \AgdaInductiveConstructor{sym-}, todos estos se podrían obtener a partir de los isomorfismos base combinados con un constructor \AgdaInductiveConstructor{sym} tal y como se construyen los isomorfismos de tipos.
@@ -850,7 +859,8 @@
 	La prueba de dicha propiedad no es trivial, y se presentará en los siguientes capítulos.
 	
 	Por este motivo, es necesario añadir un argumento de tipo \AgdaDatatype{$\mathbb{N}$} para que la definición sea aceptada por el chequeo de terminación de Agda.
-	De este modo, la evaluación realizará a lo sumo $n$ llamadas recursivas. Además, se utiliza \AgdaDatatype{Maybe} en el tipo de retorno, en caso de que el término no converja a un valor luego de $n$ pasos, simplemente se retorna \AgdaInductiveConstructor{nothing}.
+	De este modo, la evaluación realizará a lo sumo $n$ llamadas recursivas.
+	Además, se utiliza \AgdaDatatype{Maybe} en el tipo de retorno, en caso de que el término no converja a un valor luego de $n$ pasos, simplemente se retorna \AgdaInductiveConstructor{nothing}.
 
 	
 	\begin{codigo}
