@@ -873,24 +873,244 @@
 	
 	\section{Normalización Fuerte}
 	
-	\subsection{Prueba para STLC con pares y top}
-	Primero mostrar la prueba sin isomorfismos. Puedo y extendiéndola de a poco como en el apunte de Beta Ziliani
+	La propiedad de normalización fuerte dice que para cualquier término dado, toda secuencia de reducción eventualmente concluye, sin importar el camino elegido.
+	O dicho de otra forma, no es posible construir secuencias de reducción infinitas.
+	Se puede codificar esta propiedad definiendo un tipo de datos que predique sobre los términos del lenguaje.
+	
+	\begin{codigo}
+		Propiedad de normalización fuerte
+		\ExecuteMetaData[code/strong_norm.tex]{SN}
+	\end{codigo}
+	
+	Notar que es trivial construir un término de tipo \AgdaDatatype{SN} para un término en forma normal, ya que, al no existir ninguna reducción posible para dicho tipo, simplemente se debe pasar la función vacía como argumento a \AgdaInductiveConstructor{sn}.
+	Estos representan los casos bases del tipo \AgdaDatatype{SN}.
+	%TODO: Mostrar ejemplo
+	
+	El hecho de que exista un término de tipo \AgdaDatatype{SN} \AgdaBound{t} implica que no existen secuencias de reducción infinitas a partir de \AgdaBound{t}, de otro modo, no hubiera sido posible construir dicho término.
+	El objetivo final de esta sección será entonces, definir una función que dato un término cualquiera, permite obtener un término de tipo \AgdaDatatype{SN} \AgdaBound{t}:
+	
+	\AgdaFunction{strong-norm}\AgdaSpace{}%
+	\AgdaSymbol{:}\AgdaSpace{}%
+	\AgdaSymbol{∀}\AgdaSpace{}%
+	\AgdaSymbol{\{}\AgdaBound{Γ}\AgdaSpace{}%
+	\AgdaBound{A}\AgdaSymbol{\}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaBound{t}\AgdaSpace{}%
+	\AgdaSymbol{:}\AgdaSpace{}%
+	\AgdaBound{Γ}\AgdaSpace{}%
+	\AgdaOperator{\AgdaDatatype{⊢}}\AgdaSpace{}%
+	\AgdaBound{A}\AgdaSymbol{)}\AgdaSpace{}%
+	\AgdaSymbol{→}\AgdaSpace{}%
+	\AgdaDatatype{SN}\AgdaSpace{}%
+	\AgdaBound{t}
+	
+	La prueba aquí presentada está basada y extendida a partir de una formalización realiza por 
+	Andras Kovacs\footnote{\citeurl{Kovacs}} para cálculo lambda simplemente tipado.
+	A su vez, el trabajo de Kovacs se basa en la tesis de Steven Schäfer\cite{Schafer}, donde se formaliza la prueba de normalización fuerte para Sistema-F en Coq.
+	La técnica utilizada por Schäfer difiere en ciertos aspectos con la prueba de candidatos de reducibilidad de Girard\cite{Girard}.
+	Además, se utilizó como referencia una formalización de candidatos de reducibilidad en Agda realizada por Pablo Barenbaum\footnote{\citeurl{Barenbaum}}.
+	
+	\subsection{Prueba para STLC con pares y Top}
+	
+	Con el objetivo de facilitar la comprensión de la prueba, la misma será presentada en dos partes.
+	En esta sección se explicará la prueba para cálculo lambda simplemente tipado con pares, es decir, sin incluir la relación de isomorfismos entre términos.
+	Y en la siguiente sección se presentarán los cambios necesarios para extender la prueba a Sistema-I.
+	
+	
+	Por lo tanto, se define el predicado \AgdaDatatype{SN} utilizando solo la relación \AgdaDatatype{$\_\hookrightarrow\_$}
+
+	\ExecuteMetaData[code/strong_norm_base.tex]{sn}
+	
+	La idea de la prueba es definir una generalización del tipo \AgdaDatatype{SN} que añade un predicado sobre el término $t$.
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{sn-star}
+	
+	Luego, se define lo que se denomina conjunto adecuado.
+	%TODO: ver si este nombre está bien
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{candidate}
+	
+	Es fácil ver que si un término cumple con el predicado \AgdaDatatype{SN*} también cumple con \AgdaDatatype{SN}
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{sn-star-sn}
+	
+	La definición de los conjuntos adecuados se extiende a las substituciones.
+	Una substitución es adecuada cuando todos los términos por los cuales substituye las variables, cumple con el predicado \AgdaDatatype{SN*}
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-subst}
+	
+	En particular, la substitución identidad \AgdaFunction{ids} es una substitución adecuada
+	\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-ids}
+	
+	Toda la complejidad de la prueba se centra en probar el teorema fundamental, el cual implica que para todo término $t$ y substitución $\sigma$ se cumple \AgdaDatatype{SN*}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟦\AgdaUnderscore{}⟧}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaBound{σ}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaBound{t}\AgdaSymbol{)}
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-type}
+	
+	\newcommand{\snstar}{\AgdaDatatype{SN*}\AgdaSpace{}\AgdaOperator{\AgdaFunction{⟦\AgdaUnderscore{}⟧}\AgdaSpace{}}}
+	\paragraph{Caso variable}
+	
+	Este caso requiere que la substitución $\sigma$ aplicada a la variable $v$ cumpla con la propiedad
+	\snstar.
+	La hipótesis dice que $\sigma$ es una substitución adecuada, por lo tanto, basta con simplemente aplicar dicha hipótesis a la variable $v$.
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-var}
+
+	\paragraph{Caso top}
+	
+	Debido a que no existe ningún paso de reducción posible para el término \AgdaInductiveConstructor{$\star$}, la construcción del predicado es trivial.
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{lemma-top}
+	\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-top}
+
+	\paragraph{Caso producto}
+	
+	Para el caso del producto, se puede definir un lema que permite construir el predicado si se tiene como hipótesis que \snstar vale para los sub-términos $a$ y $b$ del par.
+	Estas dos hipótesis son necesarias para obtener \snstar \AgdaBound{a'} y \snstar \AgdaBound{b'} a partir de cada uno de los dos pasos de reducción de congruencia.
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{lemma-prod}
+	
+	Luego, se utiliza la hipótesis inductiva en \AgdaFunction{adecuacy} sobre $a$ y $b$ para instanciar el lema
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-pair}
+	
+	\paragraph{Caso proyección}
+	
+	El caso de la proyección también requiere como hipótesis que se cumpla el predicado para el término que se está proyectando.
+	Los pasos de reducción \AgdaInductiveConstructor{β-π₁} y \AgdaInductiveConstructor{β-π₂} implican que $t$ tiene forma $\langle a, b \rangle$, estos requieren obtener \snstar \AgdaBound{a} y \snstar \AgdaBound{b} respectivamente.
+	El problema es que no se puede concluir nada sobre $a$ y $b$ a partir de \AgdaBound{SNt}.
+	Aquí se vuelve evidente porque es necesario generalizar la propiedad \AgdaDatatype{SN} y añadir los conjuntos adecuados.
+	Para un par $\langle a, b \rangle$ el conjunto adecuado tiene forma
+	\snstar\AgdaBound{a} \AgdaOperator{\AgdaFunction{⊗}} \snstar\AgdaBound{b}
+	esto es precisamente lo que necesitamos probar en ambos casos.
+
+	\ExecuteMetaData[code/strong_norm_base.tex]{lemma-proj}
+	\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-proj}
+	
+	\paragraph{Caso aplicación}
+	
+	Este caso es similar al producto, ya que la hipótesis del lema requiere que el predicado se cumpla para ambos sub-términos.
+	Por otro lado, la solución para el caso de la $\beta$-reducción es similar al caso de la proyección, puesto que se utiliza el conjunto adecuado.
+	Para el constructor \AgdaInductiveConstructor{β-ƛ}, el término $a$ es de la forma $\lambda\; t$, por lo que se debe obtener
+	\snstar(\AgdaBound{t}\AgdaFunction{[}\AgdaBound{b}\AgdaFunction{]}).
+	El conjunto adecuado 
+	\AgdaOperator{\AgdaFunction{⟦}}\AgdaBound{a}\AgdaOperator{\AgdaFunction{⟧}}
+	será de la forma
+	\snstar\AgdaBound{u}\AgdaSpace{}%
+	\AgdaSymbol{→}\AgdaSpace{}%
+	\snstar
+	\AgdaSymbol{(}\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaBound{u}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaBound{ρ}\AgdaSymbol{)}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaBound{t}\AgdaSymbol{)}
+	es decir que basta con aplicar dicha función a \AgdaBound{SN*b}
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{lemma-app}
+	\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-app}
+	
+	Notar como los conjuntos adecuados permiten resolver los casos de la proyección y aplicación, pero, por otro lado, los casos del producto y la abstracción se vuelven más complejos, ya que son estos los que construyen dichos conjuntos adecuados.
+	Esta construcción es simple para los productos, puesto que se puede deducir de forma directa aplicando la hipótesis inductiva en \AgdaFunction{adecuacy}.	
+	Sin embargo, como se verá más adelante, obtener el conjunto adecuado correspondiente al caso de las abstracciones, resulta particularmente complejo.
+	
+	\paragraph{Caso isomorfismo}
+	
+	Este caso no presenta mayores dificultades. Sin embargo, la mayor parte de la complejidad para la extensión de la prueba a Sistema I, se presentará cuando se añadan todos los constructores de isomorfismos de términos a este lema.
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{lemma-iso}
+	\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-iso}
+	
+	\paragraph{Caso abstracción}
+	
+	La prueba del lema para el caso de la abstracción requiere obtener el conjunto adecuado  \AgdaOperator{\AgdaFunction{⟦}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{ƛ}}\AgdaSpace{}%
+	\AgdaBound{t'}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟧}}\AgdaSpace{}%
+	en la llamada inductiva.
+	Para ello es necesario definir un nuevo lema que permite conjugar un paso de reducción con cualquier substitución.
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{reduction-subst}
+	
+	Luego se utiliza la hipótesis \AgdaBound{Lƛ} en conjunto un nuevo lema.
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{lemma-abs}
+	
+	La instanciación de las hipótesis necesarias para utilizar el lema en la prueba de \AgdaFunction{adecuacy} requiere especial atención.
+	
+	Por un lado, para obtener la hipótesis \snstar \AgdaBound{t}, primero se debe probar que la extensión de una substitución adecuada sigue siendo adecuada.
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-exts}
+	
+	A su vez, para esta prueba es necesario demostrar que si se aplica un renombre de variables a un término \snstar esté no perderá dicha propiedad, esto tiene sentido, ya que los renombres no alteran el significado de los términos y, por lo tanto, preservan la propiedad \snstar
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{sn-rename}
+	
+	Explicar que el caso del lambda es el motivo por el cual se generaliza el conjunto adecuado con un renombre
+	
+	
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{rename-reduction-type}
+	
+	Por otro lado, para obtener el conjunto adecuado
+	\AgdaOperator{\AgdaFunction{⟦}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{ƛ}}\AgdaSpace{}%
+	\AgdaBound{t}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟧}}\AgdaSpace{}%
+	
+	%\ExecuteMetaData[code/strong_norm_base.tex]{subst-split}
+	%\ExecuteMetaData[code/strong_norm_base.tex]{subst-split-simple}
+	
+	\begin{samepage}
+	\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-abs}
+	\end{samepage}
+	
+	%\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy}
+	
+	\paragraph{Cierre de la prueba}
+	
+	Finalmente, se prueba la propiedad de normalización fuerte instanciando \AgdaFunction{adecuacy} con la substitución identidad.
+	
+	Como detalle adicional, se elimina la substitución identidad aplicada al término utilizando el lema
+	\AgdaFunction{sub-id}\AgdaSpace{}%
+	\AgdaSymbol{:}\AgdaSpace{}%
+	\AgdaSymbol{∀\{}\AgdaBound{Γ}\AgdaSpace{}%
+	\AgdaBound{A}\AgdaSymbol{\}}\AgdaSpace{}%
+	\AgdaSymbol{\{}\AgdaBound{N}\AgdaSpace{}%
+	\AgdaSymbol{:}\AgdaSpace{}%
+	\AgdaBound{Γ}\AgdaSpace{}%
+	\AgdaOperator{\AgdaDatatype{⊢}}\AgdaSpace{}%
+	\AgdaBound{A}\AgdaSymbol{\}}\AgdaSpace{}%
+	\AgdaSymbol{→}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaBound{N}\AgdaSpace{}%
+	\AgdaOperator{\AgdaDatatype{≡}}\AgdaSpace{}%
+	\AgdaBound{N}
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{strong-norm}
+
 	\subsection{Diferencias con la prueba de Girard}
-	Capitulo 5.6 como referencia
-	https://www.ps.uni-saarland.de/~schaefer/thesis/draft-screen.pdf
+	%Capitulo 5.6 como referencia
+	%https://www.ps.uni-saarland.de/~schaefer/thesis/draft-screen.pdf
 
 	\subsection{Prueba para Sistema I}
 	
-	%\input{code/strong_norm.tex}
-	
-	Archivos: StrongNorm
+	% Extende SN*-rename
+	% Extender todos los lemas con iso
+	% Extender 
 	
 	\subsection{Well-founded \& Accessibility}
-	Explicar que lo que hicimos en realidad es probar que la inducción sobre la relación de reducción está bien fundada
-	https://agdapad.quasicoherent.io/~AgdaPadova/html/transcript10.html
+	%Explicar que lo que hicimos en realidad es probar que la inducción sobre la relación de reducción está bien fundada
+	%https://agdapad.quasicoherent.io/~AgdaPadova/html/transcript10.html
 	
 	%\ExecuteMetaData[code/eval.tex]{eval2}
-	Archivos: Eval (con SN)
 	
 	\section{Conclusiones}
 	
