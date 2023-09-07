@@ -951,6 +951,8 @@
 	\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-type}
 	
 	\newcommand{\snstar}{\AgdaDatatype{SN*}\AgdaSpace{}\AgdaOperator{\AgdaFunction{⟦\AgdaUnderscore{}⟧}\AgdaSpace{}}}
+	\newcommand{\cand}[1]{\AgdaOperator{\AgdaFunction{⟦}}\AgdaSpace{}#1\AgdaSpace{}\AgdaOperator{\AgdaFunction{⟧}}}
+
 	\paragraph{Caso variable}
 	
 	Este caso requiere que la substitución $\sigma$ aplicada a la variable $v$ cumpla con la propiedad
@@ -1051,19 +1053,49 @@
 	
 	\ExecuteMetaData[code/strong_norm_base.tex]{sn-rename}
 	
-	Explicar que el caso del lambda es el motivo por el cual se generaliza el conjunto adecuado con un renombre
+	Aquí se deben hacer dos observaciones importantes.
+	En primer lugar, el caso de la abstracción en la prueba de \AgdaFunction{⟦⟧-rename} es el único lugar donde es necesario usar el argumento $\rho$ del conjunto adecuado.
+	De hecho, este es precisamente el motivo por el cual es necesario añadir un renombre en la definición del conjunto adecuado para lambdas.
 	
-	
+	En segundo lugar, en la prueba de \AgdaFunction{SN*-rename} se debe eliminar el renombre del paso de reducción para poder utilizar la hipótesis \AgdaBound{SNt}.
+	Para ello se define el siguiente lema:
 	
 	\ExecuteMetaData[code/strong_norm_base.tex]{rename-reduction-type}
+	
+	Básicamente, el lema dice que si una reducción parte de un término renombrado $t_\rho$, el resultado será un término $t'_\rho$, donde $t'$ se obtiene dando un paso de reducción desde $t$.
+	
 	
 	Por otro lado, para obtener el conjunto adecuado
 	\AgdaOperator{\AgdaFunction{⟦}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{ƛ}}\AgdaSpace{}%
 	\AgdaBound{t}\AgdaSpace{}%
 	\AgdaOperator{\AgdaFunction{⟧}}\AgdaSpace{}%
+	se necesita demostrar dos propiedades más sobre las substituciones adecuadas.
 	
-	%\ExecuteMetaData[code/strong_norm_base.tex]{subst-split}
+	Una de ella dice que una substitución adecuada compuesta con un renombre, es también una substitución adecuada.
+	La prueba utiliza el hecho de que \AgdaFunction{rename}\AgdaSpace{}\AgdaBound{ρ} puede ser escrito como
+	\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaBound{ρ}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-rename}
+	
+	La otra propiedad, dice que el cons entre un término \snstar y una substitución adecuada, es también una substitución adecuada.
+	
+	\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-cons}
+	
+	Un último detalle a destacar es que \AgdaFunction{adecuacy} toma como argumento solo una substitución, por lo que se debe combinar \AgdaBound{$\sigma$} y
+	\AgdaBound{u}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaBound{ρ}\AgdaSymbol{)}
+	en una sola substitución y demostrar que aplicar dicha combinación es equivalente a aplicarlas por separado.
+
+	\ExecuteMetaData[code/strong_norm_base.tex]{subst-split}
+	
 	%\ExecuteMetaData[code/strong_norm_base.tex]{subst-split-simple}
 	
 	\begin{samepage}
@@ -1102,9 +1134,164 @@
 
 	\subsection{Prueba para Sistema I}
 	
-	% Extende SN*-rename
-	% Extender todos los lemas con iso
-	% Extender 
+	El primer paso para extender la prueba, es agregar la definición de \AgdaDatatype{SN} la relación de isomorfismos entre términos.
+	
+	\ExecuteMetaData[code/strong_norm.tex]{SN}
+	\ExecuteMetaData[code/strong_norm.tex]{sn-star}
+	
+	Este cambio tiene como consecuencia que todas las partes de la prueba que construían un término \snstar haciendo \textsc{pattern matching} sobre la relación $\hookrightarrow$, ahora deberán tener también en cuenta los de la relación $\rightleftarrows$ que sean aplicables en cada caso.
+	
+	Por ejemplo, la prueba de \AgdaFunction{SN*-rename} ahora los dos constructores \AgdaInductiveConstructor{inj₁} y \AgdaInductiveConstructor{inj₂} del tipo suma.
+	
+	\ExecuteMetaData[code/strong_norm.tex]{sn-rename}
+	
+	Para esta prueba es necesario definir un nuevo lema análogo a \AgdaFunction{rename↪}.
+	
+	\ExecuteMetaData[code/strong_norm.tex]{rename-iso-type}
+	
+	Una modificación similar se realiza para extender el lema de la abstracción.
+	
+	\ExecuteMetaData[code/strong_norm.tex]{lemma-abs}
+	
+	Este caso también requiere la definición de un nuevo lema análogo al definido para la relación $\hookrightarrow$ anteriormente.
+	
+	\ExecuteMetaData[code/strong_norm.tex]{iso-subst}
+	
+	La extensión del resto de los lemas no presentan mayor dificulta.
+	A modo de ejemplo se presenta el lema correspondiente al producto, y se omiten los demás.
+	
+	\ExecuteMetaData[code/strong_norm.tex]{lemma-prod}
+	
+	El lema para el constructor de isomorfismos es donde se concentra la mayor complejidad de la prueba, ya que se deben resolver los casos de todos los isomorfismos de términos.
+	Para empezar, se presentan las reglas de congruencia.
+	
+	\ExecuteMetaData[code/strong_norm.tex]{lemma-iso-type}
+	
+	Luego, el objetivo para cada constructor será obtener \snstar\AgdaBound{t'} a partir de \snstar\AgdaBound{t}, donde \AgdaBound{t} y \AgdaBound{t'} son los términos relacionados por el isomorfismo correspondiente.
+	La idea de la prueba es utilizar los lemas anteriormente definidos para los distintos constructores de términos.
+	
+	\subsubsection{Caso comm}
+	
+	Por ejemplo, el isomorfismo \textsc{comm} es uno de los casos más simples que ilustra la técnica utilizada.
+	Aquí simplemente basta con instanciar el lema del producto utilizando las hipótesis provistas por el conjunto adecuado de los pares.
+	
+	\ExecuteMetaData[code/strong_norm.tex]{iso-comm}
+	
+	\subsubsection{Caso asso}
+	
+	El caso de \textsc{asso} no tiene mayor dificultad.
+	Notar como se aprovecha la naturaleza constructiva de las pruebas en Agda, combinando los lemas ya definidos hasta obtener un término del tipo esperado.
+	
+	\ExecuteMetaData[code/strong_norm.tex]{iso-asso}
+	
+	\subsubsection{Caso dist}
+	
+	Este caso presenta la dificultad de instanciar y construir el conjunto adecuado de la abstracción.
+	Además, se presentan dos nuevos lemas que se emplearan en múltiples insomorfimos.
+	En primer lugar, se define un lema que permite concluir \snstar\AgdaBound{t} a partir de \snstar \AgdaInductiveConstructor{ƛ} \AgdaBound{t}.
+	La idea del lema es utilizar \AgdaBound{Lt} para obtener $\llangle\; `Z \bullet S\_ \;\rrangle\;t$, es decir, se substituye la primera variable del término por el índice cero, por lo tanto, se obtiene exactamente el mismo término.
+	
+	\ExecuteMetaData[code/strong_norm.tex]{lemma-sub}
+	
+	Este lema resulta de utilidad en los casos en los que se debe construir algo a partir del cuerpo de una abstracción.
+	
+	\ExecuteMetaData[code/strong_norm.tex]{iso-dist}
+	
+	En segundo lugar, se define un lema que se empleará para probar la propiedad del conjunto adecuado de la abstracción, en los casos donde se deba $\eta$-expandir un término.
+	La clave de este lema está en notar que $\llangle\; u \bullet (ids \circ \rho) \;\rrangle\;(\text{rename S\_ } t)$ es equivalente a $\llangle\; ids \circ \rho \;\rrangle\; t$ que a su vez es equivalente a $\text{rename}\;\rho\; t$
+	
+	\ExecuteMetaData[code/strong_norm.tex]{lemma-S}
+	
+	\ExecuteMetaData[code/strong_norm.tex]{iso-distlr}
+	%\ExecuteMetaData[code/strong_norm.tex]{iso-sym-dist}
+	\ExecuteMetaData[code/strong_norm.tex]{iso-id-prod}
+	\ExecuteMetaData[code/strong_norm.tex]{iso-id-lam}
+	\ExecuteMetaData[code/strong_norm.tex]{iso-abs}
+	\ExecuteMetaData[code/strong_norm.tex]{iso-sym}
+	
+	\ExecuteMetaData[code/strong_norm.tex]{iso-cong-prod1}
+	\ExecuteMetaData[code/strong_norm.tex]{iso-cong-prod2}
+	
+	\ExecuteMetaData[code/strong_norm.tex]{iso-cong-lam2}
+	
+	El siguiente caso presenta un isomorfismo donde aparece una substitución en el término de la derecha.
+	Coloquialmente, la substitución \AgdaFunction{σ-cong⇒₁} reemplaza el primer índice del término por
+	\AgdaOperator{\AgdaInductiveConstructor{[}}\AgdaSpace{}%
+	\AgdaBound{iso}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{]≡}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaOperator{\AgdaInductiveConstructor{`}}\AgdaSpace{}%
+	\AgdaInductiveConstructor{Z}\AgdaSymbol{)}
+	y deja el resto de los índices intactos.
+	La hipótesis \AgdaBound{Lt} permite obtener un término de la forma
+	\snstar
+	\AgdaSymbol{(}\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaBound{u}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaBound{ρ}\AgdaSymbol{)}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaBound{t}\AgdaSymbol{)}
+	, entonces, la estrategia será hallar un renombre $\rho$ y un término $u$ que den como resultado el término esperado en cada caso.
+	
+	Para instanciar el lema de la abstracción, las dos hipótesis requeridas en este caso son:
+	
+	\snstar
+	\AgdaSymbol{(}\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaBound{u}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaBound{ρ}\AgdaSymbol{)}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{[}}\AgdaSpace{}%
+	\AgdaBound{iso}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{]≡}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaOperator{\AgdaInductiveConstructor{`}}\AgdaSpace{}%
+	\AgdaInductiveConstructor{Z}\AgdaSymbol{)}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{S\AgdaUnderscore{}}}\AgdaSymbol{)}
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaBound{t}\AgdaSymbol{))}
+	
+	\snstar
+	\AgdaSymbol{(}\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{[}}\AgdaSpace{}%
+	\AgdaBound{iso}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{]≡}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaOperator{\AgdaInductiveConstructor{`}}\AgdaSpace{}%
+	\AgdaInductiveConstructor{Z}\AgdaSymbol{)}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{S\AgdaUnderscore{}}}\AgdaSymbol{)}
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaBound{t}\AgdaSymbol{)}
+	
+	La segunda es la más sencilla, ya que se puede concluir directamente a partir de \AgdaBound{Lt}.
+	Por otro lado, para resolver la primera, se debe notar que es posible combinar las dos substituciones en una sola 
+	\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaOperator{\AgdaInductiveConstructor{[}}\AgdaSpace{}%
+	\AgdaBound{iso}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{]≡}}\AgdaSpace{}%
+	\AgdaBound{u}\AgdaSymbol{)}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
+	\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaBound{ρ}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaBound{N}
+	
+	\ExecuteMetaData[code/strong_norm.tex]{iso-cong-lam1}
+	
+	Es importante entender como se pueden combinar múltiples substituciones en una sola, que pueda ser obtenida a través del conjunto adecuado de la abstracción.
+	Esta técnica será la clave para resolver los constructores correspondientes al isomorfismo \textsc{curry}, los cuales también presentan substituciones.
+	
+	\ExecuteMetaData[code/strong_norm.tex]{iso-curry}
+	%\ExecuteMetaData[code/strong_norm.tex]{iso-uncurry}
 	
 	\subsection{Well-founded \& Accessibility}
 	%Explicar que lo que hicimos en realidad es probar que la inducción sobre la relación de reducción está bien fundada
@@ -1112,8 +1299,7 @@
 	
 	%\ExecuteMetaData[code/eval.tex]{eval2}
 	
-	\section{Conclusiones}
-	
+	\chapter{Conclusiones}
 	
 	\section{Trabajo futuro}
 	\subsection{Inferencia de tipos}
