@@ -1203,16 +1203,8 @@
 	\ExecuteMetaData[code/strong_norm.tex]{lemma-S}
 	
 	\ExecuteMetaData[code/strong_norm.tex]{iso-distlr}
-	%\ExecuteMetaData[code/strong_norm.tex]{iso-sym-dist}
-	\ExecuteMetaData[code/strong_norm.tex]{iso-id-prod}
-	\ExecuteMetaData[code/strong_norm.tex]{iso-id-lam}
-	\ExecuteMetaData[code/strong_norm.tex]{iso-abs}
-	\ExecuteMetaData[code/strong_norm.tex]{iso-sym}
 	
-	\ExecuteMetaData[code/strong_norm.tex]{iso-cong-prod1}
-	\ExecuteMetaData[code/strong_norm.tex]{iso-cong-prod2}
-	
-	\ExecuteMetaData[code/strong_norm.tex]{iso-cong-lam2}
+	\subsubsection{Caso congruencia abstracción}
 	
 	El siguiente caso presenta un isomorfismo donde aparece una substitución en el término de la derecha.
 	Coloquialmente, la substitución \AgdaFunction{σ-cong⇒₁} reemplaza el primer índice del término por
@@ -1290,8 +1282,160 @@
 	Es importante entender como se pueden combinar múltiples substituciones en una sola, que pueda ser obtenida a través del conjunto adecuado de la abstracción.
 	Esta técnica será la clave para resolver los constructores correspondientes al isomorfismo \textsc{curry}, los cuales también presentan substituciones.
 	
+	\subsubsection{Caso curry}
+	
+	La estrategia para los dos constructores correspondientes a este isomorfismo será, en primer lugar, definir un lema que pruebe la primera hipótesis de \AgdaFunction{lemma-ƛ}, y luego aprovechar el hecho de que
+	\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{`}}\AgdaSpace{}%
+	\AgdaInductiveConstructor{Z}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
+	\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{S\AgdaUnderscore{}}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaBound{N}\AgdaSpace{}%
+	\AgdaOperator{\AgdaDatatype{≡}}\AgdaSpace{}%
+	\AgdaBound{N}
+	para concluir la segunda hipótesis.
+	
+	El constructor \AgdaInductiveConstructor{curry} tiene la particularidad de que el conjunto adecuado de su hipótesis tiene la forma 
+	\AgdaOperator{\AgdaFunction{⟦}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{ƛ}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{ƛ}}\AgdaSpace{}%
+	\AgdaBound{t}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟧}}\AgdaSpace{}%
+	, por lo tanto, instanciandolo una vez se puede obtener un segundo conjunto de la forma
+	\AgdaOperator{\AgdaFunction{⟦}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{ƛ}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaFunction{exts}
+	\AgdaSymbol{(}\AgdaBound{u}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaBound{ρ}\AgdaSymbol{))}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaBound{t}\AgdaSymbol{)}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟧}}\AgdaSpace{}%
+	el cual puede ser nuevamente instanciado para obtener
+	\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaBound{u₁}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaBound{ρ₁}\AgdaSymbol{)}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}
+	\AgdaSymbol{(}\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaFunction{exts}
+	\AgdaSymbol{(}\AgdaBound{u}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaBound{ρ}\AgdaSymbol{))}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaBound{t}\AgdaSymbol{)}
+	
+	Por otro lado, se debe notar que es posible reescribir el objetivo del lema de una forma equivalente
+	\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaInductiveConstructor{π}\AgdaSpace{}%
+	\AgdaBound{B}\AgdaSpace{}%
+	\AgdaSymbol{\{}\AgdaInductiveConstructor{inj₂}\AgdaSpace{}%
+	\AgdaInductiveConstructor{refl}\AgdaSymbol{\}}\AgdaSpace{}%
+	\AgdaBound{u}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
+	\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaFunction{exts}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaInductiveConstructor{π}\AgdaSpace{}%
+	\AgdaBound{A}\AgdaSpace{}%
+	\AgdaSymbol{\{}\AgdaInductiveConstructor{inj₁}\AgdaSpace{}%
+	\AgdaInductiveConstructor{refl}\AgdaSymbol{\}}\AgdaSpace{}%
+	\AgdaBound{u}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
+	\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaBound{ρ}\AgdaSymbol{)}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaBound{t}\AgdaSymbol{)}
+	. Es posible obtener esta forma utilizando los conjuntos adecuados.
+	
+	\ExecuteMetaData[code/strong_norm.tex]{lemma-curry}
 	\ExecuteMetaData[code/strong_norm.tex]{iso-curry}
-	%\ExecuteMetaData[code/strong_norm.tex]{iso-uncurry}
+	
+	Para el caso \AgdaInductiveConstructor{uncurry} se debe realizar, en cierta forma, un razonamiento opuesto.
+	Si en el caso anterior se utilizaron dos hipótesis anidadas para instanciar un solo \AgdaFunction{lemma-ƛ}, en este caso se utilizará una sola hipótesis para instanciar dos \AgdaFunction{lemma-ƛ} anidados.
+	
+	El primer lema requiere obtener
+	\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaFunction{exts}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaBound{u}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
+	\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaBound{ρ}\AgdaSymbol{)}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaFunction{σ-uncurry}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaBound{t}\AgdaSymbol{))}
+	mientras que el lema anidado requiere
+	\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaBound{u₂}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
+	\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaBound{ρ₂}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaFunction{exts}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaBound{u}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
+	\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaBound{ρ}\AgdaSymbol{)}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaFunction{σ-uncurry}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaBound{t}\AgdaSymbol{))}
+	
+	. Aquí es donde se debe hallar una substitución equivalente que pueda ser obtenida a través del conjunto adecuado de la abstracción.
+	Notar que la primera substitución aplicada es extendida, por lo que primero se reemplaza el segundo índice por el término $u$.
+	Luego, se substituye el primer índice por el término $u_1$ y se aplica el renombre $\rho_1$, por lo que $u$ será renombrado.
+	Por lo tanto, la substitución equivalente es
+	\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{⟨}}\AgdaSpace{}%
+	\AgdaFunction{rename}\AgdaSpace{}%
+	\AgdaBound{ρ₁}\AgdaSpace{}%
+	\AgdaBound{u}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{,}}\AgdaSpace{}%
+	\AgdaBound{u₁}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{⟩}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
+	\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaBound{ρ₁}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaBound{ρ}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
+	\AgdaBound{t}
+	
+	\ExecuteMetaData[code/strong_norm.tex]{lemma-uncurry}
+	\ExecuteMetaData[code/strong_norm.tex]{iso-uncurry}
+	
+	\subsubsection{Resto de casos}
+
+	%\ExecuteMetaData[code/strong_norm.tex]{iso-sym-dist}
+	\ExecuteMetaData[code/strong_norm.tex]{iso-id-prod}
+	\ExecuteMetaData[code/strong_norm.tex]{iso-id-lam}
+	\ExecuteMetaData[code/strong_norm.tex]{iso-abs}
+	\ExecuteMetaData[code/strong_norm.tex]{iso-sym}
+	
+	\ExecuteMetaData[code/strong_norm.tex]{iso-cong-prod1}
+	\ExecuteMetaData[code/strong_norm.tex]{iso-cong-prod2}
+	
+	\ExecuteMetaData[code/strong_norm.tex]{iso-cong-lam2}
 	
 	\subsection{Well-founded \& Accessibility}
 	%Explicar que lo que hicimos en realidad es probar que la inducción sobre la relación de reducción está bien fundada
