@@ -1,0 +1,269 @@
+	
+\section{Tipos dependientes}
+Un ejemplo clásico que se suele dar a la hora de presentar los tipos dependientes, es el de los vectores de largo $n$:
+
+\begin{lstlisting}[mathescape, language=Haskell]
+	data Vec A (n: $\mathbb{N}$) where
+	nil : Vec A 0
+	cons : A $\rightarrow$ Vec A n $\rightarrow$ Vec A (suc n)
+\end{lstlisting}
+
+Es importante notar que el segundo parámetro de \verb|Vec| no es el tipo $\mathbb{N}$, sino un término de tipo $\mathbb{N}$, por ejemplo, \verb|Vec| $\mathbb{N}$ \verb|3| representa el tipo de los vectores de naturales de largo 3.
+Esto quiere decir que dentro de los tipos pueden aparecer términos, lo cual permite escribir programas más precisos y seguros.
+
+Para entender la practicidad de un sistema de tipos con dicho nivel de especificidad, se comparan los siguientes programas:
+\begin{lstlisting}[mathescape, language=Haskell]
+	zeroesL : $\mathbb{N}$ $\rightarrow$ List $\mathbb{N}$
+	zeroesL 0       = []
+	zeroesL (suc n) = 0 :: (zeroesL n)
+	
+	zeroesV : (n: $\mathbb{N}$) $\rightarrow$ Vec $\mathbb{N}$ n
+	zeroesV 0       = nil
+	zeroesV (suc n) = cons 0 (zeroesV n)
+\end{lstlisting}
+
+Notar que el tipo de $zeroesV$ es dependiente e introduce una variable.
+Si bien la implementación dada para $zeroesL$ es correcta, nada impediría simplemente retornar \verb|[]| en todos los casos, por el contrario, en el caso \verb|(suc n)| de $zeroesV$ se estaría cometiendo un error de tipo si se tratara de retornar \verb|[]|, ya que se espera un término de tipo \verb|Vec| $\mathbb{N}$ \verb|(suc n)| y la lista vaciá tiene tipo \verb|Vec| $\mathbb{N}$ \verb|0|.
+De cierta forma el tipo de las funciones está guiando su implementación, impidiendo, en este caso, retornar un vector de largo incorrecto.
+
+Otra comparación que pone en evidencia la correctitud de los lenguajes con tipos dependientes, es la diferencia entre el operador de indexación de listas y vectores.
+
+\begin{lstlisting}[mathescape, language=Haskell]
+	_!!_ : List A $\rightarrow$ $\mathbb{N}$ $\rightarrow$ Maybe A
+	[] !! n              = nothing
+	(x :: xs) !! zero    = just x
+	(x :: xs) !! (suc n) = xs !! n
+\end{lstlisting}
+
+Antes de presentar la implementación para vectores, es necesario definir el tipo de datos de los conjuntos finitos:
+
+\begin{lstlisting}[mathescape, language=Haskell]
+	data Fin $\mathbb{N}$ where
+	zero : Fin (suc n)
+	suc  : Fin n $\rightarrow$ Fin (suc n)
+\end{lstlisting}
+
+Cada tipo \verb|Fin n| está habitado por $n$ elementos, estos serían, el elemento \verb|zero| más el constructor \verb|suc| combinado con los $n-1$ elementos de \verb|Fin (n-1)|.
+Notar que \verb|Fin 0| es un conjunto vacío, es decir que no existe ningún término con dicho tipo, o dicho de otra forma, el tipo \verb|Fin 0| no está habitado por ningún término.
+Luego, un vector de largo $n$ estará indexado por los elementos del conjunto \verb|Fin n|, que tiene cardinalidad exactamente igual a $n$.
+
+\begin{lstlisting}[mathescape, language=Haskell]
+	_!!v_ : {n : $\mathbb{N}$} $\rightarrow$ Vec A n $\rightarrow$ Fin n $\rightarrow$ A
+	(cons x v) !!v zero  = x
+	(cons x v) !!v suc i = v !!v i
+\end{lstlisting}
+
+Notar que en la implementación ya no aparece el caso \verb|nil|, porque eso implicaría que $n = 0$, pero el parámetro $n$ del tipo dependiente está forzando al argumento \verb|Fin| a tener la misma cantidad de elementos que el vector, por lo que dicho argumento debería ser un elemento de \verb|Fin 0|, el cual es un conjunto vació.
+Esto es lo que se denomina un ``patrón absurdo'', y como es imposible que dicho patrón ocurra, se lo excluye de la implementación.
+
+Utilizando estos tipos es imposible tratar de acceder a un elemento que no esté en el rango del vector.
+Lo más interesante es que los invariantes son verificados estáticamente por el sistema de tipos en tiempo de compilación.
+Un término que trata de romper alguna invariante, estará mal tipado, por lo que no es posible construirlo.
+
+
+\subsection{Lambda cube}
+Hasta ahora se presentaron distintos tipos de cálculo lambda que se podrían agrupar en dos grandes categorías, el simplemente tipado ($\lambda_{\to}$), y el cálculo lambda polimórfico, también denominado \textit{Sistema F} o cálculo lambda de segundo orden ($\lambda 2$).
+
+La diferencia fundamental entre estos dos, son las dependencias entre tipos y términos que se permiten.
+Por ejemplo $\lambda_{\to}$ solo permite que las abstracciones liguen términos, es decir, los términos solo pueden depender de otros términos.
+Luego, $\lambda 2$ añade nuevas reglas de tipado que permiten construir términos que dependen de tipos.
+
+La inclusión de tipos dependiente, es decir, construcciones que permiten a los tipos depender de términos, da como resultado un cálculo denominado $\lambda\Pi$.
+Si se incluyen estas tres dependencias, es decir, términos que depender de términos o tipos y tipos que dependen de términos, se obtiene el cálculo lambda dependiente de segundo orden ($\lambda\Pi 2$).
+
+Notar como cada dependencia es, en cierta forma, ortogonal a las demás, y cada cálculo obtenido a medida que se añaden dependencias, es un superconjunto de los cálculos anteriores, es decir, se obtienen generalizaciones cada vez más grandes.
+Se pueden visualizar las distintas dimensiones utilizando el cubo lambda \cite{lambda_cube}:
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+		\matrix (m) [matrix of math nodes,
+		row sep=3em, column sep=2.4em,
+		text height=1.5ex,
+		text depth=0.25ex]{
+			& \lambda\omega             &              & \lambda C					  \\
+			\lambda 2   &                           & \lambda\Pi 2                                \\
+			& \lambda\underline{\omega} &              & \lambda\Pi\underline{\omega} \\
+			\lambda_{\to}&                           & \lambda\Pi 								  \\
+		};
+		\path[-{Latex[length=2.5mm, width=1.5mm]}]
+		(m-1-2) edge (m-1-4)
+		(m-2-1) edge (m-2-3)
+		edge (m-1-2)
+		(m-3-2) edge (m-1-2)
+		edge (m-3-4)
+		(m-4-1) edge (m-2-1)
+		edge (m-3-2)
+		edge (m-4-3)
+		(m-3-4) edge (m-1-4)
+		(m-2-3) edge (m-1-4)
+		(m-4-3) edge (m-3-4)
+		edge (m-2-3);
+	\end{tikzpicture}
+	\caption{El cubo lambda representa las dependencias entre tipos y términos como dimensiones ortogonales, las flechas corresponden a la relación $\subsetneq$.}
+\end{figure}
+
+\begin{itemize}
+	\item $(\uparrow)$: términos que dependen de tipos.
+	El polimorfismo incrementa el poder de cálculo del sistema, ya que permite la auto-aplicación preservando la propiedad de terminación, por lo tanto, es posible representar cualquier función recursiva primitiva.
+	\item $(\rightarrow)$: tipos que dependen de términos.
+	La inclusión de tipos dependientes no aumenta el poder de cálculo, pero permite expresar mediante en el sistema de tipos propiedades sobre los programas.
+	Como se explicará más adelante, los tipos dependientes permiten dar un salto a un sistema, que desde el punto de vista de la lógica, es equivalente a la lógica de predicados.
+	\item $(\nearrow)$: tipos que dependen de tipos.
+	Corresponde a los constructores de tipos, es decir, operadores que permiten crear nuevos tipos a partir de otros tipos más básicos.
+	El cálculo $\lambda\omega$, que permite representar funciones polimórficas y constructores de tipos, es considerado como la base de muchos lenguajes de programación funcionales.
+\end{itemize}
+
+El sistema que incluye a todos los demás, es denominado Cálculo de Construcciones ($\lambda C$), este posee el mayor poder de cómputo y expresividad.
+Si bien los sistemas de tipos imponen restricciones sobre las construcciones que son posibles en los sistemas de cálculo, permiten obtener propiedades interesantes.
+Por ejemplo, la propiedad de terminación es necesaria para que la lógica representada por estos cálculos sea consistente.
+En particular, $\lambda C$ tiene un sistema de tipos lo suficientemente expresivo como para representar la lógica de predicados de alto orden, mientras que es lo suficientemente restrictivo como para que dicha lógica sea consistente.
+
+
+\section{Propositions as Types}
+El paradigma de ``proposiciones como tipos'' describe la correspondencia entre la lógica y los lenguajes de programación.
+Básicamente, dice que a cada proposición en la lógica le corresponde un tipo, y viceversa.
+De hecho, esta relación es más profunda, ya que a cada prueba de una proposición dada, le corresponde un programa del tipo correspondiente, y viceversa.
+Es decir, ``pruebas como programas''.
+Incluso, es más profunda aún, en el sentido de que para cada forma de simplificar una prueba, existe una forma correspondiente de evaluar un programa, y viceversa.
+Por lo que tenemos, ``simplificación de pruebas como evaluación de programas''.
+
+Tal como lo explica Wadler en su artículo \cite{pas}, no se trata de una simple biyección entre proposiciones y tipos, sino de un verdadero isomorfismo que preserva la compleja estructura de pruebas y programas, simplificaciones y evaluaciones.
+
+Este principio surge de las observaciones realizadas por Curry\cite{Curry} sobre la lógica proposicional, y más tarde extendidas por Howard\cite{Howard} a la lógica de predicados.
+La clave de esta extensión es la introducción de los tipos dependientes para representar los predicados y cuantificadores en la lógica de predicados.
+
+Las correspondencias que surgen de esta interpretación pueden resumirse de la siguiente forma:
+
+\begin{itemize}
+	\item La conjunción $A \wedge B$ corresponde al par $A \times B$.
+	Una prueba de la proposición $A \wedge B$ consiste de una prueba de $A$ y una prueba de $B$.
+	
+	\item La disyunción $A \vee B$ corresponde la suma disyunta $A + B$.
+	Una prueba de la proposición $A \vee B$ consiste de una prueba de $A$ o una prueba de $B$.
+	
+	\item La implicación $A \Rightarrow B$ corresponde al espacio de funciones $A \rightarrow B$.
+	Una prueba de la proposición $A \Rightarrow B$ consiste de una función que dada una prueba de $A$ devuelve una prueba de $B$.
+	
+	\item El cuantificador existencial $\exists x:A.B$ corresponde al tipo $\Sigma x:A.B$.
+	Básicamente, esto es una familia de tipo indexada por $a : A$ donde a cada término $a$ le corresponde un tipo $B(a)$.
+	Los elementos canónicos de $\Sigma x:A.B$ son pares dependientes $\langle a, b \rangle$ donde $a:A$ y $b:B(a)$.
+	Cuando $B(a)$ es una función constante, este tipo es equivalente al producto cartesiano $A \times B$.
+	
+	
+	\item El cuantificador universal $\forall x:A.B$ corresponde $\Pi x:A.B$, al igual que para el tipo $\Sigma$, $B$ está indexado por los términos de tipo $A$.
+	Los elementos canónicos de $\Pi x:A.B$ son funciones dependientes $a \rightarrow B(a)$.
+	Cuando $B(a)$ es una función constante, el tipo $\Pi$ es equivalente al tipo de las funciones ordinarias $A \rightarrow B$.
+\end{itemize}
+
+
+\section{Intuitionistic Type Theory}
+La teoría de tipos intuicionista, también llamada teoría de tipos de Martin-Löf \cite{ITT} propone un sistema lógico formal y los fundamentos filosóficos para las matemáticas constructivas.
+
+Directamente influenciado por las ideas de Howard, Martin-Löf se basó en el principio de proposiciones como tipos y el constructivismo matemático para el desarrollo de su teoría.
+Este constructivismo requiere que las pruebas contengan un ``testigo'', una prueba de una proposición dada es un programa, por lo tanto, las proposiciones son verdaderas cuando su tipo está habitado por algún término.
+Las pruebas son términos que atestiguan la veracidad del teorema, y pueden ser manipulados como cualquier otro término del lenguaje.
+Vistas como programas, las pruebas son procedimientos que al ejecutarlos permiten obtener valores del tipo indicado por la proposición, por este motivo se dice que las pruebas son constructivas.
+
+Esto tiene algunas consecuencias interesantes, por ejemplo, en la lógica clásica, a las proposiciones se les asigna valores de verdad sin importar si existe evidencia directa de que sea verdadera o falsa.
+Esto es lo que comúnmente se denomina ``principio del tercero excluido'', ya que excluye la posibilidad de un tercer valor distinto de verdadero o falso.
+Sin embargo, puede que no siempre sea posible construir una prueba de dicha proposición para cualquier tipo $A$, por lo tanto, no es posible probar $A \vee \neg A$ en la lógica intuicionista.
+
+
+Se puede pensar a la teoría de tipos intuicionista como un lenguaje de programación funcional donde el sistema de tipos es tan rico que prácticamente cualquier propiedad concebible de un programa puede expresarse como un tipo.
+Todas las funciones de este lenguaje deben ser totales y computables, por lo que todos los programas deben necesariamente cumplir con la propiedad de terminación.
+
+Filosófica y prácticamente, la teoría de tipos de Martin-Löf es un marco fundamental donde las matemáticas constructivas y la programación son, en un sentido profundo, lo mismo.
+
+
+\section{Agda}
+Agda es un lenguaje de programación con tipos dependientes, desarrollado por la Universidad de
+Chalmers (Suiza).
+Debido al paradigma de las proposiciones como tipos, Agda también funciona como un asistente de pruebas.
+A diferencia de otros asistentes, como Coq, carece de un sistema de tácticas, por lo que las pruebas son escritas en un estilo de programación funcional, de hecho su sintaxis es similar a la de Haskell.
+
+Agda es un lenguaje total, es decir que todos los programas deben terminar, y todos los posibles casos de un pattern matching deben ser cubiertos, de otro modo la lógica sería inconsistente.
+Por este motivo, no todas las funciones recursivas están permitidas, Agda poseé un mecanismo de comprobación de terminación que acepta aquellas funciones que puede probar mecánicamente su terminación.
+
+% TODO: Explicar simbolos, opperadores y Sets (universos)
+
+\section{Indices de DeBruijn}
+Generalmente, los términos en cálculo lambda se presentan utilizando letras para nombrar las variables, por ejemplo:
+\[ \lambda z. (\lambda y. y (\lambda x. x)) (\lambda x. z x) \]
+Esta forma de representación permite ver a simple vista cuáles variables están ligadas y a que abstracción pertenecen, también suelen utilizarse palabras para dar nombres más descriptivos a las variables.
+Se puede notar que la forma de escribir un término no es única, ya que es posible cambiar los nombres de algunas variables sin alterar su significado, por ejemplo, el término $\lambda c. (\lambda b. b (\lambda d. d)) (\lambda a. c a)$ es equivalente al del ejemplo anterior.
+Cuando esto ocurre se dice que los términos son $\alpha$-equivalentes.
+
+El principal problema de esta representación es que para implementar la $\beta$-reducción, se debe tener cuidado de no capturar una variable libre cuando se substituye un término en el cuerpo de una abstracción, en caso de que eso ocurra, se renombra la variable capturada con un nuevo nombre fresco.
+En el siguiente ejemplo la variable $x$ es renombrada a $z$ para evitar la captura:
+\[ (\lambda y. (\lambda x. x y)) x \hookrightarrow_{\beta} (\lambda x. x y)[y := x] = \lambda z. z x \]
+
+Utilizar variables con nombres hace que la implementación se vuelva más engorrosa e ineficiente.
+Una alternativa más adecuada es la representación de DeBruijn \cite{debrujin_index}, que reemplaza los nombres por números naturales llamados \textit{índices de DeBruijn}.
+Por ejemplo, la forma de escribir el término del primer ejemplo con índices es la siguiente:
+
+\[ \textcolor{red}{\lambda} (\textcolor{blue}{\lambda\; 0} \; (\textcolor{orange}{\lambda\; 0})) (\textcolor{green}{\lambda}\; \textcolor{red}{1} \; \textcolor{green}{0}) \]
+
+Los índices indican cuantas abstracciones se deben ``saltar'' para llegar a la que está ligando la variable.
+Los nombres de las ligaduras ya no son necesarios, por lo que la escritura se simplifica.
+Además, los términos tienen una única representación, es decir, no es necesario tener en cuenta las $\alpha$-equivalencias.
+
+
+\section{Substituciones explícitas}
+Utilizando la representación de DeBruijn, las sustituciones son simplemente mapas de números naturales a términos, es decir que pueden interpretarse como una secuencia infinita de términos.
+Por ejemplo:
+\[ (0\; 1\; 3)\{0\mapsto a, 1\mapsto b, i+2\mapsto i\} \rightarrow a\; b\; 1 \]
+
+Si se quisiera definir la $\beta$-reducción utilizando esta notación, una primera definición sería:
+
+\[ (\lambda a)b \rightarrow_{\beta} a \{ 0 \mapsto b, i+1\mapsto i+1 \} \]
+
+El problema es que al eliminar un $\lambda$ todas las variables libres de $a$ quedaran desfasadas, por lo que se les debe restar uno:
+
+\[ (\lambda a)b \rightarrow_{\beta} a \{ 0 \mapsto b, i+1\mapsto i \} \]
+
+El siguiente problema surge al intentar empujar la substitución dentro de una abstracción, en dicho caso, se debe evitar reemplazar el índice 0 por $b$, por lo que toda la secuencia se mueve un lugar a la derecha:
+
+\[ (\lambda c)\{ 0 \mapsto b, i+1\mapsto i \} = \lambda c \{ 0 \mapsto 0, 1 \mapsto b, i+2\mapsto i+1 \} \]
+
+Un último problema puede presentarse si $b$ tiene variables libres, para evitar que estas sean capturadas por el $\lambda$ de $c$ se les debe sumar uno:
+\[ (\lambda c)\{ 0 \mapsto b, i+1\mapsto i \} = \lambda c \{ 0 \mapsto 0, 1 \mapsto b \{ i \mapsto i+1 \}, i+2\mapsto i+1 \} \]
+
+El siguiente ejemplo muestra la forma correcta de realizar una $\beta$ reducción:
+
+\[
+(\textcolor{red}{\lambda}\; \lambda\; \textcolor{orange}{3}\; \textcolor{red}{1}\; (\textcolor{green}{\lambda\; 0}\; \textcolor{red}{2}))\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{4}\; \textcolor{blue}{0})
+\hookrightarrow_\beta
+\lambda \; \textcolor{orange}{2} \; (\textcolor{blue}{\lambda}\; \textcolor{orange}{5}\; \textcolor{blue}{0})\; (\textcolor{green}{\lambda\; 0}\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{6}\; \textcolor{blue}{0}))\;
+\]
+
+Notar como las variables libres del cuerpo de la abstracción se disminuyen en uno, las variables libres del argumento aumentan en uno por cada $\lambda$ que atraviesan, y las variables ligadas quedan intactas.
+
+
+En \cite{explicit_subs} se presenta el álgebra $\sigma$ y los cuatro operadores que permiten construir estas secuencias.
+
+\begin{itemize}
+	\item $id$ es la substitución identidad $\{i \mapsto i\}$.
+	\item $\uparrow$ es el operador shift, y suma uno a cada índice $\{i \mapsto i+1\}$.
+	\item $a \cdot s$ es la concatenación del término $a$ a la substitución $s$, $\{0 \mapsto a, i+1 \mapsto s(i)\}$. Por ejemplo $a \cdot id = \{ 0 \mapsto a, 1 \mapsto 0, 2 \mapsto 1, 3 \mapsto 2, \dots \} $
+	\item $s \circ t$ corresponde a la composición de substituciones, donde primero se aplica $s$ y luego $t$.
+\end{itemize}
+
+Dada una substitución $s$, se escribe $a[s]$ para denotar la aplicación de la substitución sobre el término $a$.
+\begin{align*}
+	n[s] &= s(n) \\
+	(a\; b)[s] &= a[s]\; b[s] \\
+	(\lambda a)[s] &= \lambda a[0 \cdot (s \; \circ \uparrow)]
+\end{align*}
+
+Finalmente, la $\beta$-reducción se define como:
+\[ (\lambda a)b \hookrightarrow_{\beta} a[b \cdot id] \]
+
+El trabajo Abadi también presenta algunas propiedades algebraicas de los operadores que resultan útiles a la hora de probar propiedades sobre las substituciones:
+\begin{align*}
+	0 \; \cdot \uparrow &= id \\
+	\uparrow \circ\; (a \cdot s) &= s \\
+	0[s] \cdot (\uparrow \circ\; s) &= s \\
+	(a \cdot s) \circ t &= a[t] \cdot (s \circ t) \\
+\end{align*}
+ 
