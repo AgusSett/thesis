@@ -1128,9 +1128,6 @@
 	
 	\ExecuteMetaData[code/strong_norm_base.tex]{strong-norm}
 
-	\subsection{Diferencias con la prueba de Girard}
-	%Capitulo 5.6 como referencia
-	%https://www.ps.uni-saarland.de/~schaefer/thesis/draft-screen.pdf
 
 	\subsection{Prueba para Sistema I}
 	
@@ -1437,13 +1434,54 @@
 	
 	\ExecuteMetaData[code/strong_norm.tex]{iso-cong-lam2}
 	
-	\subsection{Well-founded \& Accessibility}
-	%Explicar que lo que hicimos en realidad es probar que la inducción sobre la relación de reducción está bien fundada
-	%https://agdapad.quasicoherent.io/~AgdaPadova/html/transcript10.html
+	\subsection{Observaciones}
+	% Capitulo 5.6 como referencia
+	% https://www.ps.uni-saarland.de/~schaefer/thesis/draft-screen.pdf
 	
-	%\ExecuteMetaData[code/eval.tex]{eval2}
+	\subsection{Relación bien fundada}
+	
+	Una vez demostrada la propiedad de normalización fuerte, se puede definir la función de evaluación sin necesidad de utilizar un argumento extra para eludir el chequeo de terminación de Agda.
+	
+	\begin{codigo}
+		Evaluación de un término
+		\ExecuteMetaData[code/eval.tex]{eval2}
+	\end{codigo}
+	
+	Notar que ya no aparece \AgdaDatatype{Maybe} en el tipo de retorno, puesto que se ha probado que toda reducción eventualmente concluye.
+	Aquí la llamada recursiva elimina un constructor \AgdaInductiveConstructor{sn} del segundo argumento, por lo tanto, dicho argumento se hace más y más pequeño.
+	De esta forma, Agda puede garantizar que la función alcanzará un caso base y la recursión concluirá.
+	
+	La forma en la que se codifica la propiedad de normalización fuerte y el hecho de que esta propiedad es la que nos permite realizar inducción sobre $\rightsquigarrow$ no es casualidad.
+	Para entender los fundamentos que se esconden detrás de estas observaciones se presentan las siguientes definiciones.
+	
+	En teoría del orden, se dice que una relación es bien fundada cuando todas sus cadenas, de la forma $x_1 < x_2 < \dots < x_n$, tienen un largo acotado.
+	Esta propiedad se denomina accesibilidad de un elemento.
+	
+	\begin{codigo}
+		Accesibilidad de un término $x$ en la relación $\_<\_$
+		\ExecuteMetaData[code/eval.tex]{acc}
+	\end{codigo}
+	
+	Un elemento $x: A$ es accesible, si todo elemento $y < x$ es también accesible.
+	Luego, una relación es bien fundada si todo elemento es accesible.
+	
+	\begin{codigo}
+		Relación bien fundada
+		\ExecuteMetaData[code/eval.tex]{wf}
+	\end{codigo}
+	
+	Si una relación está bien fundada implica que esta soporta inducción, y en el contexto de los sistemas de reescritura, cumple con la propiedad de terminación.
+	De hecho, la propiedad de normalización fuerte implica que la relación de reducción está bien fundada, y por lo tanto, soporta inducción.
+	Se puede demostrar de forma sencilla esta equivalencia.
+
+	\begin{codigo}
+		La propiedad de normalización fuerte permite concluir que la relación $\rightsquigarrow$ es bien fundada
+		\ExecuteMetaData[code/eval.tex]{wf-reduction}
+	\end{codigo}
 	
 	\chapter{Conclusiones}
+	% Como se resuelve la no-terminacion
+	% La prueba tambien sirve para STLC
 	
 	\section{Trabajo futuro}
 	\subsection{Inferencia de tipos}
