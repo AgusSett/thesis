@@ -18,22 +18,22 @@
 
 Existen dos enfoques fundamentales para la introducción de sistemas de tipos en el cálculo lambda.
 
-Por un lado, se pueden definir primero los términos y luego los tipos, por lo tanto los términos existen independientemente de los tipos y tienen significado por sí solos.
+Por un lado, se pueden definir primero los términos y luego los tipos, por lo tanto, los términos existen independientemente de los tipos y tienen significado por sí solos.
 Tiene sentido entonces definir el subconjunto de términos para los cuales existe alguna derivación de tipos, a este subconjunto se lo denomina términos ``bien tipados''.
 De hecho, para un término dado pueden existir más de un tipo posible, por ejemplo, la función identidad $\lambda x.x$ puede ser tipada como $A \rightarrow A$ o como $B \rightarrow B$.
-Desde este punto de vista, los juicios de tipos aseguran que los términos poseen ciertas propiedades.
+Desde este punto de vista, los juicios de tipado aseguran que los términos poseen ciertas propiedades.
 Este estilo es llamado ``tipos a la Curry''.
 
 Por otro lado, es posible definir los tipos en primer lugar y luego los términos.
 Aquí no tiene sentido hablar de términos ``bien tipados'', ya que no pueden existir los términos ``mal tipados''.
-Por lo tanto, todo el significado recae sobre los juicios de tipo, en lugar de los términos.
-En cierta forma, los términos y las reglas de tipo están entrelazados.
+Por lo tanto, todo el significado recae sobre los juicios de tipado, en lugar de los términos.
+En cierta forma, los términos y las reglas de tipado están entrelazados.
 Aquí, las derivaciones de tipos son únicas, puesto que los términos $\lambda x^A.x$ y $\lambda x^B.x$ se consideran distintos.
 A este enfoque se lo denomina ``tipos a la Church''.
 
-Reynolds \cite{reynolds_1998} acuñó las expresiones \textit{tipos intrínsecos} y \textit{tipos extrínsecos} para referirse a cada uno de estos dos enfoques.
+Reynolds\cite{reynolds_1998} acuñó las expresiones \textit{tipos intrínsecos} y \textit{tipos extrínsecos} para referirse a cada uno de estos dos enfoques.
 
-Gran parte de la formalización presentada en este trabajo está basada y adaptada a partir de un libro de Philip Wadler \cite{plfa}.
+Gran parte de la formalización presentada en este trabajo está basada y adaptada a partir de un libro de Philip Wadler\cite{plfa}.
 % Explicar la diferencia entre Curry style y Church style, y como nos ayuda tener tipos intrínsecos. % Acá hay muchas referencias https://plfa.github.io/DeBruijn/
 
 \subsection{Cálculo lambda con pares y tipo Top}
@@ -48,7 +48,7 @@ Y, por otro lado, el tipo de las funciones \const{$\_\Rightarrow\_$} y los pares
 \end{codigo}
 
 Dado que se utiliza la representación de De Brujin, los entornos de tipado, simplemente se formalizan como listas de tipos.
-Al contrario de las listas normales, los entornos se leen de derecha a izquierda.
+Al contrario de las listas clásicas, los entornos se leen de derecha a izquierda.
 
 Luego se formalizan las variables intrínsecamente tipadas, que son representadas por los índices propiamente dichos.
 
@@ -62,7 +62,7 @@ Por ejemplo:
 
 \ExecuteMetaData[code/context.tex]{example}
 
-A continuación se presentan los juicios de tipado, debido a que se utilizan tipos intrínsecos, estos también representaran a los términos del lenguaje.
+A continuación se presentan los juicios de tipado, debido a que se utilizan tipos intrínsecos, estos también representarán a los términos del lenguaje.
 
 \begin{codigo}
 	Tipo de dato de los términos
@@ -71,7 +71,7 @@ A continuación se presentan los juicios de tipado, debido a que se utilizan tip
 
 Notar que el constructor \const{$[\_]\equiv\_$} corresponde a la regla de tipado $(\equiv)$ de Sistema-I.
 En el constructor \const{$\pi$} se observa otro detalle importante, además de tomar como argumento el tipo \bound{C}, toma un argumento implícito que funciona como evidencia de que el tipo \bound{C} es o bien igual al tipo \bound{A}, o bien igual al tipo \bound{B}.
-Para ello se utilizan el tipo suma y la igualdad proposicional que están definidos en la librería estándar de Agda.
+Para ello se utilizan el tipo suma $\uplus$ y la igualdad proposicional $\cong$ que están definidos en la librería estándar de Agda.
 
 
 Aquí se introducen las definiciones de los renombres de variables, substitución de variables y operadores del álgebra-$\sigma$ presentados en capítulos anteriores.
@@ -80,25 +80,25 @@ Aquí se introducen las definiciones de los renombres de variables, substitució
 
 Los renombres son simplemente funciones que mapean las variables de un entorno a otro preservando el tipo de las mismas.
 Por otro lado, las substituciones mapean cada variable de un entorno a un término que tenga el mismo tipo que dicha variable.
-Se pueden pensar a estas substituciones como las secuencias que se utilizaran para reemplazar las variables libres en los cuerpos de las abstracciones cuando se realice una $\beta$-reducción. 
+Se pueden pensar a estas substituciones como las secuencias que se utilizarán para reemplazar las variables libres en los cuerpos de las abstracciones cuando se realice una $\beta$-reducción. 
 
 La implementación de las substituciones explícitas se divide en dos partes.
-Primero se implementa la operación \func{rename} que dado una función de renombrado $\rho$ y un término, aplica el renombre de variables a dicho término.
+Primero se implementa la operación \func{rename} que dada una función de renombrado $\rho$ y un término, aplica el renombre de variables $\rho$ a dicho término.
 Se debe tener cuidado de no capturar el índice 0 cuando se empuja el renombre debajo de una abstracción.
 Por este motivo, se define la función \func{ext} que toma un renombre y retorna uno nuevo con los entornos extendidos.
 Notar que esta definición sigue la forma propuesta por Abadi: $Z \cdot (\rho \; \circ S\_)$
 
 \ExecuteMetaData[code/subs.tex]{rename}
 
-Una vez implementada la aplicación de renombres, se puede implementar la aplicación de substituciones.
-De forma análoga, se define una función \func{exts} que extiende la sustitución cuando se atraviesa una abstracción.
+Una vez definida la función \func{rename}, se puede implementar la aplicación de substituciones.
+Para ello, se define de forma análoga, una función \func{exts} que extiende la sustitución cuando se atraviesa una abstracción.
 Utilizando la notación del álgebra-$\sigma$, se puede observar que aquí también se sigue la misma estructura: $`Z \cdot (\sigma \; \circ \text{rename } S\_)$.
 
-Luego se define la substitución simple \func{$\_[\_]$}, que dato un término \bound{N} cuya primera variable libre es de tipo \bound{B} y un término \bound{M} de tipo \bound{B}, cierra el índice 0 de \bound{N} utilizando \bound{M}.
+Luego se define la substitución simple \func{$\_[\_]$}, que dato un término \bound{N} cuya primera variable libre es de tipo \bound{B} y un término \bound{M} de tipo \bound{B}, reemplaza el índice 0 de \bound{N} utilizando \bound{M} y reduce en uno el resto de las variables libre.
 
 \ExecuteMetaData[code/subs.tex]{subst}
 
-Notar las similitudes entre la definición de \func{rename} y \func{subst}, esto se debe a que los renombres son un caso particular de substitución, donde todos los términos retornados por la substitución son variables.
+Notar como las definiciones de \func{rename} y \func{subst} poseen una estructura similar, esto se debe a que los renombres son un caso particular de substitución, donde todos los términos retornados por la substitución son variables.
 Esta implementación está basada en la técnica de McBride\cite{ren-sub}, donde los renombres de variables y substituciones son dos instancias de una misma operación de recorrido.
 El motivo principal por el cual es necesario implementar \func{rename}, es que si se quisiera definir \func{exts} utilizando \func{subst} ($\lambda$ \bound{v} $\rightarrow$ \const{`} (\const{S} \bound{v})) (\bound{$\sigma$} \bound{x}), la llamada recursiva sería sobre el término retornado por $\sigma$, de modo que el chequeo de terminación de Agda fallaría.
 
@@ -139,11 +139,11 @@ En primer lugar, se agregaron todos los isomorfismos necesarios para que ningún
 Este punto es más evidente cuando se tiene en cuenta la prueba de progreso presentada más adelante.
 
 El segundo objetivo es preservar la propiedad de normalización y evitar que su prueba se torne demasiado compleja.
-Una consecuencia directa de esto son los constructores con el prefijo \const{sym-}, todos estos se podrían obtener a partir de los isomorfismos base combinados con un constructor \const{sym} tal y como se construyen los isomorfismos de tipos.
+Una consecuencia directa de esto, son los constructores con el prefijo \const{sym-}, todos ellos se podrían obtener a partir de los isomorfismos base combinados con un constructor \const{sym} tal y como se construyen los isomorfismos de tipos.
 Sin embargo, incluir el constructor \const{sym} genera problemas a la hora de formalizar la prueba de normalización fuerte.
 Por otro lado, para desatascar algunos términos, es necesario incluir la $\eta$-expansión y una regla \textsc{split} $r \rightleftarrows \langle \pi_A\; r , \pi_B\; r \rangle$ donde $r: A \times B$.
 Si se incluyen estas reglas directamente, se pierde la propiedad de normalización, ya que por ejemplo nada impediría aplicar la $\eta$-expansión un número infinito de veces.
-La solución es definir nuevos constructores que embeben estas reglas, como por ejemplo \const{asso-split}.
+La solución es definir nuevos constructores que embeban estas reglas, como por ejemplo \const{asso-split}.
 
 
 \begin{codigo}
@@ -194,7 +194,7 @@ Se dice que un término está en forma neutral cuando no puede ser reducido y no
 Notar como las definiciones de \const{$\Uparrow$} y \const{$\Downarrow$} son mutuamente recursivas.
 
 Se puede observar que en la definición de las formas neutrales, el único constructor que no es recursivo es el de las variables.
-Para poder construir una forma neutral, necesariamente se debe utilizar el caso base de la variable al menos una vez.
+Es decir que, para poder construir una forma neutral, necesariamente se debe utilizar el caso base de la variable al menos una vez.
 Por lo tanto, un término está en forma neutral si y solo si contiene variables libres.
 Luego, es fácil ver que todo término cerrado en forma normal es un valor.
 
@@ -207,7 +207,7 @@ Luego, es fácil ver que todo término cerrado en forma normal es un valor.
 
 La formalización de progreso implementa una estrategia de reducción \textit{strong call-by-value}, es decir, reduce primero los argumentos de las aplicaciones antes de aplicar la $\beta$-reducción, y además, reduce debajo de los lambdas.
 
-Se define un nuevo tipo de datos \type{Progress}, que representa los tres posibles resultados de aplicar la prueba de progreso sobre un término, estos son, dar un paso de reducción $\hookrightarrow$, aplicar un isomorfismo $\rightleftarrows$, o puede encontrarse en forma normal, en cuyo caso no es posible seguir reduciéndolo.
+Se define un nuevo tipo de datos \type{Progress}, que representa los tres posibles resultados de aplicar la prueba de progreso sobre un término, estos son, dar un paso de reducción $\hookrightarrow$, aplicar un isomorfismo $\rightleftarrows$, o puede encontrarse que el término está en forma normal, en cuyo caso no es posible seguir reduciéndolo.
 
 \begin{codigo}
 	Propiedad de progreso
@@ -217,7 +217,7 @@ Se define un nuevo tipo de datos \type{Progress}, que representa los tres posibl
 La definición de \func{progress} muestra claramente como cada isomorfismo de término se corresponde con un caso donde es necesario eliminar una regla $(\equiv)$ para poder continuar con la reducción.
 En la formalización, el lenguaje es dirigido por sintaxis.
 Cuando se representan los términos usando tipos intrínsecos, la sintaxis del lenguaje contiene los isomorfismos de tipos.
-Por lo tanto, tiene sentido que los isomorfismos de términos también sean dirigidos por sintaxis.
+Por lo tanto, tiene sentido que la aplicación de los isomorfismos de términos también sea dirigida por sintaxis.
 % TODO: ver si esto tiene sentido
 
 Otra observación interesante es que gracias al paradigma de proposiciones como tipos, la prueba de la propiedad de progreso es también un programa que puede ser aplicado sobre un término para obtener el siguiente paso de reducción.
@@ -235,13 +235,13 @@ Para esto, se define la relación \type{$\_\rightsquigarrow\_$}, que representa 
 La evaluación se define sobre términos cerrados, de modo que estos siempre reduzcan a un valor.
 La definición aplica la prueba de progreso para obtener el nuevo término sobre el cual hacer el llamado recursivo y el paso de reducción que extenderá la relación \type{$\_\rightsquigarrow\_$}.
 
-Debido a que el llamado recursivo se hace sobre el término resultante luego de un paso, Agda no tiene forma de determinar que dicho término es estructuralmente más pequeño que el argumento inicial.
+Debido a que la recursión se realiza sobre el término resultante luego de un paso, Agda no tiene forma de determinar que dicho término es estructuralmente más pequeño que el argumento inicial.
 De hecho, probar la terminación de la evaluación, implicaría que todo término reduce a un valor en una cantidad finita de pasos, es decir, se estaría probando la propiedad de normalización.
 La prueba de dicha propiedad no es trivial, y se presentará en los siguientes capítulos.
 
 Por este motivo, es necesario añadir un argumento de tipo \type{$\mathbb{N}$} para que la definición sea aceptada por el chequeo de terminación de Agda.
 De este modo, la evaluación realizará a lo sumo $n$ llamadas recursivas.
-Además, se utiliza \type{Maybe} en el tipo de retorno, en caso de que el término no converja a un valor luego de $n$ pasos, simplemente se retorna \const{nothing}.
+Además, se utiliza \type{Maybe} en el tipo de retorno, en caso de que el término no converja a un valor luego de $n$ pasos, simplemente se retornará \const{nothing}.
 
 
 \begin{codigo}
@@ -284,7 +284,7 @@ El objetivo final de esta sección será entonces, definir una función que dato
 \type{SN}
 \bound{t}
 
-La prueba aquí presentada está basada y extendida a partir de una formalización realiza por 
+La prueba aquí presentada está basada y extendida a partir de una formalización realizada por 
 Andras Kovacs\footnote{\citeurl{Kovacs}} para cálculo lambda simplemente tipado.
 A su vez, el trabajo de Kovacs se basa en la tesis de Steven Schäfer\cite{Schafer}, donde se formaliza la prueba de normalización fuerte para Sistema-F en Coq.
 La técnica utilizada por Schäfer difiere en ciertos aspectos con la prueba de candidatos de reducibilidad de Girard\cite{Girard}.
@@ -315,14 +315,16 @@ Es fácil ver que si un término cumple con el predicado \type{SN*} también cum
 \ExecuteMetaData[code/strong_norm_base.tex]{sn-star-sn}
 
 La definición de los conjuntos adecuados se extiende a las substituciones.
-Una substitución es adecuada cuando todos los términos por los cuales substituye las variables, cumple con el predicado \type{SN*}
+Se dice que una substitución es adecuada cuando todos los términos por los cuales substituye las variables, cumplen con el predicado \snstar
 
 \ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-subst}
 
 En particular, la substitución identidad \func{ids} es una substitución adecuada
+
+\ExecuteMetaData[code/strong_norm_base.tex]{lemma-var}
 \ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-ids}
 
-Toda la complejidad de la prueba se centra en probar el teorema fundamental, el cual implica que para todo término $t$ y substitución $\sigma$ se cumple
+Toda la complejidad de la prueba se centra en probar el teorema fundamental, el cual implica que para todo término \bound{t} y substitución adecuada \bound{σ} se cumple
 \snstar\parens{\subst{\bound{σ}}{\bound{t}}}
 
 \ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-type}
@@ -384,13 +386,13 @@ es decir que basta con aplicar dicha función a \bound{SN*b}
 \ExecuteMetaData[code/strong_norm_base.tex]{lemma-app}
 \ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-app}
 
-Notar como los conjuntos adecuados permiten resolver los casos de la proyección y aplicación, pero, por otro lado, los casos del producto y la abstracción se vuelven más complejos, ya que son estos los que construyen dichos conjuntos adecuados.
+Notar como los conjuntos adecuados permiten resolver los casos de eliminación (proyección y aplicación), pero, por otro lado, los casos de introducción (producto y abstracción) se vuelven más complejos, ya que son estos donde se construyen dichos conjuntos adecuados.
 Esta construcción es simple para los productos, puesto que se puede deducir de forma directa aplicando la hipótesis inductiva en \func{adecuacy}.	
 Sin embargo, como se verá más adelante, obtener el conjunto adecuado correspondiente al caso de las abstracciones, resulta particularmente complejo.
 
 \paragraph{Caso isomorfismo}
 
-Este caso no presenta mayores dificultades. Sin embargo, la mayor parte de la complejidad para la extensión de la prueba a Sistema I, se presentará cuando se añadan todos los constructores de isomorfismos de términos a este lema.
+Este caso no presenta mayores dificultades. Sin embargo, la mayor parte de la complejidad para la extensión de la prueba a Sistema-I, se encuentra al añadir todos los constructores de isomorfismos de términos a este lema.
 
 \ExecuteMetaData[code/strong_norm_base.tex]{lemma-iso}
 \ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-iso}
@@ -404,7 +406,7 @@ Para ello es necesario definir un nuevo lema que permite conjugar un paso de red
 
 \ExecuteMetaData[code/strong_norm_base.tex]{reduction-subst}
 
-Luego se utiliza la hipótesis \bound{Lƛ} en conjunto un nuevo lema.
+Luego se utiliza la hipótesis \bound{Lƛ} en conjunto con el nuevo lema.
 
 \ExecuteMetaData[code/strong_norm_base.tex]{lemma-abs}
 
@@ -482,14 +484,14 @@ Como detalle adicional, se elimina la substitución identidad aplicada al térmi
 
 \subsection{Prueba para Sistema I}
 
-El primer paso para extender la prueba, es agregar la definición de \type{SN} la relación de isomorfismos entre términos.
+El primer paso para extender la prueba, es agregar en la definición de \type{SN}, la relación de isomorfismos entre términos.
 
 \ExecuteMetaData[code/strong_norm.tex]{SN}
 \ExecuteMetaData[code/strong_norm.tex]{sn-star}
 
-Este cambio tiene como consecuencia que todas las partes de la prueba que construían un término \snstar haciendo \textsc{pattern matching} sobre la relación $\hookrightarrow$, ahora deberán tener también en cuenta los de la relación $\rightleftarrows$ que sean aplicables en cada caso.
+Este cambio tiene como consecuencia que todas las partes de la prueba que construían un término \snstar haciendo \textit{pattern matching} sobre la relación $\hookrightarrow$, ahora deberán tener también en cuenta los constructores de la relación $\rightleftarrows$ que sean aplicables en cada caso.
 
-Por ejemplo, la prueba de \func{SN*-rename} ahora los dos constructores \const{inj₁} y \const{inj₂} del tipo suma.
+Por ejemplo, en la prueba de \func{SN*-rename} ahora aparecen los dos constructores \const{inj₁} y \const{inj₂} del tipo suma.
 
 \ExecuteMetaData[code/strong_norm.tex]{sn-rename}
 
@@ -505,7 +507,7 @@ Este caso también requiere la definición de un nuevo lema análogo al definido
 
 \ExecuteMetaData[code/strong_norm.tex]{iso-subst}
 
-La extensión del resto de los lemas no presentan mayor dificulta.
+La extensión del resto de los lemas no presentan mayores dificultades.
 A modo de ejemplo se presenta el lema correspondiente al producto, y se omiten los demás.
 
 \ExecuteMetaData[code/strong_norm.tex]{lemma-prod}
@@ -521,7 +523,7 @@ La idea de la prueba es utilizar los lemas anteriormente definidos para los dist
 \subsubsection{Caso comm}
 
 Por ejemplo, el isomorfismo \textsc{comm} es uno de los casos más simples que ilustra la técnica utilizada.
-Aquí simplemente basta con instanciar el lema del producto utilizando las hipótesis provistas por el conjunto adecuado de los pares.
+Aquí simplemente basta con instanciar el lema del producto utilizando las hipótesis provistas por el conjunto adecuado del par.
 
 \ExecuteMetaData[code/strong_norm.tex]{iso-comm}
 
@@ -535,7 +537,7 @@ Notar como se aprovecha la naturaleza constructiva de las pruebas en Agda, combi
 \subsubsection{Caso dist}
 
 Este caso presenta la dificultad de instanciar y construir el conjunto adecuado de la abstracción.
-Además, se presentan dos nuevos lemas que se emplearan en múltiples insomorfimos.
+Además, se presentan dos nuevos lemas que se emplearan en múltiples isomorfismos.
 En primer lugar, se define un lema que permite concluir \snstar\bound{t} a partir de \snstar \const{ƛ} \bound{t}.
 La idea del lema es utilizar \bound{Lt} para obtener
 \subst{\cons{\const{` Z}}{\const{S\_}}}{\bound{t}}, es decir, se substituye la primera variable del término por el índice cero, por lo tanto, se obtiene exactamente el mismo término.
@@ -612,7 +614,6 @@ El constructor \const{curry} tiene la particularidad de que el conjunto adecuado
 \cand{ \const{ƛ}
 \parens{\subst{\func{exts} \parens{\cons{\bound{u}}{\parens{\comp{\ids}{\bound{$\rho$}}}}}}{\bound{t}}} }
 el cual puede ser nuevamente instanciado para obtener
-
 \subst{\cons{\bound{u₁}}{\parens{\comp{\ids}{\bound{$\rho_1$}}}}}{\parens{\subst{\func{exts} \parens{\cons{\bound{u}}{\parens{\comp{\ids}{\bound{$\rho$}}}}}}{\bound{t}}}}
 
 Por otro lado, se debe notar que es posible reescribir el objetivo del lema de una forma equivalente
@@ -622,8 +623,8 @@ Por otro lado, se debe notar que es posible reescribir el objetivo del lema de u
 		{\func{exts} \parens{\cons
 				{\const{π} \bound{A} \AgdaSymbol{\{}\const{inj₁} \const{refl}\AgdaSymbol{\}} \bound{u}}
 				{\comp{\ids}{\bound{ρ}}}}}
-		{\bound{t}}}}
-. Es posible obtener esta forma utilizando los conjuntos adecuados.
+		{\bound{t}}}}.
+Es posible obtener esta forma utilizando los conjuntos adecuados.
 
 \ExecuteMetaData[code/strong_norm.tex]{lemma-curry}
 \ExecuteMetaData[code/strong_norm.tex]{iso-curry}
@@ -640,29 +641,31 @@ mientras que el lema anidado requiere
 {\cons{\bound{$u_2$}}{\parens{\comp{\ids}{\bound{$\rho_2$}}}}}
 {\parens{\subst
 		{\func{exts} \parens{\cons{\bound{u}}{\parens{\comp{\ids}{\bound{$\rho$}}}}}}
-		{\parens{\subst{\func{σ-uncurry}}{\bound{t}}}}}}
-. Aquí es donde se debe hallar una substitución equivalente que pueda ser obtenida a través del conjunto adecuado de la abstracción.
+		{\parens{\subst{\func{σ-uncurry}}{\bound{t}}}}}}.
+Aquí es donde se debe hallar una substitución equivalente que pueda ser obtenida a través del conjunto adecuado de la abstracción.
 Notar que la primera substitución aplicada es extendida, por lo que primero se reemplaza el segundo índice por el término $u$.
-Luego, se substituye el primer índice por el término $u_1$ y se aplica el renombre $\rho_1$, por lo que $u$ será renombrado.
+Luego, se substituye el primer índice por el término $u_2$ y se aplica el renombre $\rho_2$, por lo que $u$ será renombrado.
 Por lo tanto, la substitución equivalente es
-\subst{\cons{\const{⟨} \func{rename} \bound{$\rho_1$} \bound{$u$} \const{,} \bound{$u_1$} \const{⟩}}{\comp{\ids}{\comp{\bound{$\rho_1$}}{\bound{$\rho$}}}}}{\bound{t}}
+\subst{\cons{\const{⟨} \func{rename} \bound{$\rho_2$} \bound{$u$} \const{,} \bound{$u_2$} \const{⟩}}{\comp{\ids}{\comp{\bound{$\rho_2$}}{\bound{$\rho$}}}}}{\bound{t}}
 
 
 \ExecuteMetaData[code/strong_norm.tex]{lemma-uncurry}
 \ExecuteMetaData[code/strong_norm.tex]{iso-uncurry}
 
-\subsubsection{Resto de casos}
+El resto de isomorfismos se omiten, ya que se resuelven aplicando las mismas técnicas que en los casos anteriores.
+
+%\subsubsection{Resto de casos}
 
 %\ExecuteMetaData[code/strong_norm.tex]{iso-sym-dist}
-\ExecuteMetaData[code/strong_norm.tex]{iso-id-prod}
-\ExecuteMetaData[code/strong_norm.tex]{iso-id-lam}
-\ExecuteMetaData[code/strong_norm.tex]{iso-abs}
-\ExecuteMetaData[code/strong_norm.tex]{iso-sym}
+%\ExecuteMetaData[code/strong_norm.tex]{iso-id-prod}
+%\ExecuteMetaData[code/strong_norm.tex]{iso-id-lam}
+%\ExecuteMetaData[code/strong_norm.tex]{iso-abs}
+%\ExecuteMetaData[code/strong_norm.tex]{iso-sym}
 
-\ExecuteMetaData[code/strong_norm.tex]{iso-cong-prod1}
-\ExecuteMetaData[code/strong_norm.tex]{iso-cong-prod2}
+%\ExecuteMetaData[code/strong_norm.tex]{iso-cong-prod1}
+%\ExecuteMetaData[code/strong_norm.tex]{iso-cong-prod2}
 
-\ExecuteMetaData[code/strong_norm.tex]{iso-cong-lam2}
+%\ExecuteMetaData[code/strong_norm.tex]{iso-cong-lam2}
 
 \subsection{Observaciones}
 % Capitulo 5.6 como referencia
@@ -681,10 +684,10 @@ Notar que ya no aparece \type{Maybe} en el tipo de retorno, puesto que se ha pro
 Aquí la llamada recursiva elimina un constructor \const{sn} del segundo argumento, por lo tanto, dicho argumento se hace más y más pequeño.
 De esta forma, Agda puede garantizar que la función alcanzará un caso base y la recursión concluirá.
 
-La forma en la que se codifica la propiedad de normalización fuerte y el hecho de que esta propiedad es la que nos permite realizar inducción sobre $\rightsquigarrow$ no es casualidad.
+La forma en la que se codifica la propiedad de normalización fuerte, y el hecho de que sea justamente esta propiedad la que nos permite realizar inducción sobre $\rightsquigarrow$, no son casualidad.
 Para entender los fundamentos que se esconden detrás de estas observaciones se presentan las siguientes definiciones.
 
-En teoría del orden, se dice que una relación es bien fundada cuando todas sus cadenas, de la forma $x_1 < x_2 < \dots < x_n$, tienen un largo acotado.
+En teoría del orden, se dice que una relación está bien fundada cuando todas sus cadenas, de la forma $x_1 < x_2 < \dots < x_n$, tienen un largo acotado.
 Esta propiedad se denomina accesibilidad de un elemento.
 
 \begin{codigo}
@@ -705,6 +708,6 @@ De hecho, la propiedad de normalización fuerte implica que la relación de redu
 Se puede demostrar de forma sencilla esta equivalencia.
 
 \begin{codigo}
-	La propiedad de normalización fuerte permite concluir que la relación $\rightsquigarrow$ es bien fundada
+	Normalización fuerte permite concluir que la relación $\rightsquigarrow$ está bien fundada
 	\ExecuteMetaData[code/eval.tex]{wf-reduction}
 \end{codigo} 

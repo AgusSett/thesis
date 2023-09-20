@@ -1,327 +1,47 @@
-	Los sistemas de tipos permiten especificar el comportamiento de los programas.
-Por ejemplo, el tipo $(A \times B) \rightarrow C$ representa los programas que permiten obtener un valor de tipo $C$ a partir de un par de valores de tipo $A$ y $B$.
-Por otro lado, el tipo $A \rightarrow B \rightarrow C$ representa los programas que primero acepta un valor de tipo $A$, luego uno de tipo $B$ y finalmente devuelve un valor de tipo $C$.
-Estas dos especificaciones son distintas en su forma pero parecen tener el mismo significado semántico. Esto se debe al isomorfismo de Curry.
-Debido a la estrecha relación entre la programación y la lógica, se observa un comportamiento análogo cuando se trabaja con pruebas.
-Por ejemplo, una prueba de $(A \wedge B) \Rightarrow C$ no constituye una prueba de $A \Rightarrow B \Rightarrow C$, y viceversa, a pesar de que ambas tienen el mismo significado.
-
 \section{Motivación}
 
-Tanto los sistemas de tipos como los sistemas de pruebas distinguen elementos que tienen diferente forma aunque tengan el mismo significado, como pueden ser las pruebas de las conjunciones $A \wedge B$ y $B \wedge A$, por lo cual una prueba de una no constituye una prueba de la otra, a pesar de que se puede demostrar mediante la existencia de un isomorfismo que dichas proposiciones son equivalentes.
+Los sistemas de tipos permiten especificar el comportamiento de los programas.
+Estas especificaciones aseguran que los programas se comportarán de una forma esperada, pero al mismo tiempo imponen rigidez a la hora de escribirlos.
+Por ejemplo, el tipo $(A \times B) \rightarrow C$ representa los programas que permiten obtener un valor de tipo $C$ a partir de un par de valores de tipo $A$ y $B$.
+Mientas que, por otro lado, el tipo $A \rightarrow B \rightarrow C$ representa los programas que primero aceptan un valor de tipo $A$, luego uno de tipo $B$ y finalmente devuelven un valor de tipo $C$.
+A pesar de que estas dos especificaciones son distintas en su forma, representan la misma idea, es decir, poseen el mismo significado semántico.
+Al mismo tiempo, la correspondencia de Curry-Howard \cite{sorensen2006lectures} define una estrecha relación entre la programación y la lógica, donde los tipos se corresponden con las fórmulas de la lógica.
+Debido a esto, se puede observar un comportamiento análogo cuando se trabaja con pruebas.
+Por ejemplo, una prueba de $(A \wedge B) \Rightarrow C$ no constituye una prueba de $A \Rightarrow B \Rightarrow C$, y viceversa, a pesar de que ambas tienen el mismo significado.
+
+El hecho es que se puede demostrar que existe un isomorfismo entre estos dos tipos, es decir, es posible obtener uno a partir del otro debido a que ambos contienen la misma cantidad de información.
+Un caso mucho más simple es el de los pares $A \times B$ y $B \times A$, resulta fácil notar que son isomorfos, ya que desde el punto de vista de la semántica, cada uno aporta un elemento de tipo $A$ y un elemento de tipo $B$, el orden no es relevante.
+Por ejemplo, los tipos $(A \times B) \rightarrow C$ y $A \rightarrow B \rightarrow C$ del primer ejemplo, están relacionados por el isomorfismo de Curry.
 
 Programas con tipos isomorfos representan el mismo tipo de problema, por lo que tratarlos como si fueran idénticos tiene aplicaciones interesantes.
-Desde el punto de vista de los programas, nos permite construir expresiones que antes no eran posibles, por ejemplo, un término $f : (A \times B) \rightarrow C$ puede ser combinado como $f \langle a, b \rangle$ ó $f \: a \: b$, es decir, es posible evadir cierta rigidez impuesta por el sistema de tipos.
-Por otro lado, los isomorfismos hacen que las pruebas sean más naturales, por ejemplo, para probar, $A \wedge (A \Rightarrow  B) \Rightarrow B$, deberíamos primero introducir la hipótesis $A \wedge A \Rightarrow  B$, y luego descomponerla en $A$ y $A \Rightarrow B$, en cambio, utilizando el isomorfismo de curry transformamos el objetivo en $(A \Rightarrow A \Rightarrow  B) \Rightarrow B$ y luego introducimos directamente las hipótesis $A$ y $A \Rightarrow B$.
+Desde el punto de vista de los programas, nos permite construir expresiones que antes no eran posibles, por ejemplo, una función $f : (A \times B) \rightarrow C$ puede ser aplicada como $f \langle a, b \rangle$ ó $f \: a \: b$, es decir, es posible evadir cierta rigidez impuesta por el sistema de tipos.
+Por otro lado, los isomorfismos hacen que las pruebas sean más naturales, por ejemplo, para probar $(A \wedge (A \Rightarrow  B)) \Rightarrow B$ usando deducción natural, deberíamos primero introducir la hipótesis $A \wedge (A \Rightarrow B)$, y luego descomponerla en $A$ y $A \Rightarrow B$, en cambio, utilizando el isomorfismo de Curry transformamos el objetivo en $A \Rightarrow (A \Rightarrow  B) \Rightarrow B$ y luego introducimos directamente las hipótesis $A$ y $A \Rightarrow B$.
 
-\section{Estado del arte}
-\subsection{Isomorfismos de tipos}
+\section{Trabajo previo}
 
-Para poder abstraernos de la forma y centrarnos en el significado de los programas, es necesario establecer cuáles son las formas que son combinables y cómo combinarlas.
-Para ello nos valdremos de la noción de isomorfismo entre tipos.
-El primer paso es considerar dos proposiciones $A$ y $B$ como isomorfas si existen dos pruebas $A \Rightarrow B$ y $B \Rightarrow A$, tal que al componerlas, en ambos sentidos, obtenemos como resultado la identidad.
-Por ejemplo, para probar que $A \Rightarrow (B \times C) \equiv (A \Rightarrow B) \times (A \Rightarrow C)$ es efectivamente un isomorfismo, se define un término $curry$ que dada una función devuelve su forma currificada, y un término $uncurry$ que realiza la operación inversa:
+Se han realizado múltiples aportes sobre los denominados sistemas módulo isomorfismos.
+Estos sistemas utilizan el cálculo lambda simplemente tipado con pares como marco de trabajo, y lo extienden de forma que los tipos isomorfos se consideran idénticos.
+El más relevante para este trabajo es Sistema I \cite{system-i}, que se corresponde con el fragmento de la lógica que incorpora las conectivas $\Rightarrow$ y $\wedge$.
+Este sistema ignora las formas de los tipos y se centra solo en su significado semántico, permitiendo así realizar aplicaciones de funciones y proyecciones que no son posibles en el cálculo tradicional.
+Además, presentan propiedades interesantes como el no determinismo y la optimización de programas.
 
-\[ curry = \lambda x^{(A \times B) \Rightarrow C}. \lambda a^A . \lambda b^B . x\langle a,b \rangle \]
-\[ uncurry = \lambda x^{A \Rightarrow B \Rightarrow C}. \lambda y^{A \times B} . x(\pi_1 y)(\pi_2 y) \]
+En términos de expresividad, un siguiente paso natural para un lenguaje de programación simplemente tipado consiste en la adición de polimorfismo, esto es justamente lo que propone Sistema I Polimórfico \cite{sip}.
+Dicho trabajo incorpora el constructor $\forall$ a nivel de tipos, la abstracción y aplicación de tipos a nivel de términos, y algunos de los isomorfismos faltantes correspondientes al fragmento de la lógica con $\forall$, $\Rightarrow$ y $\wedge$.
 
-Luego, se demuestra por extensionalidad que para cualquier par $\langle u,v \rangle$ y función $f$ se cumple $uncurry \circ curry = id_{(A \times B) \Rightarrow C}$:
+Existe una implementación de Sistema I desarrollada en Haskell, denominada $\lambda^+$ \cite{lambda-plus}, para este trabajo es importante examinar y comprender las dificultades que se presentan a la hora de implementar un lenguaje de estas características.
 
-\begin{align*}
-	& (uncurry \circ curry) f \langle u,v \rangle \\
-	=& \\
-	& uncurry (curry \; f) \langle u,v \rangle \\
-	=& \\
-	& uncurry ((\lambda x^{(A \times B) \Rightarrow C}. \lambda a^A . \lambda b^B . x\langle a,b \rangle) f)  \langle u,v \rangle \\
-	\hookrightarrow& \\
-	& uncurry (\lambda a^A . \lambda b^B . f\langle a,b \rangle)  \langle u,v \rangle \\
-	=& \\
-	& (\lambda x^{A \Rightarrow B \Rightarrow C}. \lambda y^{A \times B} . x(\pi_1 y)(\pi_2 y)) (\lambda a^A . \lambda b^B . f\langle a,b \rangle)  \langle u,v \rangle \\
-	\hookrightarrow& \\
-	& (\lambda y^{A \times B} . (\lambda a^A . \lambda b^B . f\langle a,b \rangle)(\pi_1 y)(\pi_2 y)) \langle u,v \rangle \\
-	\hookrightarrow& \\
-	& (\lambda a^A . \lambda b^B . f\langle a,b \rangle)(\pi_1 \langle u,v \rangle)(\pi_2 \langle u,v \rangle) \\
-	\hookrightarrow& \\
-	& (\lambda a^A . \lambda b^B . f\langle a,b \rangle) u \; v \\
-	\hookrightarrow& \\
-	& f\langle u,v \rangle \\
-\end{align*}
-De forma similar se puede probar que $curry \circ uncurry = id_{A \Rightarrow B \Rightarrow C}$
+También, es importante destacar que todos los isomorfismos de tipos que se presentan en estos sistemas, fueron caracterizados y agrupados en conjuntos axiomáticos por Di Cosmo \cite{MSCSSurvey05}.
 
-Di Cosmo \cite{MSCSSurvey05} caracterizó los conjuntos mínimos de isomorfismos que permiten construir todos los demás a partir de reglas de congruencia y transitividad.
-Se escribe $A \equiv B$ cuando $A$ y $B$ sean isomorfos.
+\section{Estructura del trabajo}
 
-\begin{table}[H]
-	\centering
-	\begin{minipage}{0.7\linewidth}
-		\begin{enumerate}
-			\item[swap] $A \Rightarrow (B \Rightarrow  C) \equiv B \Rightarrow (A \Rightarrow  C)$ \tikzmark{swap}
-			
-			\item $A \times B \equiv B \times A$ \tikzmark{topTh1xT}
-			\item $A \times (B \times C) \equiv (A \times B) \times C$
-			\item $(A \times B) \Rightarrow C \equiv A \Rightarrow (B \Rightarrow C)$
-			\item $A \Rightarrow (B \times C) \equiv (A \Rightarrow B) \times (A \Rightarrow C)$
-			
-			\item $A \times \textbf{T} \equiv A$
-			\item $A \Rightarrow \textbf{T} \equiv \textbf{T}$
-			\item $\textbf{T} \Rightarrow A \equiv A$ \tikzmark{botTh1xT}
-			
-			\item $\forall X. \forall Y. A \equiv \forall Y. \forall X. A$ \tikzmark{topTh2}
-			\item $\forall X.A \equiv \forall Y.A [Y/X]$
-			\item $\forall X. (A \Rightarrow B) \equiv A \Rightarrow \forall X.B]$ \tikzmark{botTh2}
-			\item $\forall X. (A \times B) \equiv \forall X.A \times \forall X.B$
-			\item $\forall X.\textbf{T} \equiv \textbf{T}$ \tikzmark{botTh2xT}
-			
-			\item[split] $\forall X. (A \times B) \equiv \forall X \forall Y.A \times \forall X. (B [Y/X])$ \tikzmark{split}
-			
-		\end{enumerate}
-		
-		\begin{tikzpicture}[overlay, remember picture]
-			\draw [decoration={calligraphic brace,amplitude=0.4em},very thick,decorate]
-			let \p1=(pic cs:swap) in
-			(19em, \y1+1em) -- node[right=0.6em] {$Th^1$} (19em, \y1-0.6em);
-			
-			\draw [decoration={calligraphic brace,amplitude=0.4em},very thick,decorate]
-			let \p1=(pic cs:topTh1xT), \p2=(pic cs:botTh1xT) in
-			(19em, \y1+0.8em) -- node[right=0.6em] {$Th^1_{\times T}$} (19em, \y2);
-			
-			\draw [decoration={calligraphic brace,amplitude=0.4em},very thick,decorate]
-			let \p1=(pic cs:topTh2), \p2=(pic cs:botTh2) in
-			(15em, \y1+0.8em) -- node[right=0.6em] {+ swap = $Th^2$} (15em, \y2);
-			
-			\draw [decoration={calligraphic brace,amplitude=0.4em},very thick,decorate]
-			let \p1=(pic cs:topTh1xT), \p2=(pic cs:botTh2xT) in
-			(23em, \y1+0.8em) -- node[right=0.6em] {$Th^2_{\times T}$} (23em, \y2);
-			
-			\draw [decoration={calligraphic brace,amplitude=0.4em},very thick,decorate]
-			let \p1=(pic cs:topTh1xT), \p2=(pic cs:split) in
-			(27em, \y1+0.8em) -- node[right=0.6em] {$-10, 11 = Th^{ML}$} (27em, \y2);
-		\end{tikzpicture}
-	\end{minipage}
-	\caption{Isomorfismos de tipo en cálculo lambda tipado}
-\end{table}
+En el capítulo 2 se presentan los fundamentos previos necesarios para comprender los aportes realizados en esta tesina.
+Por un lado, se introducen los isomorfismos de tipos y se explican en detalle la sintaxis y semántica de Sistema I.
+Por otro lado, se introducen una serie de conceptos que culminan en la presentación de Agda, que será el lenguaje elegido para la formalización realizada en este trabajo.
+Además, se explicará de forma sucinta la representación de términos con índices de De Brujin, y el funcionamiento de las substituciones explícitas, ambos conceptos no solo serán una pieza central de la formalización aquí presentada, sino que también son comúnmente empleados en el desarrollo de muchas implementaciones de cálculo lambda.
 
-\subsection{Sistema I}
-Sistema I \cite{system-i} es un lenguaje de pruebas para el fragmento de la lógica con $\Rightarrow$ y $\wedge$, que se corresponde con lambda cálculo simplemente tipado con pares.
-El conjunto de isomorfismos que abarca este sistema es denominado $Th^1_\times$.
-El primer paso para la internalización de los isomorfismos es la definición de una nueva regla de tipado llamada $(\equiv)$
+Luego, el capítulo 3 presenta la formalización de Sistema I con tipo Top, que será el aporte principal de esta tesina.
+El orden de presentación del código y los fragmentos presentados se escogieron con el objetivo de hacer la explicación más intuitiva y facilitar la comprensión de las pruebas.
+La propiedad de normalización fuerte se presenta en dos partes debido a su complejidad, donde primero se realiza la prueba para el cálculo lambda simplemente tipado con pares, y luego se extiende dicha prueba añadiendo isomorfismos de tipos.
+El código completo de toda la formalización puede obtenerse en \url{https://github.com/AgusSett/thesis}
 
-\[ \frac{A \equiv B \quad \Gamma \vdash r:A}{\Gamma \vdash r:B} (\equiv) \]
-
-Esta regla permite emplear términos $r:A$ en cualquier lugar que se necesite un tipo isomorfo a $A$. Por ejemplo:
-
-\begin{prooftree*}
-	\hypo{ \Gamma\vdash r: A }
-	\infer1[($\Rightarrow_i$)]{ \Gamma\vdash \lambda x.r: C \Rightarrow A }
-	\hypo{ \Gamma\vdash s: B }
-	\infer1[($\Rightarrow_i$)]{ \Gamma\vdash \lambda x.s: C \Rightarrow B }
-	\infer2[($\times_i$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle : (C \Rightarrow A) \times (C \Rightarrow B) }
-	\infer1[($\equiv$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle : C \Rightarrow (A \times B) }
-	\hypo{ \Gamma\vdash t: C }
-	\infer2[($\Rightarrow_e$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle \; t : A \times B }
-\end{prooftree*}
-
-La introducción de una relación de equivalencia en el nivel de los tipos, necesariamente deberá tener consecuencias en el nivel de los términos.
-Con las reglas de reducción usuales, un término como el del ejemplo anterior estaría en forma normal.
-Entonces, el siguiente paso es extender la relación de reducción con isomorfismos a nivel términos.
-Estas nuevas reglas permiten desatascar los términos que tipamos usando $(\equiv)$.
-Por ejemplo, para reducir el término del ejemplo anterior, es necesario definir la siguiente equivalencia de términos $\langle \lambda x^A.r, \lambda x^A.s \rangle \leftrightarrows \lambda x^A. \langle r, s \rangle$:
-\begin{align*}
-	& \langle \lambda x.r, \lambda x.s \rangle \; t \\
-	\leftrightarrows& \\
-	& (\lambda x^A. \langle r, s \rangle) t \\
-	\hookrightarrow& \\
-	& \langle r[t/x], s[t/x] \rangle
-\end{align*}
-
-Es importante destacar que dependiendo del conjunto de isomorfismos de términos que se incluyen, se obtienen sistemas de cálculo con distintas propiedades, incluir demasiados puede desencadenar en no terminación, y si se incluyen pocos pueden aparecer eliminaciones en formas normales.
-
-A continuación, se presentan las reglas propuestas por Sistema I, las cuales fueron elegidas con el objetivo de obtener un cálculo fuertemente normalizante y consistente:
-
-\begin{figure}[ht!]
-	\begin{align*}
-		A \times B &\equiv B \times A \\
-		A \times (B \times C) &\equiv (A \times B) \times C \\
-		(A \times B) \Rightarrow C &\equiv A \Rightarrow (B \Rightarrow C) \\
-		A \Rightarrow (B \times C) &\equiv (A \Rightarrow B) \times (A \Rightarrow C)
-	\end{align*}
-	
-	\caption{Isomorfismos de tipo en Sistema I}
-\end{figure}
-
-\begin{figure}[ht!]
-	\centering
-	\begin{align}
-		\langle r,s \rangle &\rightleftarrows \langle s,r \rangle \tag{\textsc{comm}} \\
-		\langle r, \langle s,t \rangle \rangle &\rightleftarrows \langle \langle r, s \rangle, t \rangle \tag{\textsc{asso}} \\
-		\lambda x^A \langle r,s \rangle &\rightleftarrows \langle \lambda x^A.r, \lambda x^A.s \rangle \tag{$\textsc{dist}_{\lambda}$} \\
-		\langle r,s \rangle t &\rightleftarrows \langle r t, s t \rangle \tag{$\textsc{dist}_{app}$} \\
-		r \langle s, t \rangle &\rightleftarrows r s t \tag{\textsc{curry}}
-	\end{align}
-	
-	\begin{prooftree}
-		\hypo{\lambda x.t \rightleftarrows \lambda x.r}
-		\infer1{ t \rightleftarrows r }
-	\end{prooftree} \quad
-	\begin{prooftree}
-		\hypo{ts \rightleftarrows rs}
-		\infer1{ t \rightleftarrows r }
-	\end{prooftree} \quad
-	\begin{prooftree}
-		\hypo{st \rightleftarrows sr}
-		\infer1{ t \rightleftarrows r }
-	\end{prooftree} \\ \vspace{1em}
-	\begin{prooftree}
-		\hypo{\langle t, s \rangle \rightleftarrows \langle r, s \rangle}
-		\infer1{ t \rightleftarrows r }
-	\end{prooftree} \quad
-	\begin{prooftree}
-		\hypo{\langle s, t \rangle \rightleftarrows \langle s, r \rangle}
-		\infer1{ t \rightleftarrows r }
-	\end{prooftree} \quad
-	\begin{prooftree}
-		\hypo{\pi_A t \rightleftarrows \pi_A r}
-		\infer1{ t \rightleftarrows r }
-	\end{prooftree}
-	
-	\caption{Reglas de equivalencia entre términos}
-\end{figure}
-
-\begin{figure}[ht!]
-	\centering
-	\begin{prooftree}
-		\infer0[($ax$)]{ \Gamma, x:A \vdash x:A }
-	\end{prooftree}
-	\quad
-	\begin{prooftree}
-		\hypo{A \equiv B}
-		\hypo{\Gamma \vdash r:A}
-		\infer2[($\equiv$)]{ \Gamma \vdash r:B }
-	\end{prooftree}
-	\vspace{1em}
-	\\
-	\begin{prooftree}
-		\hypo{\Gamma, x:A \vdash r:B}
-		\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x.r : A \Rightarrow B }
-	\end{prooftree}
-	\quad
-	\begin{prooftree}
-		\hypo{\Gamma \vdash \lambda x.r : A \Rightarrow B}
-		\hypo{\Gamma \vdash s:A}
-		\infer2[($\Rightarrow_e$)]{ \Gamma \vdash rs : B }
-	\end{prooftree}
-	\vspace{1em}
-	\\
-	\begin{prooftree}
-		\hypo{\Gamma \vdash r:A}
-		\hypo{\Gamma \vdash s:B}
-		\infer2[($\times_i$)]{ \Gamma \vdash \langle r, s \rangle : A \times B }
-	\end{prooftree}
-	\quad
-	\begin{prooftree}
-		\hypo{\Gamma \vdash \langle r, s \rangle : A \times B}
-		\infer1[($\times_e$)]{ \Gamma \vdash \pi_A\langle r, s \rangle : A }
-	\end{prooftree}
-	\caption{Reglas de tipado}
-\end{figure}
-
-El siguiente paso surge de notar que las nuevas reglas introducen problemas en la reducción clásica.
-Por un lado, las reglas de proyección $\pi_1$ y $\pi_2$ indexan el par a través de la posición de los elementos, pero el isomorfismo $\textsc{comm}$ permite cambiar el orden de un par, permitiendo así proyectar cualquiera de los dos elementos:
-
-\begin{align*}
-	\langle r, s \rangle& \hookrightarrow_{\pi_1} r \\
-	\langle r, s \rangle& \leftrightarrows_{\textsc{comm}} \langle s, r \rangle \hookrightarrow_{\pi_1} s
-\end{align*}
-
-Esto supone un problema para la preservación de tipos.
-La solución es indexar el elemento a través de su tipo, por lo que se define una nueva regla:
-
-\[ \text{si} \; r:A \quad \pi_A \langle r, s \rangle \hookrightarrow_{\pi} r \]
-
-Una consecuencia importante es que esta regla introduce no determinismo en el cálculo.
-Si $r$ y $s$ tienen tipo $A$, entonces $\pi_A \langle r, s \rangle$ puede reducir indistintamente a cualesquiera de los dos términos.
-Sin embargo, es posible codificar una proyección determinista incluso cuando ambos términos son del mismo tipo, por ejemplo, el par $\langle r, s \rangle: A \times A$
-se codifica como $\langle \lambda x^\mathbb{X}.r, \lambda x^\mathbb{Y}.s \rangle : \mathbb{X} \Rightarrow A \times \mathbb{Y} \Rightarrow A$.
-Y la proyección $\pi_1 \langle r, s \rangle$ se codifica como $(\pi_{\mathbb{X} \Rightarrow A} \langle \lambda x^\mathbb{X}.r, \lambda x^\mathbb{Y}.s \rangle) y^\mathbb{X}$, donde $\mathbb{X}$ y $\mathbb{Y}$ son dos tipos distintos, y $y^\mathbb{X}$ es cualquier elemento de tipo $\mathbb{X}$.
-De forma análoga se puede codificar $\pi_2$.
-
-
-La $\beta$-reducción clásica también entra en conflicto con la preservación de tipos.
-Por ejemplo, el término $(\lambda x^A . \lambda y^B . r)ts$ donde $t:B$ y $s:A$ está bien tipado, pero para reducirlo correctamente primero se deben aplicar equivalencias para intercambiar el orden de $t$ y $s$.
-Sin embargo, no hay nada que impida aplicar la regla $\beta$, lo cual podría terminar reduciendo a un tipo equivocado.
-Para solucionar esto, se modifica la $\beta$-reducción:
-
-\[ \text{si} \; s:A \quad (\lambda x^A.r) s \hookrightarrow_{\beta} r[s/x] \]
-
-Por último se define la relación de reducción módulo isomorfismos:
-
-\[ \rightsquigarrow \; = \; \leftrightarrows^* \circ \hookrightarrow \circ \leftrightarrows^* \]
-
-Es decir, que primero los términos son transformados a una forma equivalente donde sea posible aplicar las eliminaciones, y luego se aplican las $\beta$-reducciones y proyecciones.
-
-
-\subsection{SIP}
-Sistema I Polimórfico \cite{sip}, es una extensión que agrega polimorfismos a Sistema I, toma algunos de los isomorfismos del conjunto axiomático $Th^2_\times$.
-Desde el punto de vista de la lógica, agrega el conector $\forall$, y en cuanto a la programación, agrega la gramática de tipos y términos correspondientes a Sistema F con pares.
-
-El trabajo presenta la técnica utilizada para obtener las equivalencias de términos inducidas por un isomorfismo de tipos.
-Dado un isomorfismo de tipos con dos constructores involucrados, se construyen términos aplicando de diferentes maneras las reglas de tipado relacionadas con los constructores.
-Para cualquier par de conectivas, tenemos cuatro posibles formas de combinar sus reglas de tipado: introducción-introducción, introducción-eliminación, eliminación-introducción, y eliminación-eliminación.
-Cada una induce una equivalencia, y cada lado de la equivalencia estará dado por el orden en que se apliquen las conectivas.
-
-Por ejemplo, el isomorfismo $A \Rightarrow (B \times C) \equiv (A \Rightarrow B) \times (A \Rightarrow C)$ emplea los conectores $\Rightarrow$ y $\times$, SIP incluye las siguientes dos equivalencias:
-
-\begin{itemize}
-	\item Introducción de $\Rightarrow$ e introducción de $\times$: $\lambda x.\langle r,s \rangle \leftrightarrows \langle \lambda x.r, \lambda x.s \rangle$
-	
-	\begin{center}
-		\begin{prooftree}
-			\hypo{\Gamma, x:A \vdash r:B}
-			\hypo{\Gamma, x:A \vdash s:C}
-			\infer2[($\times_i$)]{ \Gamma, x:A \vdash \langle r, s \rangle : B \times C }
-			\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x. \langle r, s \rangle : A \Rightarrow B \times C }
-		\end{prooftree}
-		\\
-		\vspace{1em}
-		\begin{prooftree}
-			\hypo{\Gamma, x:A \vdash r:B}
-			\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x.r : A \Rightarrow B }
-			\hypo{\Gamma, x:A \vdash s:C}
-			\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x.s : A \Rightarrow C }
-			\infer2[($\times_i$)]{ \Gamma \vdash \langle \lambda x.r, \lambda x.s \rangle : (A \Rightarrow B) \times (A \Rightarrow C) }
-			\infer1[($\equiv$)]{ \Gamma \vdash \langle \lambda x.r, \lambda x.s \rangle : A \Rightarrow (B \times C) }
-		\end{prooftree}
-	\end{center}
-	
-	\item Eliminación de $\Rightarrow$ e introducción de $\times$: $\langle r,s \rangle t \leftrightarrows \langle rt, st \rangle$
-	
-	\begin{center}
-		\begin{prooftree}
-			\hypo{\Gamma \vdash r: A \Rightarrow B}
-			\hypo{\Gamma \vdash s: A \Rightarrow C}
-			\infer2[($\times_i$)]{ \Gamma \vdash \langle r, s \rangle : (A \Rightarrow B) \times (A \Rightarrow C) }
-			\infer1[($\equiv$)]{ \Gamma \vdash \langle r, s \rangle : A \Rightarrow (B \times C) }
-			\hypo{\Gamma \vdash t: A}
-			\infer2[($\Rightarrow_e$)]{ \Gamma \vdash \langle r, s \rangle t : B \times C }
-		\end{prooftree}
-		\\
-		\vspace{1em}
-		\begin{prooftree}
-			\hypo{\Gamma \vdash r: A \Rightarrow B} \hypo{\Gamma \vdash t: A}
-			\infer2[($\Rightarrow_e$)]{ \Gamma \vdash rt : B }
-			\hypo{\Gamma \vdash s: A \Rightarrow C} \hypo{\Gamma \vdash t: A}
-			\infer2[($\Rightarrow_e$)]{ \Gamma \vdash st : C }
-			\infer2[($\times_i$)]{ \Gamma \vdash \langle rt, st \rangle :  B \times C }
-		\end{prooftree}
-	\end{center}
-\end{itemize}
-
-
-\subsection{$\lambda^+$}
-$\lambda^+$ \cite{lambda-plus} es una implementación en Haskell de una extensión que agrega naturales y recursión general a Sistema I.
-Este trabajo muestra las dificultades de implementar un sistema de tipos módulo isomorfismos y las aplicaciones prácticas de un lenguaje de programación con dichas capacidades.
-Por ejemplo, utilizando $\textsc{curry}$, $\textsc{comm}$ y $\textsc{asso}$ es posible aplicar parcialmente los argumentos de una función en cualquier orden.
-
-Un detalle interesante es la adición de una nueva regla llamada $\textsc{split}$ que no surge de ningún isomorfismo, sino que es necesaria para reducir términos que de otra forma quedarían atascados.
-Esto muestra que desde el punto de vista de la implementación, puede ser necesario agregar nuevas equivalencias de términos para lograr reducir a una forma normal.
-% explicar que introduce el split, es necesario agregar o eliminar isos para lograr la reduccion 
- 
+Por último, en el capítulo 4 se presentan las conclusiones y trabajo futuro que se derivan del presente trabajo de tesina.
