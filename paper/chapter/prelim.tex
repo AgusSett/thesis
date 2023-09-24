@@ -253,7 +253,7 @@ Por último se define la relación de reducción módulo isomorfismos:
 
 Donde $r \rightsquigarrow s \iff r \rightleftarrows^* r' \hookrightarrow s' \rightleftarrows^* s$. Es decir, que primero los términos son transformados a una forma equivalente donde sea posible aplicar las eliminaciones, y luego se aplican las $\beta$-reducciones y proyecciones.
 
-	\subsection{SIP}
+\subsection{SIP}
 Sistema I Polimórfico \cite{sip}, es una extensión que agrega polimorfismos a Sistema I, toma algunos de los isomorfismos del conjunto axiomático $Th^2_\times$.
 A la gramática de tipos y términos definida en Sistema I, le agrega la gramática de tipos y términos correspondientes a Sistema F con pares.
 Sus tipos y términos son entonces los siguientes:
@@ -261,14 +261,30 @@ Sus tipos y términos son entonces los siguientes:
 \[ A := X \mid A \Rightarrow A \mid A \times A \mid \forall X.A \]
 \[ t := x \mid \lambda^Ax.t \mid t t \mid \langle t,t \rangle \mid \pi_A t \mid \Lambda X.t \mid t[A] \]
 
+Las reglas de tipado de este cálculo surgen de tomar las reglas de Sistema I y agregar las correspondientes a polimorfismo de Sistema F:
+
+\begin{center}
+	\begin{prooftree}
+		\hypo{\Gamma \vdash r:A}
+		\hypo{X \notin FTV_c(\Gamma)}
+		\infer2[($\forall_i$)]{ \Gamma \vdash \Lambda X.r : \forall X.A }
+	\end{prooftree} \quad
+	\begin{prooftree}
+		\hypo{\Gamma \vdash r: \forall X.A}
+		\infer1[($\forall_e$)]{ \Gamma \vdash \Lambda r[B] : A[B/X] }
+	\end{prooftree}
+\end{center}
+
+Donde $FTV_c(\Gamma)$ es el conjunto de variables de tipo libres en el contexto $\Gamma$.
+
+Los isomorfismos de carácter axiomático que se considerarán en este sistema son los siguientes:
 
 \begin{align*}
 	\forall X.(A \Rightarrow B) &\equiv A \Rightarrow \forall X.B \tag{\textsc{p-comm}} \\
 	\forall X.(A \times B) &\equiv \forall X.A \times \forall X.B \tag{\textsc{p-dist}}
 \end{align*}
 
-
-El trabajo presenta la técnica utilizada para obtener las equivalencias de términos inducidas por un isomorfismo de tipos.
+Un aspecto interesante de este trabajo, es que presenta la técnica utilizada para obtener las equivalencias de términos inducidas por un isomorfismo de tipos.
 Dado un isomorfismo de tipos con dos constructores involucrados, se construyen términos aplicando de diferentes maneras las reglas de tipado relacionadas con los constructores.
 Para cualquier par de conectivas, tenemos cuatro posibles formas de combinar sus reglas de tipado: introducción-introducción, introducción-eliminación, eliminación-introducción, y eliminación-eliminación.
 Cada una induce una equivalencia, y cada lado de la equivalencia estará dado por el orden en que se apliquen las conectivas.
@@ -324,9 +340,30 @@ Por ejemplo, el isomorfismo $A \Rightarrow (B \times C) \equiv (A \Rightarrow B)
 \subsection{$\lambda^+$}
 $\lambda^+$ \cite{lambda-plus} es una implementación en Haskell de una extensión que agrega naturales y recursión general a Sistema I.
 Este trabajo muestra las dificultades de implementar un sistema de tipos módulo isomorfismos y las aplicaciones prácticas de un lenguaje de programación con dichas capacidades.
-Por ejemplo, utilizando $\textsc{curry}$, $\textsc{comm}$ y $\textsc{asso}$ es posible aplicar parcialmente los argumentos de una función en cualquier orden.
+Por ejemplo, utilizando los isomorfismos \textsc{curry} y \textsc{comm} es posible aplicar una función a sus argumentos dados en cualquier orden e incluso aplicar la función a solo un subconjunto de  argumentos.
+La idea es convertir todos los argumentos a pares utilizando \textsc{curry}, y luego reordenarlos empleando conmutatividad y asociatividad de los pares:
+\begin{align*}
+	R \rightarrow S \rightarrow T& \equiv_\textsc{curry} \\
+	(R \times S) \rightarrow T& \equiv_\textsc{comm} \\
+	(S \times R) \rightarrow T& \equiv_\textsc{curry} \\
+	S \rightarrow R \rightarrow T& 
+\end{align*}
 
 Un detalle interesante es la adición de una nueva regla llamada $\textsc{split}$ que no surge de ningún isomorfismo, sino que es necesaria para reducir términos que de otra forma quedarían atascados.
+Esta regla relaciona términos de la forma
+$\pi_{R \times S}(\langle r,s \rangle) \rightleftarrows \langle \pi_R(r), \pi_S(s) \rangle$
+y permite desatascar proyecciones donde el argumento es una abstracción más algún otro término.
+Por ejemplo:
+\begin{align*}
+	& \pi_{((R \times S) \Rightarrow S) \times T } \langle \lambda x^{R \times S}.x, t \rangle \\
+	\rightleftarrows& \\
+	& \langle \pi_{(R \times S) \Rightarrow S}(\lambda x^{R \times S}.x), \pi_T(t) \rangle \\
+	\hookrightarrow& \\
+	& \langle \pi_{(R \times S) \Rightarrow S}(\lambda x^{R \times S}.x), t \rangle \\
+	\rightleftarrows& \\
+	& \langle \lambda x^{R \times S}. \pi_S(x) , t \rangle \\
+\end{align*}
+
 Esto muestra que desde el punto de vista de la implementación, puede ser necesario agregar nuevas equivalencias de términos para lograr reducir a una forma normal.
 % explicar que introduce el split, es necesario agregar o eliminar isos para lograr la reduccion 
 
