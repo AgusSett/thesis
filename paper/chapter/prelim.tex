@@ -1,4 +1,4 @@
-\section{Trabajo previo}
+\section{Sistemas módulo isomorfismos}
 \subsection{Isomorfismos de tipos}
 
 Para poder abstraernos de la forma de los programas y centrarnos en su significado, es necesario establecer cuáles son las formas que son combinables y cómo combinarlas.
@@ -243,15 +243,47 @@ De forma análoga se puede codificar $\pi_2$.
 La $\beta$-reducción clásica también entra en conflicto con la preservación de tipos.
 Por ejemplo, el término $(\lambda x^A . \lambda y^B . r)ts$ donde $t:B$ y $s:A$ está bien tipado, pero para reducirlo correctamente primero se deben aplicar equivalencias para intercambiar el orden de $t$ y $s$.
 Sin embargo, no hay nada que impida aplicar la regla $\beta$, lo cual podría terminar reduciendo a un tipo equivocado.
-Para solucionar esto, se modifica la $\beta$-reducción:
+Para solucionar esto, se modifica la $\beta$-reducción y se añade una precondición que requiere que el término que se está aplicando tenga el mismo tipo que el argumento de la abstracción:
 
 \[ \text{si} \; s:A \quad (\lambda x^A.r) s \hookrightarrow_{\beta} r[s/x] \]
+
 
 Por último se define la relación de reducción módulo isomorfismos:
 
 \[ \rightsquigarrow \; := \; \rightleftarrows^* \circ \hookrightarrow \circ \rightleftarrows^* \]
 
 Donde $r \rightsquigarrow s \iff r \rightleftarrows^* r' \hookrightarrow s' \rightleftarrows^* s$. Es decir, que primero los términos son transformados a una forma equivalente donde sea posible aplicar las eliminaciones, y luego se aplican las $\beta$-reducciones y proyecciones.
+
+\subsubsection{Ejemplo}
+El término $\lambda x^A . \lambda y^B . \langle x,y \rangle$ tiene tipo $A \rightarrow B \rightarrow A \times B$, luego aplicando los isomorfismos \textsc{dist} y \textsc{curry} se obtiene el tipo $((A \times B) \rightarrow A) \times ((A \times B) \rightarrow B)$
+
+\begin{align*}
+	&A \rightarrow B \rightarrow A \times B \\
+	\equiv&_\textsc{curry} \\
+	&(A \times B) \rightarrow A \times B \\
+	\equiv&_\textsc{dist} \\
+	&((A \times B) \rightarrow A) \times ((A \times B) \rightarrow B)
+\end{align*}
+
+Es decir, que una función que recibe dos argumentos por separado y retorna un par, puede ser vista como un par de funciones que toman ambos argumentos dentro de un par.
+Por lo tanto, es posible proyectar la función antes de aplicarla, y dados $s: A$ y $t: B$, se puede aplicar la función proyectada $\pi_{(A \times B) \rightarrow A}(\lambda x^A . \lambda y^B . \langle x,y \rangle) \langle s,t \rangle$
+
+A continuación se detalla la forma correcta de reducir dicho término:
+\begin{align*}
+	&\pi_{(A \times B) \rightarrow A}(\lambda x^A . \lambda y^B . \langle x,y \rangle) \langle s,t \rangle \\
+	\rightleftarrows&_{\textsc{dist}_\lambda} \\
+	&\pi_{(A \times B) \rightarrow A}(\lambda x^A. \langle \lambda y^B.x, \lambda y^B.y \rangle) \langle s,t \rangle \\
+	\rightleftarrows&_{\textsc{dist}_\lambda} \\
+	&\pi_{(A \times B) \rightarrow A}(\langle \lambda x^A.\lambda y^B.x, \lambda x^A.\lambda y^B.y \rangle) \langle s,t \rangle \\
+	\hookrightarrow&_\pi \\
+	&(\lambda x^A.\lambda y^B.x) \langle s,t \rangle \\
+	\rightleftarrows&_{\textsc{cury}} \\
+	&(\lambda x^A.\lambda y^B.x) s t \\
+	\hookrightarrow&_\beta \\
+	&(\lambda y^B.s) t \\
+	\hookrightarrow&_\beta \\
+	s
+\end{align*}
 
 \subsection{SIP}
 Sistema I Polimórfico \cite{sip}, es una extensión que agrega polimorfismos a Sistema I, toma algunos de los isomorfismos del conjunto axiomático $Th^2_\times$.
