@@ -95,7 +95,7 @@ La implementación de las substituciones explícitas se divide en dos partes.
 Primero se implementa la operación \func{rename} que dada una función de renombrado $\rho$ y un término, aplica el renombre de variables $\rho$ a dicho término.
 Se debe tener cuidado de no capturar el índice 0 cuando se empuja el renombre debajo de una abstracción.
 Por este motivo, se define la función \func{ext} que toma un renombre y retorna uno nuevo con los entornos extendidos.
-Notar que esta definición sigue la forma propuesta por Abadi: $Z \cdot (\rho \; \circ S\_)$
+Notar que esta definición sigue la forma propuesta por Abadi: $Z \bullet (\rho \; \circ S\_)$
 
 \begin{codigo}
 	Aplicación de renombres sobre términos
@@ -109,7 +109,7 @@ Notar que esta definición sigue la forma propuesta por Abadi: $Z \cdot (\rho \;
 
 Una vez definida la función \func{rename}, se puede implementar la aplicación de substituciones.
 Para ello, se define de forma análoga, una función \func{exts} que extiende la sustitución cuando se atraviesa una abstracción.
-Utilizando la notación del álgebra-$\sigma$, se puede observar que aquí también se sigue la misma estructura: $`Z \cdot (\sigma \; \circ \text{rename } S\_)$.
+Utilizando la notación del álgebra-$\sigma$, se puede observar que aquí también se sigue la misma estructura: $`Z \bullet (\sigma \; \circ \text{rename } S\_)$.
 
 Luego se define la substitución simple \func{$\_[\_]$}, que dato un término \bound{N} cuya primera variable libre es de tipo \bound{B} y un término \bound{M} de tipo \bound{B}, reemplaza el índice 0 de \bound{N} utilizando \bound{M} y reduce en uno el resto de las variables libre.
 
@@ -293,12 +293,12 @@ Además, se utiliza \type{Maybe} en el tipo de retorno, en caso de que el térmi
 \end{codigo}
 
 \begin{example}
-	asd
+	Cuando la cantidad de pasos máxima es suficiente, la evaluación retorna la secuencia de reducción y evidencia de que el término final es un valor
 	\ExecuteMetaData[code/example.tex]{eval1}
 \end{example}
 
 \begin{example}
-	asd
+	En caso de que la cantidad de pasos no sea suficiente para arribar a un valor, la evaluación retorna la secuencia de reducción incompleta y el constructor \const{nothing}
 	\ExecuteMetaData[code/example.tex]{eval2}
 \end{example}
 
@@ -382,7 +382,7 @@ Toda la complejidad de la prueba se centra en probar el teorema fundamental, el 
 
 \ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-type}
 
-\paragraph{Caso variable}
+\subsubsection{Caso variable}
 
 Este caso requiere que la substitución $\sigma$ aplicada a la variable $v$ cumpla con la propiedad
 \snstar.
@@ -390,14 +390,14 @@ La hipótesis dice que $\sigma$ es una substitución adecuada, por lo tanto, bas
 
 \ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-var}
 
-\paragraph{Caso top}
+\subsubsection{Caso top}
 
 Debido a que no existe ningún paso de reducción posible para el término \const{$\star$}, la construcción del predicado es trivial.
 
 \ExecuteMetaData[code/strong_norm_base.tex]{lemma-top}
 \ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-top}
 
-\paragraph{Caso producto}
+\subsubsection{Caso producto}
 
 Para el caso del producto, se puede definir un lema que permite construir el predicado si se tiene como hipótesis que \snstar vale para los sub-términos $a$ y $b$ del par.
 Estas dos hipótesis son necesarias para obtener \snstar \bound{a'} y \snstar \bound{b'} a partir de cada uno de los dos pasos de reducción de congruencia.
@@ -408,7 +408,7 @@ Luego, se utiliza la hipótesis inductiva en \func{adecuacy} sobre $a$ y $b$ par
 
 \ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-pair}
 
-\paragraph{Caso proyección}
+\subsubsection{Caso proyección}
 
 El caso de la proyección también requiere como hipótesis que se cumpla el predicado para el término que se está proyectando.
 Los pasos de reducción \const{β-π₁} y \const{β-π₂} implican que $t$ tiene forma $\langle a, b \rangle$, estos requieren obtener \snstar \bound{a} y \snstar \bound{b} respectivamente.
@@ -419,7 +419,7 @@ La interpretación de un par $\langle a, b \rangle$ tiene forma \snstar\bound{a}
 \ExecuteMetaData[code/strong_norm_base.tex]{lemma-proj}
 \ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-proj}
 
-\paragraph{Caso aplicación}
+\subsubsection{Caso aplicación}
 
 Este caso es similar al producto, ya que la hipótesis del lema requiere que el predicado se cumpla para ambos sub-términos.
 Por otro lado, la solución para el caso de la $\beta$-reducción es similar al caso de la proyección, puesto que se utiliza la interpretación de la abstracción.
@@ -439,14 +439,14 @@ Notar como los conjuntos adecuados permiten resolver los casos de eliminación (
 Esta construcción es simple para los productos, puesto que se puede deducir de forma directa aplicando la hipótesis inductiva en \func{adecuacy}.	
 Sin embargo, como se verá más adelante, obtener la interpretación correspondiente al caso de las abstracciones, resulta particularmente complejo.
 
-\paragraph{Caso isomorfismo}
+\subsubsection{Caso isomorfismo}
 
 Este caso no presenta mayores dificultades. Sin embargo, la mayor parte de la complejidad para la extensión de la prueba a Sistema-I, se encuentra al añadir todos los constructores de isomorfismos de términos a este lema.
 
 \ExecuteMetaData[code/strong_norm_base.tex]{lemma-iso}
 \ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-iso}
 
-\paragraph{Caso abstracción}
+\subsubsection{Caso abstracción}
 
 La prueba del lema para el caso de la abstracción requiere obtener la interpretación \cand{ \const{ƛ} \bound{t'} } en la llamada inductiva.
 Para ello es necesario definir un nuevo lema que permite conjugar un paso de reducción con cualquier substitución.
@@ -505,7 +505,7 @@ en una sola substitución y demostrar que aplicar dicha combinación es equivale
 
 %\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy}
 
-\paragraph{Cierre de la prueba}
+\subsubsection{Cierre de la prueba}
 
 Finalmente, se prueba la propiedad de normalización fuerte instanciando \func{adecuacy} con la substitución identidad.
 
@@ -712,7 +712,7 @@ El resto de isomorfismos se omiten, ya que se resuelven aplicando las mismas té
 
 %\ExecuteMetaData[code/strong_norm.tex]{iso-cong-lam2}
 
-\subsection{Observaciones}
+%\subsection{Observaciones}
 % Capitulo 5.6 como referencia
 % https://www.ps.uni-saarland.de/~schaefer/thesis/draft-screen.pdf
 
@@ -730,7 +730,7 @@ Aquí la llamada recursiva elimina un constructor \const{sn} del segundo argumen
 De esta forma, Agda puede garantizar que la función alcanzará un caso base y la recursión concluirá.
 
 \begin{example}
-	asd
+	~\newline
 	\ExecuteMetaData[code/example.tex]{eval}
 \end{example}
 
