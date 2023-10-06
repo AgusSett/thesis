@@ -113,11 +113,11 @@ Además, se añade la definición de una nueva regla de tipado llamada $(\equiv)
 	\\
 	\begin{prooftree}
 		\hypo{\Gamma, x:A \vdash r:B}
-		\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x.r : A \Rightarrow B }
+		\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x.r : A \rightarrow B }
 	\end{prooftree}
 	\quad
 	\begin{prooftree}
-		\hypo{\Gamma \vdash \lambda x.r : A \Rightarrow B}
+		\hypo{\Gamma \vdash \lambda x.r : A \rightarrow B}
 		\hypo{\Gamma \vdash s:A}
 		\infer2[($\Rightarrow_e$)]{ \Gamma \vdash rs : B }
 	\end{prooftree}
@@ -143,8 +143,8 @@ A continuación se presentan los cuatro isomorfismos que pertenecen a dicho conj
 	\begin{align*}
 		A \times B &\equiv B \times A \tag{\textsc{comm}} \\
 		A \times (B \times C) &\equiv (A \times B) \times C \tag{\textsc{asso}} \\
-		(A \times B) \Rightarrow C &\equiv A \Rightarrow (B \Rightarrow C) \tag{\textsc{dist}} \\
-		A \Rightarrow (B \times C) &\equiv (A \Rightarrow B) \times (A \Rightarrow C) \tag{\textsc{curry}}
+		(A \times B) \rightarrow C &\equiv A \rightarrow (B \rightarrow C) \tag{\textsc{dist}} \\
+		A \rightarrow (B \times C) &\equiv (A \rightarrow B) \times (A \rightarrow C) \tag{\textsc{curry}}
 	\end{align*}
 	
 	\caption{Isomorfismos de tipo en Sistema I}
@@ -154,11 +154,11 @@ La regla $(\equiv)$ permite emplear términos $r:A$ en cualquier lugar que se ne
 
 \begin{prooftree*}
 	\hypo{ \Gamma\vdash r: A }
-	\infer1[($\Rightarrow_i$)]{ \Gamma\vdash \lambda x.r: C \Rightarrow A }
+	\infer1[($\Rightarrow_i$)]{ \Gamma\vdash \lambda x.r: C \rightarrow A }
 	\hypo{ \Gamma\vdash s: B }
-	\infer1[($\Rightarrow_i$)]{ \Gamma\vdash \lambda x.s: C \Rightarrow B }
-	\infer2[($\times_i$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle : (C \Rightarrow A) \times (C \Rightarrow B) }
-	\infer1[($\equiv$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle : C \Rightarrow (A \times B) }
+	\infer1[($\Rightarrow_i$)]{ \Gamma\vdash \lambda x.s: C \rightarrow B }
+	\infer2[($\times_i$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle : (C \rightarrow A) \times (C \rightarrow B) }
+	\infer1[($\equiv$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle : C \rightarrow (A \times B) }
 	\hypo{ \Gamma\vdash t: C }
 	\infer2[($\Rightarrow_e$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle \; t : A \times B }
 \end{prooftree*}
@@ -172,7 +172,7 @@ Por ejemplo, es necesario definir la siguiente equivalencia de términos $\langl
 \begin{align*}
 	& \langle \lambda x.r, \lambda x.s \rangle \; t \\
 	\rightleftarrows& \\
-	& (\lambda x^A. \langle r, s \rangle) t \\
+	& (\lambda x^A. \langle r, s \rangle)\; t \\
 	\hookrightarrow& \\
 	& \langle r[t/x], s[t/x] \rangle
 \end{align*}
@@ -238,8 +238,13 @@ La solución es indexar el elemento a través de su tipo, por lo que se define u
 Una consecuencia importante es que esta regla introduce no determinismo en el cálculo.
 Si $r$ y $s$ tienen tipo $A$, entonces $\pi_A \langle r, s \rangle$ puede reducir indistintamente a cualesquiera de los dos términos.
 Sin embargo, es posible codificar una proyección determinista incluso cuando ambos términos son del mismo tipo, por ejemplo, el par $\langle r, s \rangle: A \times A$
-se codifica como $\langle \lambda x^\mathbb{X}.r, \lambda x^\mathbb{Y}.s \rangle : \mathbb{X} \Rightarrow A \times \mathbb{Y} \Rightarrow A$.
-Y la proyección $\pi_1 \langle r, s \rangle$ se codifica como $(\pi_{\mathbb{X} \Rightarrow A} \langle \lambda x^\mathbb{X}.r, \lambda x^\mathbb{Y}.s \rangle) y^\mathbb{X}$, donde $\mathbb{X}$ y $\mathbb{Y}$ son dos tipos distintos, y $y^\mathbb{X}$ es cualquier elemento de tipo $\mathbb{X}$.
+se codifica como:
+\[ \langle \lambda x^\mathbb{X}.r, \lambda x^\mathbb{Y}.s \rangle : \mathbb{X} \rightarrow A \times \mathbb{Y} \rightarrow A \]
+
+Y la proyección $\pi_1 \langle r, s \rangle$ se codifica como:
+\[ (\pi_{\mathbb{X} \rightarrow A} \langle \lambda x^\mathbb{X}.r, \lambda x^\mathbb{Y}.s \rangle)\; y^\mathbb{X} \]
+
+Donde $\mathbb{X}$ y $\mathbb{Y}$ son dos tipos distintos, y $y^\mathbb{X}$ es cualquier elemento de tipo $\mathbb{X}$.
 De forma análoga se puede codificar $\pi_2$.
 
 
@@ -258,7 +263,7 @@ Por último se define la relación de reducción módulo isomorfismos:
 Donde $r \rightsquigarrow s \iff r \rightleftarrows^* r' \hookrightarrow s' \rightleftarrows^* s$. Es decir, que primero los términos son transformados a una forma equivalente donde sea posible aplicar las eliminaciones, y luego se aplican las $\beta$-reducciones y proyecciones.
 
 \subsubsection{Ejemplo}
-El término $\lambda x^A . \lambda y^B . \langle x,y \rangle$ tiene tipo $A \rightarrow B \rightarrow A \times B$, luego aplicando los isomorfismos \textsc{dist} y \textsc{curry} se obtiene el tipo $((A \times B) \rightarrow A) \times ((A \times B) \rightarrow B)$
+El término $\lambda x^A . \lambda y^B . \langle x,y \rangle$ tiene tipo $A \rightarrow B \rightarrow A \times B$ aplicando los isomorfismos \textsc{dist} y \textsc{curry} se obtiene el tipo $((A \times B) \rightarrow A) \times ((A \times B) \rightarrow B)$
 
 \begin{align*}
 	&A \rightarrow B \rightarrow A \times B \\
@@ -275,17 +280,17 @@ A continuación se detalla la forma correcta de reducir dicho término:
 
 {\allowdisplaybreaks
 \begin{align*}
-	&\pi_{(A \times B) \rightarrow A}(\lambda x^A . \lambda y^B . \langle x,y \rangle) \langle s,t \rangle \\
+	&\pi_{(A \times B) \rightarrow A}(\lambda x^A . \lambda y^B . \langle x,y \rangle)\, \langle s,t \rangle \\
 	\rightleftarrows&_{\textsc{dist}_\lambda} \\
-	&\pi_{(A \times B) \rightarrow A}(\lambda x^A. \langle \lambda y^B.x, \lambda y^B.y \rangle) \langle s,t \rangle \\
+	&\pi_{(A \times B) \rightarrow A}(\lambda x^A. \langle \lambda y^B.x, \lambda y^B.y \rangle)\, \langle s,t \rangle \\
 	\rightleftarrows&_{\textsc{dist}_\lambda} \\
-	&\pi_{(A \times B) \rightarrow A}(\langle \lambda x^A.\lambda y^B.x, \lambda x^A.\lambda y^B.y \rangle) \langle s,t \rangle \\
+	&\pi_{(A \times B) \rightarrow A}(\langle \lambda x^A.\lambda y^B.x, \lambda x^A.\lambda y^B.y \rangle)\, \langle s,t \rangle \\
 	\hookrightarrow&_\pi \\
-	&(\lambda x^A.\lambda y^B.x) \langle s,t \rangle \\
-	\rightleftarrows&_{\textsc{cury}} \\
-	&(\lambda x^A.\lambda y^B.x) s t \\
+	&(\lambda x^A.\lambda y^B.x)\, \langle s,t \rangle \\
+	\rightleftarrows&_{\textsc{curry}} \\
+	&(\lambda x^A.\lambda y^B.x)\, s \, t \\
 	\hookrightarrow&_\beta \\
-	&(\lambda y^B.s) t \\
+	&(\lambda y^B.s)\, t \\
 	\hookrightarrow&_\beta \\
 	s
 \end{align*}
@@ -318,7 +323,7 @@ Donde $FTV_c(\Gamma)$ es el conjunto de variables de tipo libres en el contexto 
 Los isomorfismos de carácter axiomático que se considerarán en este sistema son los siguientes:
 
 \begin{align*}
-	\forall X.(A \Rightarrow B) &\equiv A \Rightarrow \forall X.B \tag{\textsc{p-comm}} \\
+	\forall X.(A \rightarrow B) &\equiv A \rightarrow \forall X.B \tag{\textsc{p-comm}} \\
 	\forall X.(A \times B) &\equiv \forall X.A \times \forall X.B \tag{\textsc{p-dist}}
 \end{align*}
 
@@ -327,47 +332,47 @@ Dado un isomorfismo de tipos con dos constructores involucrados, se construyen t
 Para cualquier par de conectivas, tenemos cuatro posibles formas de combinar sus reglas de tipado: introducción-introducción, introducción-eliminación, eliminación-introducción, y eliminación-eliminación.
 Cada una induce una equivalencia, y cada lado de la equivalencia estará dado por el orden en que se apliquen las conectivas.
 
-Por ejemplo, el isomorfismo $A \Rightarrow (B \times C) \equiv (A \Rightarrow B) \times (A \Rightarrow C)$ emplea los conectores $\Rightarrow$ y $\times$, SIP incluye solamente dos de las cuatro equivalencias:
+Por ejemplo, el isomorfismo $A \rightarrow (B \times C) \equiv (A \rightarrow B) \times (A \rightarrow C)$ emplea los conectores $\rightarrow$ y $\times$, SIP incluye solamente dos de las cuatro equivalencias:
 
 \begin{itemize}
-	\item Introducción de $\Rightarrow$ e introducción de $\times$: $\lambda x.\langle r,s \rangle \rightleftarrows \langle \lambda x.r, \lambda x.s \rangle$
+	\item Introducción de $\rightarrow$ e introducción de $\times$: $\lambda x.\langle r,s \rangle \rightleftarrows \langle \lambda x.r, \lambda x.s \rangle$
 	
 	\begin{center}
 		\begin{prooftree}
 			\hypo{\Gamma, x:A \vdash r:B}
 			\hypo{\Gamma, x:A \vdash s:C}
 			\infer2[($\times_i$)]{ \Gamma, x:A \vdash \langle r, s \rangle : B \times C }
-			\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x. \langle r, s \rangle : A \Rightarrow B \times C }
+			\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x. \langle r, s \rangle : A \rightarrow B \times C }
 		\end{prooftree}
 		\\
 		\vspace{1em}
 		\begin{prooftree}
 			\hypo{\Gamma, x:A \vdash r:B}
-			\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x.r : A \Rightarrow B }
+			\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x.r : A \rightarrow B }
 			\hypo{\Gamma, x:A \vdash s:C}
-			\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x.s : A \Rightarrow C }
-			\infer2[($\times_i$)]{ \Gamma \vdash \langle \lambda x.r, \lambda x.s \rangle : (A \Rightarrow B) \times (A \Rightarrow C) }
-			\infer1[($\equiv$)]{ \Gamma \vdash \langle \lambda x.r, \lambda x.s \rangle : A \Rightarrow (B \times C) }
+			\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x.s : A \rightarrow C }
+			\infer2[($\times_i$)]{ \Gamma \vdash \langle \lambda x.r, \lambda x.s \rangle : (A \rightarrow B) \times (A \rightarrow C) }
+			\infer1[($\equiv$)]{ \Gamma \vdash \langle \lambda x.r, \lambda x.s \rangle : A \rightarrow (B \times C) }
 		\end{prooftree}
 	\end{center}
 	
-	\item Eliminación de $\Rightarrow$ e introducción de $\times$: $\langle r,s \rangle t \rightleftarrows \langle rt, st \rangle$
+	\item Eliminación de $\rightarrow$ e introducción de $\times$: $\langle r,s \rangle t \rightleftarrows \langle rt, st \rangle$
 	
 	\begin{center}
 		\begin{prooftree}
-			\hypo{\Gamma \vdash r: A \Rightarrow B}
-			\hypo{\Gamma \vdash s: A \Rightarrow C}
-			\infer2[($\times_i$)]{ \Gamma \vdash \langle r, s \rangle : (A \Rightarrow B) \times (A \Rightarrow C) }
-			\infer1[($\equiv$)]{ \Gamma \vdash \langle r, s \rangle : A \Rightarrow (B \times C) }
+			\hypo{\Gamma \vdash r: A \rightarrow B}
+			\hypo{\Gamma \vdash s: A \rightarrow C}
+			\infer2[($\times_i$)]{ \Gamma \vdash \langle r, s \rangle : (A \rightarrow B) \times (A \rightarrow C) }
+			\infer1[($\equiv$)]{ \Gamma \vdash \langle r, s \rangle : A \rightarrow (B \times C) }
 			\hypo{\Gamma \vdash t: A}
 			\infer2[($\Rightarrow_e$)]{ \Gamma \vdash \langle r, s \rangle t : B \times C }
 		\end{prooftree}
 		\\
 		\vspace{1em}
 		\begin{prooftree}
-			\hypo{\Gamma \vdash r: A \Rightarrow B} \hypo{\Gamma \vdash t: A}
+			\hypo{\Gamma \vdash r: A \rightarrow B} \hypo{\Gamma \vdash t: A}
 			\infer2[($\Rightarrow_e$)]{ \Gamma \vdash rt : B }
-			\hypo{\Gamma \vdash s: A \Rightarrow C} \hypo{\Gamma \vdash t: A}
+			\hypo{\Gamma \vdash s: A \rightarrow C} \hypo{\Gamma \vdash t: A}
 			\infer2[($\Rightarrow_e$)]{ \Gamma \vdash st : C }
 			\infer2[($\times_i$)]{ \Gamma \vdash \langle rt, st \rangle :  B \times C }
 		\end{prooftree}
@@ -379,7 +384,7 @@ Por ejemplo, el isomorfismo $A \Rightarrow (B \times C) \equiv (A \Rightarrow B)
 $\lambda^+$ \cite{lambda-plus} es una implementación en Haskell de una extensión que agrega naturales y recursión general a Sistema I.
 Este trabajo muestra las dificultades de implementar un sistema de tipos módulo isomorfismos y las aplicaciones prácticas de un lenguaje de programación con dichas capacidades.
 Por ejemplo, utilizando los isomorfismos \textsc{curry} y \textsc{comm} es posible aplicar una función a sus argumentos dados en cualquier orden e incluso aplicar la función a solo un subconjunto de  argumentos.
-La idea es convertir todos los argumentos a pares utilizando \textsc{curry}, y luego reordenarlos empleando conmutatividad y asociatividad de los pares:
+La idea es convertir todos los argumentos en forma de pares utilizando \textsc{curry}, y luego reordenarlos empleando conmutatividad y asociatividad de los pares:
 \begin{align*}
 	R \rightarrow S \rightarrow T& \equiv_\textsc{curry} \\
 	(R \times S) \rightarrow T& \equiv_\textsc{comm} \\
@@ -387,25 +392,24 @@ La idea es convertir todos los argumentos a pares utilizando \textsc{curry}, y l
 	S \rightarrow R \rightarrow T& 
 \end{align*}
 
-Un detalle interesante es la adición de una nueva regla llamada $\textsc{split}$ que no surge de ningún isomorfismo, sino que es necesaria para reducir términos que de otra forma quedarían atascados.
+Un detalle interesante de este sistema, es la adición de una nueva regla llamada $\textsc{split}$ que no surge de ningún isomorfismo, sino que es necesaria para reducir términos que de otra forma quedarían atascados.
 Esta regla relaciona términos de la forma
 $\pi_{R \times S}(\langle r,s \rangle) \rightleftarrows \langle \pi_R(r), \pi_S(s) \rangle$
 y permite desatascar proyecciones donde el argumento es una abstracción más algún otro término.
-Por ejemplo:
+Por ejemplo, dados los términos $\lambda x^{R \times S}.x: (R \times S) \rightarrow (R \times S)$ y $t : T$ y aplicando las reglas \textsc{dist} y \textsc{asso} se puede obtener un par $\langle \lambda x^{R \times S}.x, t \rangle: ((R \times S) \rightarrow R) \times (((R \times S) \rightarrow S) \times T)$ a continuación se muestra como emplear la regla \textsc{split} para reducir una proyección:
 
 \begin{align*}
-	& \pi_{((R \times S) \Rightarrow S) \times T } \langle \lambda x^{R \times S}.x, t \rangle \\
+	& \pi_{((R \times S) \rightarrow S) \times T } \langle \lambda x^{R \times S}.x, t \rangle \\
 	\rightleftarrows& \\
-	& \langle \pi_{(R \times S) \Rightarrow S}(\lambda x^{R \times S}.x), \pi_T(t) \rangle \\
+	& \langle \pi_{(R \times S) \rightarrow S}(\lambda x^{R \times S}.x), \pi_T(t) \rangle \\
 	\hookrightarrow& \\
-	& \langle \pi_{(R \times S) \Rightarrow S}(\lambda x^{R \times S}.x), t \rangle \\
+	& \langle \pi_{(R \times S) \rightarrow S}(\lambda x^{R \times S}.x), t \rangle \\
 	\rightleftarrows& \\
 	& \langle \lambda x^{R \times S}. \pi_S(x) , t \rangle \\
 \end{align*}
 
 Esto muestra que desde el punto de vista de la implementación, puede ser necesario agregar nuevas equivalencias de términos para lograr reducir a una forma normal.
-% explicar que introduce el split, es necesario agregar o eliminar isos para lograr la reduccion 
-
+Este punto es importante, ya que la formalización de la propiedad de progreso implica demostrar que es posible reducir todas las eliminaciones hasta llegar a una forma normal, en simples palabras, el conjunto de equivalencias de términos es lo suficientemente grande como para desatascar cualquier término que pueda presentarse.
 	
 \section{Tipos dependientes}
 
@@ -437,7 +441,7 @@ Notar que el tipo de $zeroesV$ es dependiente e introduce una variable.
 Si bien la implementación dada para $zeroesL$ es correcta, nada impediría simplemente retornar \verb|[]| en todos los casos, por el contrario, en el caso \verb|(suc n)| de $zeroesV$ se estaría cometiendo un error de tipo si se tratara de retornar \verb|[]|, ya que se espera un término de tipo \verb|Vec| $\mathbb{N}$ \verb|(suc n)| y la lista vacía tiene tipo \verb|Vec| $\mathbb{N}$ \verb|0|.
 De cierta forma el tipo de las funciones está guiando su implementación, impidiendo, en este caso, retornar un vector de largo incorrecto.
 
-Otro ejemplo interesante que se logra con la programación con tipos dependientes es el operador de indexación. Sobre listas este operador se define como:
+Otro ejemplo interesante que se logra con la programación con tipos dependientes es el operador de indexación. Sobre las listas, este operador se define como:
 
 \begin{lstlisting}[mathescape, language=Haskell]
 	_!!_ :: List a -> $\mathbb{N}$ -> Maybe a
@@ -486,7 +490,7 @@ La inclusión de tipos dependientes, es decir, construcciones que permiten a los
 Si se incluyen estas tres dependencias, es decir, términos que dependen de términos o tipos y tipos que dependen de términos, se obtiene el cálculo lambda dependiente de segundo orden ($\lambda\Pi 2$).
 
 Notar como cada dependencia es, en cierta forma, ortogonal a las demás, y cada cálculo obtenido a medida que se añaden dependencias, es un superconjunto de los cálculos anteriores, es decir, se obtienen generalizaciones cada vez más grandes.
-Se pueden visualizar las distintas dimensiones utilizando el cubo lambda \cite{lambda_cube}:
+Se pueden visualizar las distintas dimensiones en las que es posible moverse hacia un cálculo más general utilizando un diagrama llamado ``cubo lambda'' \cite{lambda_cube}:
 
 \begin{figure}[H]
 	\centering
@@ -601,7 +605,7 @@ Por este motivo, no todas las funciones recursivas están permitidas, Agda pose�
 
 % TODO: Explicar simbolos, opperadores y Sets (universos)
 
-\section{Indices de DeBruijn}
+\section{Indices de De Bruijn}
 Generalmente, los términos en cálculo lambda se presentan utilizando letras para nombrar las variables, por ejemplo:
 \[ \lambda z. (\lambda y. y (\lambda x. x)) (\lambda x. z x) \]
 Esta forma de representación permite ver a simple vista cuáles variables están ligadas y a qué abstracción pertenecen, también suelen utilizarse palabras para dar nombres más descriptivos a las variables.
@@ -613,7 +617,7 @@ En el siguiente ejemplo la variable $x$ es renombrada a $z$ para evitar la captu
 \[ (\lambda y. (\lambda x. x y)) x \hookrightarrow_{\beta} (\lambda x. x y)[y := x] = \lambda z. z x \]
 
 Utilizar variables con nombres hace que la implementación se vuelva más engorrosa e ineficiente.
-Una alternativa más adecuada es la representación de DeBruijn \cite{debrujin_index}, que reemplaza los nombres por números naturales llamados \textit{índices de DeBruijn}.
+Una alternativa más adecuada es la representación de De Bruijn \cite{debrujin_index}, que reemplaza los nombres por números naturales llamados \textit{índices de De Bruijn}.
 Por ejemplo, la forma de escribir el término del primer ejemplo con índices es la siguiente:
 
 \[ \textcolor{red}{\lambda} (\textcolor{blue}{\lambda\; 0} \; (\textcolor{orange}{\lambda\; 0})) (\textcolor{green}{\lambda}\; \textcolor{red}{1} \; \textcolor{green}{0}) \]
@@ -621,49 +625,49 @@ Por ejemplo, la forma de escribir el término del primer ejemplo con índices es
 Los índices indican cuantas abstracciones se deben ``saltar'' para llegar a la que está ligando la variable.
 Los nombres de las ligaduras ya no son necesarios, por lo que la escritura se simplifica.
 Además, los términos tienen una única representación, es decir, no es necesario tener en cuenta las $\alpha$-equivalencias.
-
+A nivel implementación, esta representación facilita la manipulación de términos, en especial, cuando se implementa la $\beta$-reducción.
 
 \section{Substituciones explícitas}
-Utilizando la representación de DeBruijn, las sustituciones son simplemente mapas de números naturales a términos, es decir que pueden interpretarse como una secuencia infinita de términos.
+Utilizando la representación de De Bruijn, las sustituciones son simplemente mapas de números naturales a términos, es decir que pueden interpretarse como una secuencia infinita de términos.
 Por ejemplo:
-\[ (0\; 1\; 3)\{0\mapsto a, 1\mapsto b, i+2\mapsto i\} \rightarrow a\; b\; 1 \]
+\[ (0\; 1\; 3)\{0\mapsto a, 1\mapsto b, 2\mapsto 0, 3\mapsto 1, \dots \} \rightarrow a\; b\; 1 \]
 
 Si se quisiera definir la $\beta$-reducción utilizando esta notación, una primera definición sería:
 
-\[ (\lambda a)b \rightarrow_{\beta} a \{ 0 \mapsto b, i+1\mapsto i+1 \} \]
+\[ (\lambda a)b \rightarrow_{\beta} a \{ 0 \mapsto b, 1\mapsto 1, 2\mapsto 2, \dots \} \]
 
 El problema es que al eliminar un $\lambda$ todas las variables libres de $a$ quedarán desfasadas, por lo que se les debe restar uno:
 
-\[ (\lambda a)b \rightarrow_{\beta} a \{ 0 \mapsto b, i+1\mapsto i \} \]
+\[ (\lambda a)b \rightarrow_{\beta} a \{ 0 \mapsto b, 1\mapsto 0, 2\mapsto 1, \dots \} \]
 
 El siguiente problema surge al intentar empujar la substitución dentro de una abstracción, en dicho caso, se debe evitar reemplazar el índice 0 por $b$, por lo que toda la secuencia se mueve un lugar a la derecha:
 
-\[ (\lambda c)\{ 0 \mapsto b, i+1\mapsto i \} = \lambda c \{ 0 \mapsto 0, 1 \mapsto b, i+2\mapsto i+1 \} \]
+\[ (\lambda c)\{ 0 \mapsto b, i+1\mapsto i \} = \lambda c \{ 0 \mapsto 0, 1 \mapsto b, 2\mapsto 1, 3\mapsto 2, \dots \} \]
 
 Un último problema puede presentarse si $b$ tiene variables libres, para evitar que estas sean capturadas por el $\lambda$ de $c$ se les debe sumar uno:
-\[ (\lambda c)\{ 0 \mapsto b, i+1\mapsto i \} = \lambda c \{ 0 \mapsto 0, 1 \mapsto b \{ i \mapsto i+1 \}, i+2\mapsto i+1 \} \]
+\[ (\lambda c)\{ 0 \mapsto b, i+1\mapsto i \} = \lambda c \{ 0 \mapsto 0, 1 \mapsto b \{ 0\mapsto 1, 1\mapsto 2, \dots \}, 2\mapsto 1, 3\mapsto 2, \dots \} \]
 
 El siguiente ejemplo muestra la forma correcta de realizar una $\beta$ reducción:
 
 \[
-(\textcolor{red}{\lambda}\; \lambda\; \textcolor{orange}{3}\; \textcolor{red}{1}\; (\textcolor{green}{\lambda\; 0}\; \textcolor{red}{2}))\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{4}\; \textcolor{blue}{0})
+(\textcolor{red}{\lambda}\; \lambda\; \textcolor{magenta}{3}\; \textcolor{red}{1}\; (\textcolor{green}{\lambda\; 0}\; \textcolor{red}{2}))\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{4}\; \textcolor{blue}{0})
 \hookrightarrow_\beta
-\lambda \; \textcolor{orange}{2} \; (\textcolor{blue}{\lambda}\; \textcolor{orange}{5}\; \textcolor{blue}{0})\; (\textcolor{green}{\lambda\; 0}\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{6}\; \textcolor{blue}{0}))\;
+\lambda \; \textcolor{magenta}{2} \; (\textcolor{blue}{\lambda}\; \textcolor{orange}{5}\; \textcolor{blue}{0})\; (\textcolor{green}{\lambda\; 0}\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{6}\; \textcolor{blue}{0}))\;
 \]
 
 Notar como las variables libres del cuerpo de la abstracción se disminuyen en uno, las variables libres del argumento aumentan en uno por cada $\lambda$ que atraviesan, y las variables ligadas quedan intactas.
 
 
-En \cite{explicit_subs} se presenta el álgebra $\sigma$ y los cuatro operadores que permiten construir estas secuencias.
+En \cite{explicit_subs} se presenta el álgebra-$\sigma$ y los cuatro operadores que permiten construir estas secuencias.
 
 \begin{itemize}
 	\item $id$ es la substitución identidad $\{i \mapsto i\}$.
 	\item $\uparrow$ es el operador shift, y suma uno a cada índice $\{i \mapsto i+1\}$.
-	\item $a \bullet s$ es la concatenación del término $a$ a la substitución $s$, $\{0 \mapsto a, i+1 \mapsto s(i)\}$. Por ejemplo $a \bullet id = \{ 0 \mapsto a, 1 \mapsto 0, 2 \mapsto 1, 3 \mapsto 2, \dots \} $
-	\item $s \circ t$ corresponde a la composición de substituciones, donde primero se aplica $s$ y luego $t$.
+	\item $a \bullet s$ es la concatenación del término $a$ con la substitución $s$, $\{0 \mapsto a, i+1 \mapsto s(i)\}$. Por ejemplo $a \bullet id = \{ 0 \mapsto a, 1 \mapsto 0, 2 \mapsto 1, 3 \mapsto 2, \dots \} = \{ 0 \mapsto a, i+1 \mapsto i \} $
+	\item $s \circ t$ corresponde a la composición de substituciones, donde primero se aplica $s$ y luego $t$ $\{ i \mapsto \llangle t \rrangle (s(i)) \}$.
 \end{itemize}
 
-Dada una substitución $s$, se escribe $\llangle s \rrangle a$ para denotar la aplicación de la substitución sobre el término $a$.
+Dada una substitución $s$, se escribe $\llangle s \rrangle a$ para denotar la aplicación de la substitución $s$ sobre el término $a$.
 \begin{align*}
 	\llangle s \rrangle n &= s(n) \\
 	\llangle s \rrangle (a\; b) &= \llangle s \rrangle a\; \llangle s \rrangle b \\

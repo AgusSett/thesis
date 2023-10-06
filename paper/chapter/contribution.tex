@@ -17,7 +17,6 @@
 \subsection{Tipos intrínsecos}
 
 Existen dos enfoques fundamentales para la introducción de sistemas de tipos en el cálculo lambda.
-
 Por un lado, se pueden definir primero los términos y luego los tipos, por lo tanto, los términos existen independientemente de los tipos y tienen significado por sí solos.
 Tiene sentido entonces definir el subconjunto de términos para los cuales existe alguna derivación de tipos, a este subconjunto se lo denomina términos ``bien tipados''.
 De hecho, para un término dado pueden existir más de un tipo posible, por ejemplo, la función identidad $\lambda x.x$ puede ser tipada como $A \rightarrow A$ o como $B \rightarrow B$.
@@ -31,7 +30,7 @@ En cierta forma, los términos y las reglas de tipado están entrelazados.
 Aquí, las derivaciones de tipos son únicas, puesto que los términos $\lambda x^A.x$ y $\lambda x^B.x$ se consideran distintos.
 A este enfoque se lo denomina ``tipos a la Church''.
 
-Reynolds\cite{reynolds_1998} acuñó las expresiones \textit{tipos intrínsecos} y \textit{tipos extrínsecos} para referirse a cada uno de estos dos enfoques.
+Reynolds \cite{reynolds_1998} acuñó las expresiones \textit{tipos intrínsecos} y \textit{tipos extrínsecos} para referirse a cada uno de estos dos enfoques.
 
 \subsection{Cálculo lambda con pares y tipo Top}
 
@@ -77,7 +76,9 @@ A continuación se presentan los juicios de tipado, debido a que se utilizan tip
 
 Notar que el constructor \const{$[\_]\equiv\_$} corresponde a la regla de tipado $(\equiv)$ de Sistema I.
 En el constructor \const{$\pi$} se observa otro detalle importante, además de tomar como argumento el tipo \bound{C}, toma un argumento implícito que funciona como evidencia de que el tipo \bound{C} es o bien igual al tipo \bound{A}, o bien igual al tipo \bound{B}.
-Para ello se utilizan el tipo suma \type{$\_\uplus\_$} y la igualdad proposicional \type{$\_\cong\_$} que están definidos en la librería estándar de Agda.
+Para ello se utilizan el tipo suma \type{$\_\uplus\_$} definido en el módulo \AgdaModule{Data.Sum} y la igualdad proposicional \type{$\_\cong\_$} definida en el módulo \AgdaModule{Relation.Binary.PropositionalEquality}.
+Estos dos tipos forman parte de la librería estándar de Agda.
+Generalmente, se utiliza el símbolo $(\equiv)$ para denotar la igualdad proposicional, pero en ese caso, ese símbolo se utilizará para definir los isomorfismos de tipos, por lo tanto, se renombra el operador de la igualdad al símbolo $(\cong)$
 
 \begin{example}
 	Construcción de términos
@@ -235,7 +236,7 @@ Donde $var$ son las variables y la categoría sintáctica $neu$ caracteriza a la
 	\ExecuteMetaData[code/progress.tex]{normal}
 \end{codigo}
 
-Notar como las definiciones de \const{$\Uparrow$} y \const{$\Downarrow$} son mutuamente recursivas.
+Notar como las definiciones de \type{$\Uparrow$} y \type{$\Downarrow$} son mutuamente recursivas.
 
 Se puede observar que en la definición de las formas neutrales, el único constructor que no es recursivo es el de las variables.
 Es decir que, para poder construir una forma neutral, necesariamente se debe utilizar el caso base de la variable al menos una vez.
@@ -353,8 +354,8 @@ El objetivo final de esta sección será entonces, definir una función que dado
 
 La prueba aquí presentada está basada y extendida a partir de una formalización realizada por 
 Andras Kovacs\footnote{\citeurl{Kovacs}} para cálculo lambda simplemente tipado.
-A su vez, el trabajo de Kovacs se basa en la tesis de Steven Schäfer\cite{Schafer}, donde se formaliza la prueba de normalización fuerte para Sistema-F en Coq.
-La técnica utilizada por Schäfer difiere en ciertos aspectos con la prueba de candidatos de reducibilidad de Girard\cite{Girard}.
+A su vez, el trabajo de Kovacs se basa en la tesis de Steven Schäfer \cite{Schafer}, donde se formaliza la prueba de normalización fuerte para Sistema-F en Coq.
+La técnica utilizada por Schäfer difiere en ciertos aspectos con la prueba de candidatos de reducibilidad de Girard \cite{Girard}.
 Además, se utilizó como referencia una formalización de candidatos de reducibilidad en Agda realizada por Pablo Barenbaum\footnote{\citeurl{Barenbaum}}.
 
 \subsection{Prueba para STLC con pares y Top}
@@ -742,15 +743,15 @@ Una vez demostrada la propiedad de normalización fuerte, se puede definir la fu
 \end{codigo}
 
 Notar que ya no aparece \type{Maybe} en el tipo de retorno, puesto que se ha probado que toda reducción eventualmente concluye.
-Aquí la llamada recursiva elimina un constructor \const{sn} del segundo argumento, por lo tanto, dicho argumento se hace estructuralmente más pequeño en cada llamada recursiva.
-De esta forma, Agda puede garantizar que la función alcanzará un caso base y la recursión concluirá.
+Aquí la llamada recursiva elimina un constructor \const{sn} del segundo argumento, por lo tanto, dicho argumento se hace estructuralmente más pequeño en cada llamada.
+De esta forma, Agda puede garantizar que la función alcanzará un caso base y la recursión concluirá eventualmente.
 
 \begin{example}
 	~\newline
 	\ExecuteMetaData[code/example.tex]{eval}
 \end{example}
 
-La forma en la que se codifica la propiedad de normalización fuerte, y el hecho de que sea justamente esta propiedad la que nos permite realizar inducción sobre $\rightsquigarrow$, no son casualidad.
+La forma en la que se codifica la propiedad de normalización fuerte, y el hecho de que sea justamente esta propiedad la que nos permite realizar inducción sobre la relación $\rightsquigarrow$, no son casualidad.
 Para entender los fundamentos que se esconden detrás de estas observaciones se presentan las siguientes definiciones.
 
 En teoría del orden, se dice que una relación está bien fundada cuando todas sus cadenas, de la forma $x_1 < x_2 < \dots < x_n$, tienen un largo acotado.
@@ -762,7 +763,7 @@ Esta propiedad se denomina accesibilidad de un elemento.
 \end{codigo}
 
 Un elemento $x: A$ es accesible, si todo elemento $y < x$ es también accesible.
-Luego, una relación es bien fundada si todo elemento es accesible.
+Luego, una relación está bien fundada si todo elemento es accesible.
 
 \begin{codigo}
 	Relación bien fundada

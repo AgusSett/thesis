@@ -1,5 +1,33 @@
 %<*SN>
 \begin{code}%
+	\>[0]\AgdaOperator{\AgdaFunction{\AgdaUnderscore{}⇝\AgdaUnderscore{}}}\AgdaSpace{}%
+	\AgdaSymbol{:}\AgdaSpace{}%
+	\AgdaSymbol{∀}\AgdaSpace{}%
+	\AgdaSymbol{\{}\AgdaBound{Γ}\AgdaSpace{}%
+	\AgdaBound{A}\AgdaSymbol{\}}\AgdaSpace{}%
+	\AgdaSymbol{→}\AgdaSpace{}%
+	\AgdaSymbol{(}\AgdaBound{t}\AgdaSpace{}%
+	\AgdaBound{t'}\AgdaSpace{}%
+	\AgdaSymbol{:}\AgdaSpace{}%
+	\AgdaBound{Γ}\AgdaSpace{}%
+	\AgdaOperator{\AgdaDatatype{⊢}}\AgdaSpace{}%
+	\AgdaBound{A}\AgdaSymbol{)}\AgdaSpace{}%
+	\AgdaSymbol{→}\AgdaSpace{}%
+	\AgdaPrimitive{Set}\<%
+	\\
+	\>[0]\AgdaBound{t}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{⇝}}\AgdaSpace{}%
+	\AgdaBound{t'}\AgdaSpace{}%
+	\AgdaSymbol{=}\AgdaSpace{}%
+	\AgdaBound{t}\AgdaSpace{}%
+	\AgdaOperator{\AgdaDatatype{↪}}\AgdaSpace{}%
+	\AgdaBound{t'}\AgdaSpace{}%
+	\AgdaOperator{\AgdaDatatype{⊎}}\AgdaSpace{}%
+	\AgdaBound{t}\AgdaSpace{}%
+	\AgdaOperator{\AgdaDatatype{⇄}}\AgdaSpace{}%
+	\AgdaBound{t'}\<%
+	\\
+	\\[\AgdaEmptyExtraSkip]%
 	\>[0]\AgdaKeyword{data}\AgdaSpace{}%
 	\AgdaDatatype{SN}\AgdaSpace{}%
 	\AgdaSymbol{\{}\AgdaBound{Γ}\AgdaSpace{}%
@@ -20,11 +48,7 @@
 	\AgdaSymbol{\{}\AgdaBound{t'}\AgdaSymbol{\}}\AgdaSpace{}%
 	\AgdaSymbol{→}\AgdaSpace{}%
 	\AgdaBound{t}\AgdaSpace{}%
-	\AgdaOperator{\AgdaDatatype{↪}}\AgdaSpace{}%
-	\AgdaBound{t'}\AgdaSpace{}%
-	\AgdaOperator{\AgdaDatatype{⊎}}\AgdaSpace{}%
-	\AgdaBound{t}\AgdaSpace{}%
-	\AgdaOperator{\AgdaDatatype{⇄}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaDatatype{⇝}}\AgdaSpace{}%
 	\AgdaBound{t'}\AgdaSpace{}%
 	\AgdaSymbol{→}\AgdaSpace{}%
 	\AgdaDatatype{SN}\AgdaSpace{}%
@@ -67,11 +91,7 @@
 	\AgdaSymbol{\{}\AgdaBound{t'}\AgdaSymbol{\}}\AgdaSpace{}%
 	\AgdaSymbol{→}\AgdaSpace{}%
 	\AgdaBound{t}\AgdaSpace{}%
-	\AgdaOperator{\AgdaDatatype{↪}}\AgdaSpace{}%
-	\AgdaBound{t'}\AgdaSpace{}%
-	\AgdaOperator{\AgdaDatatype{⊎}}\AgdaSpace{}%
-	\AgdaBound{t}\AgdaSpace{}%
-	\AgdaOperator{\AgdaDatatype{⇄}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaDatatype{⇝}}\AgdaSpace{}%
 	\AgdaBound{t'}\AgdaSpace{}%
 	\AgdaSymbol{→}\AgdaSpace{}%
 	\AgdaDatatype{SN*}\AgdaSpace{}%
@@ -497,15 +517,7 @@
 	\AgdaOperator{\AgdaInductiveConstructor{,}}\AgdaSpace{}%
 	\AgdaBound{b}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{⟩}}\AgdaSpace{}%
-	\AgdaOperator{\AgdaDatatype{↪}}\AgdaSpace{}%
-	\AgdaBound{t'}\AgdaSpace{}%
-	\AgdaOperator{\AgdaDatatype{⊎}}\AgdaSpace{}%
-	\AgdaOperator{\AgdaInductiveConstructor{⟨}}\AgdaSpace{}%
-	\AgdaBound{a}\AgdaSpace{}%
-	\AgdaOperator{\AgdaInductiveConstructor{,}}\AgdaSpace{}%
-	\AgdaBound{b}\AgdaSpace{}%
-	\AgdaOperator{\AgdaInductiveConstructor{⟩}}\AgdaSpace{}%
-	\AgdaOperator{\AgdaDatatype{⇄}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaDatatype{⇝}}\AgdaSpace{}%
 	\AgdaBound{t'}\AgdaSpace{}%
 	\AgdaSymbol{→}\AgdaSpace{}%
 	\AgdaDatatype{SN*}\AgdaSpace{}%
@@ -654,14 +666,7 @@
 	\AgdaBound{C}\AgdaSpace{}%
 	\AgdaSymbol{\{}\AgdaBound{p}\AgdaSymbol{\}}\AgdaSpace{}%
 	\AgdaBound{t}\AgdaSymbol{)}\AgdaSpace{}%
-	\AgdaOperator{\AgdaDatatype{↪}}\AgdaSpace{}%
-	\AgdaBound{t'}\AgdaSpace{}%
-	\AgdaOperator{\AgdaDatatype{⊎}}\AgdaSpace{}%
-	\AgdaInductiveConstructor{π}\AgdaSpace{}%
-	\AgdaBound{C}\AgdaSpace{}%
-	\AgdaSymbol{\{}\AgdaBound{p}\AgdaSymbol{\}}\AgdaSpace{}%
-	\AgdaBound{t}\AgdaSpace{}%
-	\AgdaOperator{\AgdaDatatype{⇄}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaDatatype{⇝}}\AgdaSpace{}%
 	\AgdaBound{t'}\AgdaSpace{}%
 	\AgdaSymbol{→}\AgdaSpace{}%
 	\AgdaDatatype{SN*}\AgdaSpace{}%
@@ -817,13 +822,7 @@
 	\AgdaBound{a}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{·}}\AgdaSpace{}%
 	\AgdaBound{b}\AgdaSpace{}%
-	\AgdaOperator{\AgdaDatatype{↪}}\AgdaSpace{}%
-	\AgdaBound{t'}\AgdaSpace{}%
-	\AgdaOperator{\AgdaDatatype{⊎}}\AgdaSpace{}%
-	\AgdaBound{a}\AgdaSpace{}%
-	\AgdaOperator{\AgdaInductiveConstructor{·}}\AgdaSpace{}%
-	\AgdaBound{b}\AgdaSpace{}%
-	\AgdaOperator{\AgdaDatatype{⇄}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaDatatype{⇝}}\AgdaSpace{}%
 	\AgdaBound{t'}\AgdaSpace{}%
 	\AgdaSymbol{→}\AgdaSpace{}%
 	\AgdaDatatype{SN*}\AgdaSpace{}%
@@ -1654,14 +1653,7 @@
 			\AgdaBound{iso}\AgdaSpace{}%
 			\AgdaOperator{\AgdaInductiveConstructor{]≡}}\AgdaSpace{}%
 			\AgdaBound{t}\AgdaSymbol{)}\AgdaSpace{}%
-			\AgdaOperator{\AgdaDatatype{↪}}\AgdaSpace{}%
-			\AgdaBound{t'}\AgdaSpace{}%
-			\AgdaOperator{\AgdaDatatype{⊎}}\AgdaSpace{}%
-			\AgdaSymbol{(}\AgdaOperator{\AgdaInductiveConstructor{[}}\AgdaSpace{}%
-			\AgdaBound{iso}\AgdaSpace{}%
-			\AgdaOperator{\AgdaInductiveConstructor{]≡}}\AgdaSpace{}%
-			\AgdaBound{t}\AgdaSymbol{)}\AgdaSpace{}%
-			\AgdaOperator{\AgdaDatatype{⇄}}\AgdaSpace{}%
+			\AgdaOperator{\AgdaDatatype{⇝}}\AgdaSpace{}%
 			\AgdaBound{t'}\AgdaSpace{}%
 			\AgdaSymbol{→}\AgdaSpace{}%
 			\AgdaDatatype{SN*}\AgdaSpace{}%
