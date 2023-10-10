@@ -13,11 +13,11 @@ Además, es importante destacar que debido a que este trabajo posee el formato d
 \subsection{Inferencia de tipos}
 
 La construcción de un término en Sistema I, no solo implica dar su derivación de tipo, sino también construir isomorfismos a través de las reglas de congruencia.
-Este proceso puede volverse engorroso cuando se trabaja con términos grandes.
+Este proceso puede volverse engorroso cuando se trabaja con términos de tamaño considerable.
 
 En la práctica, por ejemplo cuando se programa en Haskell, solo se dan anotaciones de tipo a los términos de nivel superior y luego el \textit{type checker} del lenguaje puede inferir el resto de los tipos.
 
-En el libro \citetitle{plfa} \cite{plfa} se presenta una formalización de la inferencia bidireccional de tipos, allí se implementa un algoritmo que a partir de simples anotaciones de tipo, retorna toda la derivación de tipos de un término, o un error en caso de que el término esté mal formado.
+En el libro \citetitle{plfa} \cite{plfa} se presenta una formalización de inferencia bidireccional de tipos, allí se implementa un algoritmo que a partir de simples anotaciones de tipo, retorna la derivación de tipos completa para un término dado, o un error en caso de que el término esté mal formado.
 Debido al paradigma de Proposiciones como Tipos, la formalización de este algoritmo funciona también como una prueba de que el tipado de términos en Sistema I es decidible.
 
 \subsection{Formalización SIP}

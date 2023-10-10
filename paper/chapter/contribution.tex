@@ -259,16 +259,53 @@ Se define una nueva relación \type{Progress}, que representa los tres posibles 
 	\ExecuteMetaData[code/progress.tex]{progress-type}
 \end{codigo}
 
-\begin{codigo}
-	Prueba de la propiedad de progreso
-	\ExecuteMetaData[code/progress.tex]{progress}
-\end{codigo}
+Luego, la prueba de progreso consiste en probar la propiedad \type{Progress} se cumple para todo término dado.
+
+En primer lugar, se presentan los casos para las variables y el término \const{$\star$}, donde simplemente se concluye que ambos se encuentran en formal normal.
+
+\ExecuteMetaData[code/progress.tex]{progress-base}
+
+Para el caso de la abstracción, se realiza una llamada recursiva de \func{progress} sobre el cuerpo de la función, en caso de que esta nueva llamada retorne un paso, entonces se extiende dicho paso usando la congruencia \const{$\zeta$}.
+En otro caso, se retorna que la abstracción está en forma normal.
+
+\ExecuteMetaData[code/progress.tex]{progress-lam}
+
+Para los pares se sigue un razonamiento análogo con la diferencia de que se realizan dos llamadas recursivas, una por cada lado del par.
+Primero se realizan todos los pasos que sean posibles sobre el lado izquierdo, y luego sobre el lado derecho.
+
+\ExecuteMetaData[code/progress.tex]{progress-prod}
+
+Notar que las evidencias retornadas por las llamadas recursivas que indican que \bound{N} y \bound{M} están en forma normal, son utilizadas para probar que todo el par se encuentra en formal normal \const{N-$\langle$}~\bound{NN}~\const{,}~\bound{NM}~\const{$\rangle$}.
+
+Para las proyecciones se reduce primero el término que se está proyectando.
+Aquí se debe notar que existen dos posibles formas en las que la llamada recursiva puede alcanzar una forma normal.
+Por un lado, podría llegar a una forma neutral, en cuyo caso toda la proyección es neutral.
+Por otro lado, podría alcanzar un par en formal normal, en cuyo caso es posible proyectar dicho par.
+
+\ExecuteMetaData[code/progress.tex]{progress-proj}
+
+La aplicación sigue la misma lógica, solo que en este caso se reduce primero la función y luego el argumento, cuando ambos términos llegan a una forma normal, se aplica la $\beta$-reducción.
+Sin embargo, si la función se encuentra en formal neutral, entonces no es posible realizar la aplicación, pro lo que todo el término será neutral.
+
+\ExecuteMetaData[code/progress.tex]{progress-app}
+
+Por último se presenta el constructor \const{[}~\bound{iso}~\const{]≡}~\bound{N}.
+Al igual que en el resto de los casos, primero se reduce el subtérmino \bound{N}.
+Luego, para cada forma normal se deben tener en cuentas todos los isomorfismos que sean aplicables en cada caso.
+
+Notar como solo es posible aplicar \const{step⇄ asso} cuando el elemento de la derecha es un par.
+En caso de que dicho elemento esté en forma neutral, es necesario convertilo a un par aplicando la regla $r \rightleftarrows \langle \pi_A (r), \pi_B(r) \rangle$ antes de poder aplicar \const{asso}.
+Por este motivo se añade el isomorfismo \const{asso-split} que combina ambas reglas en un solo paso.
+Lo mismo ocurre con el resto de los isomorfismos que presentan los sufijos \const{split} y \const{$\eta$}.
+
+Finalmente, si el término \bound{N} es neutral, se concluye que todo el término también es neutral.
+
+\ExecuteMetaData[code/progress.tex]{progress-iso}
 
 La definición de \func{progress} muestra claramente como cada isomorfismo de término se corresponde con un caso donde es necesario eliminar una regla $(\equiv)$ para poder continuar con la reducción.
 En la formalización, el lenguaje es dirigido por sintaxis.
 Cuando se representan los términos usando tipos intrínsecos, la sintaxis del lenguaje contiene los isomorfismos de tipos.
 Por lo tanto, tiene sentido que la aplicación de los isomorfismos de términos también sea dirigida por sintaxis.
-% TODO: ver si esto tiene sentido
 
 Otra observación interesante es que gracias a la dualidad entre pruebas y programas que propone el paradigma de proposiciones como tipos, implementar y demostrar resultan ser la misma tarea.
 Por lo tanto, la prueba \func{progress} es también un programa, que al ser aplicado sobre un término retorna el siguiente paso de reducción correspondiente a dicho término.
