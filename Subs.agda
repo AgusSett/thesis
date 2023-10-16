@@ -1,6 +1,7 @@
 module Subs where
 
 open import Term
+open import Function.Base using (_∘_)
 
 Rename : Context → Context → Set
 Rename Γ Δ = ∀{A} → Γ ∋ A → Δ ∋ A
@@ -20,7 +21,7 @@ _•_ : ∀{Γ Δ A} → (Δ ⊢ A) → Subst Γ Δ → Subst (Γ , A) Δ
 
 ext : ∀ {Γ Δ A}
   → Rename Γ Δ
-    ---------------------------------
+    -----------------------
   → Rename (Γ , A) (Δ , A)
 ext ρ Z      =  Z
 ext ρ (S x)  =  S (ρ x)
@@ -41,11 +42,9 @@ rename ρ ([ iso ]≡ N)   =  [ iso ]≡ rename ρ N
 
 exts : ∀ {Γ Δ A}
   → Subst Γ Δ
-    ---------------------------------
+    ----------------------
   → Subst (Γ , A) (Δ , A)
---exts σ Z      =  ` Z
---exts σ (S x)  =  rename S_ (σ x)
-exts σ = ` Z • λ x → rename S_ (σ x)
+exts σ = ` Z • rename S_ ∘ σ
 
 subst : ∀ {Γ Δ} → Subst Γ Δ → (∀ {C} → Γ ⊢ C → Δ ⊢ C)
 subst σ (` k)          =  σ k
@@ -72,24 +71,23 @@ _,*_ : Context → Context → Context
 Γ ,* (Δ , A) = (Γ ,* Δ) , A
 
 ext* : ∀ {Γ Δ Σ} → Rename Γ Δ → Rename (Γ ,* Σ) (Δ ,* Σ)
-ext* {Σ = ∅}     ρ = ρ
+ext* {Σ = ∅}    ρ = ρ
 ext* {Σ = _ , _} ρ = ext (ext* ρ)
 
 exts* : ∀ {Γ Δ Σ} → Subst Γ Δ → Subst (Γ ,* Σ) (Δ ,* Σ)
-exts* {Σ = ∅}     σ = σ
+exts* {Σ = ∅}    σ = σ
 exts* {Σ = _ , _} σ = exts (exts* σ)
 
 
 open import Relation.Binary.PropositionalEquality using (_≡_; cong; cong₂; refl; sym; trans)
 open Relation.Binary.PropositionalEquality.≡-Reasoning using (begin_; step-≡; step-≡˘; _∎)
-open import Function.Base using (_∘_)
 
 ------------------------------------------------------------------------
 -- ⟪ ids ⟫ N ≡ N
 ------------------------------------------------------------------------
 
 sub-id-var : ∀{Γ Σ} {A} {v : Γ ,* Σ ∋ A} → exts* {Σ = Σ} ids v ≡ ` v
-sub-id-var {Σ = ∅} {v = v}       = refl
+sub-id-var {Σ = ∅} {v = v}      = refl
 sub-id-var {Σ = Σ , _} {v = Z}   = refl
 sub-id-var {Σ = Σ , _} {v = S v} = cong (rename S_) (sub-id-var {Σ = Σ} {v = v})
 
@@ -108,9 +106,9 @@ sub-id {Σ = Σ} {N = [ iso ]≡ N} = cong ([ iso ]≡_) (sub-id {Σ = Σ} {N = 
 
 Z-weaken-var : ∀{Γ Σ A B}{v : (Γ , B) ,* Σ ∋ A}
     → exts* (` Z • ids ∘ S_) v ≡ ` v
-Z-weaken-var {Σ = ∅} {v = Z} = refl
-Z-weaken-var {Σ = ∅} {v = S v} = refl
-Z-weaken-var {Σ = _ , _} {v = Z} = refl
+Z-weaken-var {Σ = ∅} {v = Z}      = refl
+Z-weaken-var {Σ = ∅} {v = S v}    = refl
+Z-weaken-var {Σ = _ , _} {v = Z}   = refl
 Z-weaken-var {Σ = _ , _} {v = S v} = cong (rename S_) (Z-weaken-var {v = v})
 
 Z-weaken : ∀{Γ Σ A B}{N : (Γ , B) ,* Σ ⊢ A}
@@ -150,7 +148,7 @@ rename-subst-ids {N = [ iso ]≡ n} {ρ = ρ} = cong ([ iso ]≡_) (rename-subst
 
 subst-weaken-var : ∀{Γ Δ Σ A B}{v : Γ ,* Σ ∋ A}{M : Δ ⊢ B}{σ : Subst Γ Δ}
     → exts* (M • σ) ((ext* S_) v) ≡ exts* σ v
-subst-weaken-var {Σ = ∅} {v = v}               = refl
+subst-weaken-var {Σ = ∅} {v = v}              = refl
 subst-weaken-var {Σ = Σ , _} {v = Z}           = refl
 subst-weaken-var {Σ = Σ , _} {v = S v} {σ = σ} = cong (rename S_) (subst-weaken-var {v = v} {σ = σ})
 
@@ -170,7 +168,7 @@ subst-weaken {N = [ iso ]≡ n} {σ = σ} = cong ([ iso ]≡_) (subst-weaken {N 
 
 rename-shift-weaken-var : ∀{Γ Δ Σ A B}{v : Γ ,* Σ ∋ A}{ρ : Rename Γ Δ}
     → ext* (ext ρ) (ext* {Σ = Σ} (S_ {A = B}) v) ≡ ext* S_ (ext* ρ v)
-rename-shift-weaken-var {Σ = ∅}               = refl
+rename-shift-weaken-var {Σ = ∅}              = refl
 rename-shift-weaken-var {Σ = Σ , _} {v = Z}   = refl
 rename-shift-weaken-var {Σ = Σ , _} {v = S v} = cong S_ (rename-shift-weaken-var {v = v})
 
@@ -190,7 +188,7 @@ rename-shift-weaken {N = [ iso ]≡ N} {ρ = ρ} = cong ([ iso ]≡_) (rename-sh
 
 subst-shift-weaken-var : ∀{Γ Δ Σ A B}{v : Γ ,* Σ ∋ A}{σ : Subst Γ Δ}
     → exts* (exts σ) (ext* {Σ = Σ} (S_ {A = B}) v) ≡ rename (ext* (S_)) (exts* σ v)
-subst-shift-weaken-var {Σ = ∅}                       = refl
+subst-shift-weaken-var {Σ = ∅}                      = refl
 subst-shift-weaken-var {Σ = Σ , _} {v = Z}           = refl
 subst-shift-weaken-var {Σ = Σ , _} {v = S v} {σ = σ} =
   begin
@@ -215,8 +213,8 @@ subst-shift-weaken {N = [ iso ]≡ N} {σ = σ} = cong ([ iso ]≡_) (subst-shif
 
 subst-split-var : ∀{Γ Δ Δ₁ Σ A B}{v : (Γ , A) ,* Σ ∋ B}{M : Δ₁ ⊢ A}{σ : Subst Γ Δ}{ρ : Rename Δ Δ₁}
     → exts* (M • (⟪ ids ∘ ρ ⟫ ∘ σ)) v ≡ ⟪ exts* (M • (ids ∘ ρ)) ⟫ (exts* (exts σ) v)
-subst-split-var {Σ = ∅} {v = Z}                               = refl
-subst-split-var {Σ = ∅} {v = S v} {σ = σ} {ρ = ρ}             = sym (subst-weaken {N = σ v} {σ = ids ∘ ρ})
+subst-split-var {Σ = ∅} {v = Z}                              = refl
+subst-split-var {Σ = ∅} {v = S v} {σ = σ} {ρ = ρ}            = sym (subst-weaken {N = σ v} {σ = ids ∘ ρ})
 subst-split-var {Σ = Σ , _} {v = Z}                           = refl
 subst-split-var {Σ = Σ , _} {v = S v} {M = M} {σ = σ} {ρ = ρ} =
   begin
@@ -241,8 +239,8 @@ subst-split {N = [ iso ]≡ N} {σ = σ} {ρ = ρ} = cong ([ iso ]≡_) (subst-s
 
 rename-subst-var : ∀{Γ Δ Δ′ Σ A B}{v : (Γ , B) ,* Σ ∋ A}{N : Δ′ ⊢ B}{ρ : Rename Γ Δ}{σ : Subst Δ Δ′}
     → exts* (N • σ) (ext* (ext ρ) v) ≡ exts* (N • (σ ∘ ρ)) v
-rename-subst-var {Σ = ∅} {v = Z}       = refl
-rename-subst-var {Σ = ∅} {v = S v}     = refl
+rename-subst-var {Σ = ∅} {v = Z}      = refl
+rename-subst-var {Σ = ∅} {v = S v}    = refl
 rename-subst-var {Σ = Σ , _} {v = Z}   = refl
 rename-subst-var {Σ = Σ , _} {v = S v} = cong (rename S_) (rename-subst-var {v = v})
 
@@ -262,8 +260,8 @@ rename-subst {M = [ iso ]≡ n} {ρ = ρ} {σ = σ} = cong ([ iso ]≡_) (rename
 
 rename-subst-commute-var : ∀{Γ Δ Σ A B}{v : (Γ , A) ,* Σ ∋ B}{M : Γ ⊢ A}{ρ : Rename Γ Δ}
     → rename (ext* ρ) (exts* (M • ids) v) ≡ exts* ((rename ρ M) • ids) ((ext* (ext ρ) v))
-rename-subst-commute-var {Σ = ∅} {v = Z}                       = refl
-rename-subst-commute-var {Σ = ∅} {v = S v}                     = refl
+rename-subst-commute-var {Σ = ∅} {v = Z}                      = refl
+rename-subst-commute-var {Σ = ∅} {v = S v}                    = refl
 rename-subst-commute-var {Σ = Σ , _} {v = Z}                   = refl
 rename-subst-commute-var {Σ = Σ , _} {v = S v} {M = M} {ρ = ρ} =
   begin
@@ -363,7 +361,7 @@ subst-cong⇒₁-commute {N = [ iso ]≡ N} {σ = σ} = cong ([ iso ]≡_) (subs
 
 rename-split-var : ∀{Γ Σ A B C}{v : Γ ,* Σ ∋ A}
     → (ext* {Σ = Σ} (S_ {A = C}) (ext* (S_ {A = B}) v)) ≡ (ext* (λ x → S (S x)) v)
-rename-split-var {Σ = ∅}                 = refl
+rename-split-var {Σ = ∅}                = refl
 rename-split-var {Σ = _ , _} {v =  Z}    = refl
 rename-split-var {Σ = _ , _} {v = (S v)} = cong S_ (rename-split-var {v = v})
 
@@ -463,8 +461,8 @@ subst-curryη-commute {B = B} {N = N} {σ = σ}
 
 exts-ext-var : ∀ {Γ Δ Σ}{A B}{v : (Γ , B) ,* Σ ∋ A}{ρ : Rename Γ Δ}
         → ` ((ext* (ext ρ)) v) ≡ exts* (exts (ids ∘ ρ)) v
-exts-ext-var {Σ = ∅} {v = Z}       = refl
-exts-ext-var {Σ = ∅} {v = S v}     = refl
+exts-ext-var {Σ = ∅} {v = Z}      = refl
+exts-ext-var {Σ = ∅} {v = S v}    = refl
 exts-ext-var {Σ = _ , _} {v = Z}   = refl
 exts-ext-var {Σ = _ , _} {v = S v} = cong (rename S_) (exts-ext-var {v = v})
 
