@@ -17,7 +17,7 @@ infix  9 `_
 
 
 data Context : Set where
-  ∅   : Context
+  ∅  : Context
   _,_ : Context → Type → Context
 
 data _∋_ : Context → Type → Set where
@@ -44,7 +44,7 @@ data _⊢_ : Context → Type → Set where
 
   -- ≡
 
-  [_]≡_ : ∀ {Γ A B} → A ≡ B → Γ ⊢ A → Γ ⊢ B -- (1) This rule constructs "unstable" terms
+  [_]≡_ : ∀ {Γ A B} → A ≡ B → Γ ⊢ A → Γ ⊢ B
 
   -- functions
 
@@ -79,13 +79,13 @@ data Value : ∀ {Γ A} → Γ ⊢ A → Set where
   -- functions
 
   V-ƛ : ∀ {Γ A B} {N : Γ , A ⊢ B}
-      ---------------------------
+      ------------
     → Value (ƛ N)
   
   -- unit
 
   V-⋆ : ∀ {Γ}
-      ---------------------------
+      --------------
     → Value (⋆ {Γ})
 
   -- products
@@ -104,46 +104,44 @@ data ⇑ : ∀ {Γ A} → Γ ⊢ A → Set
 data ⇓ where
 
   `_  : ∀ {Γ A} (x : Γ ∋ A)
-      -------------
+      --------
     → ⇓ (` x)
 
   _·_  : ∀ {Γ A B} {L : Γ ⊢ A ⇒ B} {M : Γ ⊢ A}
     → ⇓ L → ⇑ M
-      ---------------
+      ----------
     → ⇓ (L · M)
   
   π : ∀ {Γ A B C p} {L : Γ ⊢ A × B}
     → ⇓ L
-      ---------------
+      --------------
     → ⇓ (π C {p} L)
   
   [_]≡_ : ∀ {Γ A B} {N : Γ ⊢ A}
     → (iso : A ≡ B)
     → ⇓ N
-      ------------------
+      ---------------
     → ⇓ ([ iso ]≡ N)
 
--- Normal M = ∀ {N} → ¬ (M ⇝ N)
+-- Normal M = ¬∃ N / M ⇝ N
 data ⇑ where
 
   ^_ : ∀ {Γ A} {M : Γ ⊢ A}
     → ⇓ M
-      ---------
+      ----
     → ⇑ M
 
   N-ƛ : ∀ {Γ A B} {N : Γ , A ⊢ B}
-    → {⇑ N}
-      ------------
+      --------
     → ⇑ (ƛ N)
   
-  ⟨_,_⟩ : ∀ {Γ A B} {V : Γ ⊢ A} {W : Γ ⊢ B}
-    → ⇑ V
-    → ⇑ W
-      ----------------
+  N-⟨_,_⟩ : ∀ {Γ A B} {V : Γ ⊢ A} {W : Γ ⊢ B}
+    → ⇑ V → ⇑ W
+      ------------
     → ⇑ ⟨ V , W ⟩
   
   N-⋆ : ∀ {Γ}
-      ---------------------------
+      ----------
     → ⇑ (⋆ {Γ})
 
 open import Data.Empty using (⊥-elim)
@@ -160,5 +158,5 @@ closed→¬⇓ (π _ x)    = λ { (π ⇓x) → closed→¬⇓ x ⇓x }
 closed⇑→Value : ∀ {A} → {N : ∅ ⊢ A} → ⇑ N → Value N
 closed⇑→Value N-⋆            = V-⋆
 closed⇑→Value N-ƛ            = V-ƛ
-closed⇑→Value ⟨ a , b ⟩      = V-⟨ closed⇑→Value a , closed⇑→Value b ⟩
+closed⇑→Value N-⟨ a , b ⟩    = V-⟨ closed⇑→Value a , closed⇑→Value b ⟩
 closed⇑→Value {N = N} (^ ⇓N) = ⊥-elim (closed→¬⇓ N ⇓N)

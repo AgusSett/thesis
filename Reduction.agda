@@ -10,6 +10,7 @@ open import Relation.Binary.PropositionalEquality using (cong₂; sym; refl)
 infixr 2 _↪_
 
 data _↪_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
+
   -- functions
 
   ξ-·₁ : ∀ {Γ A B} {L L' : Γ ⊢ A ⇒ B} {M : Γ ⊢ A}
@@ -18,27 +19,28 @@ data _↪_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
     → L · M ↪ L' · M
 
   ξ-·₂ : ∀ {Γ A B} {V : Γ ⊢ A ⇒ B} {M M' : Γ ⊢ A}
---    → Value V
     → M ↪ M'
       ---------------
     → V · M ↪ V · M'
 
   β-ƛ : ∀ {Γ A B} {N : Γ , A ⊢ B} {V : Γ ⊢ A}
---    → Value V
       --------------------
     → (ƛ N) · V ↪ N [ V ]
+  
+  ζ : ∀ {Γ A B} {L L' : Γ , B ⊢ A}
+    → L ↪ L'
+    → ƛ L ↪ ƛ L'
 
   -- products
 
   ξ-⟨,⟩₁ : ∀ {Γ A B} {M M' : Γ ⊢ A} {N : Γ ⊢ B}
     → M ↪ M'
-      -------------------------
+      -----------------------
     → ⟨ M , N ⟩ ↪ ⟨ M' , N ⟩
 
   ξ-⟨,⟩₂ : ∀ {Γ A B} {V : Γ ⊢ A} {N N' : Γ ⊢ B}
---    → Value V
     → N ↪ N'
-      -------------------------
+      -----------------------
     → ⟨ V , N ⟩ ↪ ⟨ V , N' ⟩
 
   ξ-π : ∀ {Γ A B C p} {L L' : Γ ⊢ A × B}
@@ -47,31 +49,25 @@ data _↪_ : ∀ {Γ A} → (Γ ⊢ A) → (Γ ⊢ A) → Set where
     → π C {p} L ↪ π C {p} L'
 
   β-π₁ : ∀ {Γ A B} {V : Γ ⊢ A} {W : Γ ⊢ B}
---    → Value V
---    → Value W
-      ----------------------
+      ------------------------------
     → π A {inj₁ refl} ⟨ V , W ⟩ ↪ V
 
   β-π₂ : ∀ {Γ A B} {V : Γ ⊢ A} {W : Γ ⊢ B}
---    → Value V
---    → Value W
-      ----------------------
+      ------------------------------
     → π B {inj₂ refl} ⟨ V , W ⟩ ↪ W
+
+  -- iso
 
   ξ-≡ : ∀ {Γ A B} {N : Γ ⊢ A} {N' : Γ ⊢ A} {iso : A ≡ B}
     → N ↪ N'
     → [ iso ]≡ N ↪ [ iso ]≡ N'
-  
-  ζ : ∀ {Γ A B} {L L' : Γ , B ⊢ A}
-    → L ↪ L'
-    → ƛ L ↪ ƛ L'
 
 
 ↪[] : ∀ {Γ Δ A}{t t' : Γ ⊢ A}{σ : Subst Γ Δ} → t ↪ t' → subst σ t ↪ subst σ t'
 ↪[] (ξ-·₁ step) = ξ-·₁ (↪[] step)
 ↪[] (ξ-·₂ step) = ξ-·₂ (↪[] step)
 ↪[] {σ = σ} (β-ƛ {N = N} {V = V})
-  rewrite cong₂ (_↪_) {x = (ƛ subst (exts σ) N) · (subst σ V)} refl (sym (subst-commute {Σ = ∅} {N = N} {M = V} {σ = σ}))
+  rewrite (sym (subst-commute {Σ = ∅} {N = N} {M = V} {σ = σ}))
     = β-ƛ
 ↪[] (ζ step) = ζ (↪[] step)
 ↪[] (ξ-⟨,⟩₁ step) = ξ-⟨,⟩₁ (↪[] step)

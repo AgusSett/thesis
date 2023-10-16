@@ -3,6 +3,7 @@ module StrongNorm where
 open import Function.Base using (_∘_; case_of_)
 open import Relation.Binary.PropositionalEquality using (_≡_; cong; cong₂; refl; sym; trans) renaming (subst to transport)
 open import Data.Product using (∃; proj₁; proj₂) renaming (_,_ to ﹙_,_﹚; _×_ to _⊗_)
+open import Data.Unit using (tt) renaming (⊤ to Top)
 open import Data.Sum
 
 open import Term
@@ -11,53 +12,36 @@ open import Reduction
 open import IsoTerm
 open import Subs
 
+infixr 2 _⇝_
+
+_⇝_ : ∀ {Γ A} → (t t' : Γ ⊢ A) → Set
+t ⇝ t' = t ↪ t' ⊎ t ⇄ t'
+
+-- Strongly normalizing terms
 
 data SN {Γ A} (t : Γ ⊢ A) : Set where
-  sn : (∀ {t'} → t ↪ t' ⊎ t ⇄ t' → SN t') → SN t
+  sn : (∀ {t'} → t ⇝ t' → SN t') → SN t
 
--- Esta definicion es igual a SN pero se agrega una propiedad P que se debe cumplir para t.
 
 data SN* {Γ A} (P : Γ ⊢ A → Set) (t : Γ ⊢ A) : Set where
-  sn* : P t → (∀ {t'} → t ↪ t' ⊎ t ⇄ t' → SN* P t') → SN* P t
+  sn* : P t → (∀ {t'} → t ⇝ t' → SN* P t') → SN* P t
 
 
-open import Data.Unit using (tt) renaming (⊤ to Top)
+SN*-SN : ∀ {Γ A P} {t : Γ ⊢ A} → SN* P t → SN t
+SN*-SN (sn* Lt SNt) = sn (λ step → SN*-SN (SNt step))
 
-{-
-  Esta es la propiedad que vamos a usar en SN*
-  La principal diferencia con la prueba de reducibility candidates es que predica sobre terminos en lugar
-  de tipos y ademas tenemos
-    ∀ u → ⟦ u ⟧ → ⟦ t [ u ] ⟧
-  en lugar de
-    ∀ u → ⟦ u ⟧ → ⟦ t · u ⟧
-
-  Otra particularidad es aparece un rename ρ, ∀ ρ u → ⟦ u ⟧ → ⟦ (rename ρ t) [ u ] ⟧
-  esto es necesario para poder hacer la prueba de Γ ⊨ σ → (Γ , A) ⊨ (exts σ), es decir,
-  la extensión de una substitución adecuada también es una substitución adecuada.
--}
+-- Term interpretation
 
 ⟦_⟧ : ∀ {Γ A} → Γ ⊢ A → Set
-⟦ (ƛ t) ⟧ = ∀ {Δ}{ρ : Rename _ Δ}{u} → SN* ⟦_⟧ u → SN* ⟦_⟧ (⟪ u • (ids ∘ ρ) ⟫ t)
+⟦ (ƛ t) ⟧     = ∀ {Δ}{ρ : Rename _ Δ}{u} → SN* ⟦_⟧ u → SN* ⟦_⟧ (⟪ u • (ids ∘ ρ) ⟫ t)
 ⟦ ⟨ a , b ⟩ ⟧ = SN* ⟦_⟧ a ⊗ SN* ⟦_⟧ b
-⟦ t ⟧ = Top
+⟦ t ⟧         = Top
 
--- Definición de las substituciónes adecuadas
 
 _⊨_ : ∀{Δ} → (Γ : Context) → (σ : Subst Γ Δ) → Set
 Γ ⊨ σ = ∀{A} (v : Γ ∋ A) → SN* ⟦_⟧ (σ {A} v)
 
 
-SN*-SN : ∀ {Γ A} {t : Γ ⊢ A} → SN* ⟦_⟧ t → SN t
-SN*-SN (sn* Lt SNt) = sn (λ step → SN*-SN (SNt step))
-
-{-
-  Todo esto es necesario para probar ⊨exts
-  El Rename ρ que aparecia en ⟦_⟧ es necesario para probar ⟦⟧-rename, ya que como ocurre en varias partes de
-  la prueba, estamos obligados a probar una generalización para poder destrabar algún caso.
-
-  ⊨exts va a ser necesario porque en adequacy (ƛ n) necesitamos SN n, en reducibility candidates no es necesario
-  esto ya que usa 'atom' en ∀ u → ⟦ u ⟧ → ⟦ t [ u ] ⟧ para cerrar el termino t.
--}
 
 rename↪ : ∀ {Γ Δ A}{t : Γ ⊢ A}{σ : Rename Γ Δ}{t'} → (rename σ t) ↪ t' → ∃ λ t'' → (t ↪ t'') ⊗ (rename σ t'' ≡ t')
 rename↪ {t = ƛ t} (ζ step) with rename↪ step
@@ -105,9 +89,9 @@ SN*-rename ρ (sn* Lt SNt) =
 ⊨exts σ (S v) = SN*-rename S_ (σ v)
 
 ⊨rename : ∀{Γ Δ Δ₁} {σ : Subst Γ Δ} → Γ ⊨ σ → (ρ : Rename Δ Δ₁) → Γ ⊨ (⟪ ids ∘ ρ ⟫ ∘ σ)
-⊨rename {σ = σ} Lσ ρ v rewrite cong (SN* ⟦_⟧) (rename-subst-ids {Σ = ∅} {N = σ v} {ρ = ρ}) = SN*-rename ρ (Lσ v)
+⊨rename {σ = σ} ⊨σ ρ v rewrite cong (SN* ⟦_⟧) (rename-subst-ids {Σ = ∅} {N = σ v} {ρ = ρ}) = SN*-rename ρ (⊨σ v)
 
--------
+
 
 ↪SN* : ∀ {Γ A}{t t' : Γ ⊢ A} → t ↪ t' → SN* ⟦_⟧ t → SN* ⟦_⟧ t'
 ↪SN* step (sn* _ SNt) = SNt (inj₁ step)
@@ -122,7 +106,7 @@ lemma-ƛ {t = t} Lƛ (sn* _ SNt) =
 
 lemma-⟨,⟩ : ∀ {Γ A B} → {a : Γ ⊢ A} {b : Γ ⊢ B} → SN* ⟦_⟧ a → SN* ⟦_⟧ b → SN* ⟦_⟧ (⟨ a , b ⟩)
 lemma-⟨,⟩ SN*a SN*b = sn* ﹙ SN*a , SN*b ﹚ λ step → aux SN*a SN*b step
-  where aux : ∀ {Γ A B} {a : Γ ⊢ A} {b : Γ ⊢ B} {t' : Γ ⊢ A × B} → SN* ⟦_⟧ a → SN* ⟦_⟧ b → ⟨ a , b ⟩ ↪ t' ⊎ ⟨ a , b ⟩ ⇄ t' → SN* ⟦_⟧ t'
+  where aux : ∀ {Γ A B} {a : Γ ⊢ A} {b : Γ ⊢ B} {t' : Γ ⊢ A × B} → SN* ⟦_⟧ a → SN* ⟦_⟧ b → ⟨ a , b ⟩ ⇝ t' → SN* ⟦_⟧ t'
         aux (sn* La SNa) SN*b (inj₁ (ξ-⟨,⟩₁ step)) = lemma-⟨,⟩ (SNa (inj₁ step)) SN*b
         aux SN*a (sn* Lb SNb) (inj₁ (ξ-⟨,⟩₂ step)) = lemma-⟨,⟩ SN*a (SNb (inj₁ step))
         aux (sn* La SNa) SN*b (inj₂ (ξ-⟨,⟩₁ step)) = lemma-⟨,⟩ (SNa (inj₂ step)) SN*b
@@ -131,7 +115,7 @@ lemma-⟨,⟩ SN*a SN*b = sn* ﹙ SN*a , SN*b ﹚ λ step → aux SN*a SN*b step
 
 lemma-π : ∀ {Γ A B C p} → {t : Γ ⊢ A × B} → SN* ⟦_⟧ t → SN* ⟦_⟧ (π C {p} t)
 lemma-π SN*t = sn* tt (aux SN*t)
-  where aux : ∀ {Γ A B C p t'} → {t : Γ ⊢ A × B} → SN* ⟦_⟧ t → (π C {p} t) ↪ t' ⊎ π C {p} t ⇄ t' → SN* ⟦_⟧ t'
+  where aux : ∀ {Γ A B C p t'} → {t : Γ ⊢ A × B} → SN* ⟦_⟧ t → (π C {p} t) ⇝ t' → SN* ⟦_⟧ t'
         aux (sn* Lt SNt)             (inj₁ (ξ-π step)) = lemma-π (SNt (inj₁ step))
         aux (sn* ﹙ SN*t' , _ ﹚ SNt) (inj₁ β-π₁)       = SN*t'
         aux (sn* ﹙ _ , SN*t' ﹚ SNt) (inj₁ β-π₂)       = SN*t'
@@ -141,7 +125,7 @@ open import IsoType using (dist; curry)
 
 lemma-· : ∀ {Γ A B} → {a : Γ ⊢ A ⇒ B} {b : Γ ⊢ A} → SN* ⟦_⟧ a → SN* ⟦_⟧ b → SN* ⟦_⟧ (a · b)
 lemma-· SN*a SN*b = sn* tt λ step → aux SN*a SN*b step
-  where aux : ∀ {Γ A B} {a : Γ ⊢ B ⇒ A} {b : Γ ⊢ B} {t' : Γ ⊢ A} → SN* ⟦_⟧ a → SN* ⟦_⟧ b → a · b ↪ t' ⊎ a · b ⇄ t' → SN* ⟦_⟧ t'
+  where aux : ∀ {Γ A B} {a : Γ ⊢ B ⇒ A} {b : Γ ⊢ B} {t' : Γ ⊢ A} → SN* ⟦_⟧ a → SN* ⟦_⟧ b → a · b ⇝ t' → SN* ⟦_⟧ t'
         aux (sn* La SNa) SN*b (inj₁ (ξ-·₁ step)) = lemma-· (SNa (inj₁ step)) SN*b
         aux SN*a (sn* Lb SNb) (inj₁ (ξ-·₂ step)) = lemma-· SN*a (SNb (inj₁ step))
         aux (sn* La SNa) SN*b (inj₁ β-ƛ)         = La SN*b 
@@ -190,7 +174,7 @@ lemma-uncurry {A = A} {B = B} {t = t} {u = u} Lt SNu ρ =
 
 lemma-≡ : ∀ {Γ A B iso} → {t : Γ ⊢ A} → SN* ⟦_⟧ t → SN* {A = B} ⟦_⟧ ([ iso ]≡ t)
 lemma-≡ SN*t = sn* tt (aux SN*t)
-  where aux : ∀ {Γ A iso t'} → {t : Γ ⊢ A} → SN* ⟦_⟧ t → ([ iso ]≡ t) ↪ t' ⊎ ([ iso ]≡ t) ⇄ t' → SN* ⟦_⟧ t'
+  where aux : ∀ {Γ A iso t'} → {t : Γ ⊢ A} → SN* ⟦_⟧ t → ([ iso ]≡ t) ⇝ t' → SN* ⟦_⟧ t'
         aux (sn* _ SNt) (inj₁ (ξ-≡ step)) = lemma-≡ (SNt (inj₁ step))
         aux (sn* _ SNt) (inj₂ (ξ-≡ step)) = lemma-≡ (SNt (inj₂ step))
         ---
@@ -292,12 +276,10 @@ lemma-≡ SN*t = sn* tt (aux SN*t)
         aux (sn* ﹙ SN*r , SN*s ﹚ _) (inj₂ cong×₂)     = lemma-⟨,⟩ SN*r (lemma-≡ SN*s)
         aux (sn* ﹙ SN*r , SN*s ﹚ _) (inj₂ sym-cong×₂) = lemma-⟨,⟩ SN*r (lemma-≡ SN*s)
 
--- ids es una substitución adecuada
+
 
 ⊨ids : ∀{Γ} → Γ ⊨ ids
 ⊨ids _ = lemma-var
-
--- cons entre una substitución adecuada y un termino SN* es también una substitución adecuada
 
 ⊨_•_ : ∀{Γ Δ A} {σ : Subst Δ Γ} {t : Γ ⊢ A} → SN* ⟦_⟧ t → Δ ⊨ σ → (Δ , A) ⊨ (t • σ)
 (⊨ t • σ)  Z    = t
@@ -305,19 +287,19 @@ lemma-≡ SN*t = sn* tt (aux SN*t)
 
 
 adequacy : ∀ {Γ Δ A} {σ : Subst Γ Δ} → (t : Γ ⊢ A) → Γ ⊨ σ → SN* ⟦_⟧ (⟪ σ ⟫ t)
-adequacy (` v) Lσ         = Lσ v
-adequacy ⋆ Lσ             = lemma-top
-adequacy ⟨ a , b ⟩ Lσ     = lemma-⟨,⟩ (adequacy a Lσ) (adequacy b Lσ)
-adequacy (π _ x) Lσ       = lemma-π (adequacy x Lσ)
-adequacy (a · b) Lσ       = lemma-· (adequacy a Lσ) (adequacy b Lσ)
-adequacy ([ iso ]≡ n) Lσ  = lemma-≡ (adequacy n Lσ)
-adequacy {σ = σ} (ƛ n) Lσ =
+adequacy (` v) ⊨σ         = ⊨σ v
+adequacy ⋆ ⊨σ             = lemma-top
+adequacy ⟨ a , b ⟩ ⊨σ     = lemma-⟨,⟩ (adequacy a ⊨σ) (adequacy b ⊨σ)
+adequacy (π _ x) ⊨σ       = lemma-π (adequacy x ⊨σ)
+adequacy (a · b) ⊨σ       = lemma-· (adequacy a ⊨σ) (adequacy b ⊨σ)
+adequacy ([ iso ]≡ n) ⊨σ  = lemma-≡ (adequacy n ⊨σ)
+adequacy {σ = σ} (ƛ n) ⊨σ =
   lemma-ƛ
     (λ { {ρ = ρ}{u = u} SNu →
       transport (SN* ⟦_⟧)
         (subst-split {Σ = ∅} {N = n})
-        (adequacy n (⊨ SNu • (⊨rename Lσ ρ)))}) -- {u • (⟪ ids ∘ ρ ⟫ ∘ σ)}
-    (adequacy n (⊨exts Lσ))
+        (adequacy n (⊨ SNu • (⊨rename ⊨σ ρ)))}) -- {u • (⟪ ids ∘ ρ ⟫ ∘ σ)}
+    (adequacy n (⊨exts ⊨σ))
 
 SN-substitute : ∀ {Γ Δ A}{σ : Subst Γ Δ}{t : Γ ⊢ A} → SN (subst σ t) → SN t
 SN-substitute (sn SNtσ) = sn (λ {(inj₁ step) → SN-substitute (SNtσ (inj₁ (↪[] step)))
@@ -325,3 +307,15 @@ SN-substitute (sn SNtσ) = sn (λ {(inj₁ step) → SN-substitute (SNtσ (inj�
 
 strong-norm : ∀ {Γ A} (t : Γ ⊢ A) → SN t
 strong-norm t = SN-substitute (SN*-SN (adequacy t ⊨ids))
+
+
+open import Induction.WellFounded using (WellFounded; Acc; acc)
+
+_⇜_ : ∀ {Γ A} → (t' t : Γ ⊢ A) → Set
+t' ⇜ t = t ⇝ t'
+
+WF-⇜ : ∀ {Γ A} → WellFounded (_⇜_ {Γ} {A})
+WF-⇜ t = SN→Acc (strong-norm t)
+  where
+    SN→Acc : ∀ {Γ A} {t : Γ ⊢ A} → SN t → Acc _⇜_ t
+    SN→Acc (sn f) = acc (λ _ t'⇜t → SN→Acc (f t'⇜t))
