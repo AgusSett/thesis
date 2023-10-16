@@ -135,7 +135,7 @@ El motivo principal por el cual es necesario implementar \func{rename}, es que s
 \end{example}
 
 Finalmente, se presenta la relación de reducción.
-Los constructores \const{$\xi$} y \const{$\zeta$} representan las reglas de congruencia que permiten construir reducciones sobre sub-términos.
+Los constructores \const{$\xi$} y \const{$\zeta$} representan las reglas de congruencia que permiten construir reducciones sobre subtérminos.
 
 \begin{codigo}
 	Tipo de dato de la relación de reducción
@@ -147,7 +147,7 @@ Por lo tanto, no es necesario demostrar que la reducción preserva tipos, ya que
 Esta es una de las ventajas más importante de utilizar tipos intrínsecos.
 
 \begin{example}
-	Las congruencias permiten construir reducciones sobre sub-términos
+	Las congruencias permiten construir reducciones sobre subtérminos
 	\ExecuteMetaData[code/example.tex]{reduction}
 \end{example}
 
@@ -240,7 +240,7 @@ Notar como las definiciones de \type{$\Uparrow$} y \type{$\Downarrow$} son mutua
 
 Se puede observar que en la definición de las formas neutrales, el único constructor que no es recursivo es el de las variables.
 Es decir que, para poder construir una forma neutral, necesariamente se debe utilizar el caso base de la variable al menos una vez.
-Por lo tanto, un término está en forma neutral si y solo si contiene variables libres.
+Por lo tanto, un término está en forma neutral solo si contiene variables libres.
 Luego, es fácil ver que todo término cerrado en forma normal es un valor.
 
 \begin{codigo}
@@ -293,14 +293,14 @@ Por último se presenta el constructor \const{[}~\bound{iso}~\const{]≡}~\bound
 Al igual que en el resto de los casos, primero se reduce el subtérmino \bound{N}.
 Luego, para cada forma normal se deben tener en cuentas todos los isomorfismos que sean aplicables en cada caso.
 
+\ExecuteMetaData[code/progress.tex]{progress-iso}
+
 Notar como solo es posible aplicar \const{step⇄ asso} cuando el elemento de la derecha es un par.
 En caso de que dicho elemento esté en forma neutral, es necesario convertilo a un par aplicando la regla $r \rightleftarrows \langle \pi_A (r), \pi_B(r) \rangle$ antes de poder aplicar \const{asso}.
 Por este motivo se añade el isomorfismo \const{asso-split} que combina ambas reglas en un solo paso.
 Lo mismo ocurre con el resto de los isomorfismos que presentan los sufijos \const{split} y \const{$\eta$}.
 
 Finalmente, si el término \bound{N} es neutral, se concluye que todo el término también es neutral.
-
-\ExecuteMetaData[code/progress.tex]{progress-iso}
 
 La definición de \func{progress} muestra claramente como cada isomorfismo de término se corresponde con un caso donde es necesario eliminar una regla $(\equiv)$ para poder continuar con la reducción.
 En la formalización, el lenguaje es dirigido por sintaxis.
@@ -352,9 +352,6 @@ Además, se utiliza \type{Maybe} en el tipo de retorno, en caso de que el térmi
 	\ExecuteMetaData[code/example.tex]{eval2}
 \end{example}
 
-%Ver si esta bien llama reducción a $\hookrightarrow$ o a $\rightsquigarrow$
-%Archivos: Progress, Eval (sin SN)
-
 \section{Normalización Fuerte}
 
 La propiedad de normalización fuerte dice que para cualquier término dado, toda secuencia de reducción eventualmente concluye, sin importar el camino elegido.
@@ -366,9 +363,16 @@ Se puede codificar esta propiedad definiendo un tipo de datos que predique sobre
 	\ExecuteMetaData[code/strong_norm.tex]{SN}
 \end{codigo}
 
-Notar que es trivial construir un término de tipo \type{SN} para un término en forma normal, ya que, al no existir ninguna reducción posible para dicho tipo, simplemente se debe pasar la función vacía como argumento a \const{sn}.
+Notar que es trivial construir un término de tipo \type{SN} para un valor, ya que, al no existir ninguna reducción posible para los valores, simplemente se debe pasar la función vacía como argumento a \const{sn}.
 Estos representan los casos bases del tipo \type{SN}.
-%TODO: Mostrar ejemplo
+
+\begin{example}
+	Cuando se construye \type{SN} se deben tener en cuenta todos los pasos de reducción posible.
+	Para términos normales, todos los pasos concluyen en un patrón absurdo.
+	En los casos que si es posible aplicar una eliminación, se debe construir recursivamente \type{SN} para el término resultante.
+	
+	\ExecuteMetaData[code/example.tex]{sn}
+\end{example}
 
 El hecho de que exista un término de tipo \type{SN} \bound{t} implica que no existen secuencias de reducción infinitas a partir de \bound{t}, de otro modo, no hubiera sido posible construir dicho término.
 El objetivo final de esta sección será entonces, definir una función que dado un término cualquiera, permita obtener un término de tipo \type{SN} \bound{t}:
@@ -415,6 +419,9 @@ Luego, se define lo que se denomina \textit{interpretación del término}.
 
 \ExecuteMetaData[code/strong_norm_base.tex]{candidate}
 
+La definición utiliza los productos \func{$\_\times\_$} y el tipo top \type{$\top$} definidos en los módulos \AgdaModule{Data.Product} y \AgdaModule{Data.Unit} de la librería estándar.
+Para evitar una colisión de nombres con los constructores de tipos del cálculo, se renombran los tipos de la librería estándar como \func{$\_\otimes\_$} y \type{Top} respectivamente.
+
 Es fácil ver que si un término cumple con el predicado \type{SN*} también cumple con \type{SN}
 
 \ExecuteMetaData[code/strong_norm_base.tex]{sn-star-sn}
@@ -451,7 +458,7 @@ Debido a que no existe ningún paso de reducción posible para el término \cons
 
 \subsubsection{Caso producto}
 
-Para el caso del producto, se puede definir un lema que permite construir el predicado si se tiene como hipótesis que \snstar vale para los sub-términos $a$ y $b$ del par.
+Para el caso del producto, se puede definir un lema que permite construir el predicado si se tiene como hipótesis que \snstar vale para los subtérminos $a$ y $b$ del par.
 Estas dos hipótesis son necesarias para obtener \snstar \bound{a'} y \snstar \bound{b'} a partir de cada uno de los dos pasos de reducción de congruencia.
 
 \ExecuteMetaData[code/strong_norm_base.tex]{lemma-prod}
@@ -505,6 +512,11 @@ Para ello es necesario definir un nuevo lema que permite conjugar un paso de red
 
 \ExecuteMetaData[code/strong_norm_base.tex]{reduction-subst}
 
+A su vez, la prueba de dicho lema requiere una propiedad de la substitución para poder probar el caso correspondiente a la $\beta$-reducción.
+La propiedad \func{subst-commute} dice que la substitución conmuta consigo misma:
+
+\ExecuteMetaData[code/strong_norm_base.tex]{subst-commute}
+
 Luego se utiliza la hipótesis \bound{Lƛ} en conjunto con el nuevo lema.
 
 \ExecuteMetaData[code/strong_norm_base.tex]{lemma-abs}
@@ -519,7 +531,7 @@ A su vez, para esta prueba es necesario demostrar que si se aplica un renombre d
 
 \ExecuteMetaData[code/strong_norm_base.tex]{sn-rename}
 
-Aquí se deben hacer dos observaciones importantes.
+Aquí se deben realizar dos observaciones importantes.
 En primer lugar, el caso de la abstracción en la prueba de \func{⟦⟧-rename} es el único lugar donde es necesario usar el argumento $\rho$ de la interpretación.
 De hecho, este es precisamente el motivo por el cual es necesario generalizar la interpretación de las lambdas añadiendo un renombre en su definición.
 
@@ -556,6 +568,9 @@ en una sola substitución y demostrar que aplicar dicha combinación es equivale
 \end{samepage}
 
 %\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy}
+La función \func{transport} permite obtener \bound{P y} a partir de una prueba de \bound{x} \type{$\cong$} \bound{y} y una instancia de \bound{P x}.
+Esto es útil cuando se tiene como hipótesis \snstar \bound{x} y se debe concluir \snstar \bound{y}, en dicho caso simplemente se utiliza \func{transport} con una prueba de que \bound{x} y \bound{y} son equivalentes.
+Esta función está definida en el módulo \AgdaModule{Relation.Binary.PropositionalEquality} con el nombre \func{subst}, aquí se la renombra a \func{transport} para evitar una colisión de nombres con la substitución.
 
 \subsubsection{Cierre de la prueba}
 
