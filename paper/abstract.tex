@@ -1,16 +1,16 @@
 Los sistemas de tipos desempeñan un papel esencial en la garantía del comportamiento adecuado de los programas.
 Sin embargo, estos imponen cierta rigidez a la hora de escribir dichos programas, ya que se deben adherir estrictamente a las reglas de tipado establecidas.
-Existen una serie de ``sistemas módulo isomorfismos'' que proponen resolver este problema considerando aquellos tipos que sean isomorfos como idénticos.
+Existen una serie de ``sistemas módulo isomorfismos'' \cite{system-i,lambda-plus,sip} que proponen flexibilizar esta restricción considerando aquellos tipos que sean isomorfos como idénticos.
 En simples palabras, dos tipos se consideran isomorfos cuando es posible convertir uno en el otro, y viceversa, sin perder información en el proceso.
-Es decir, si dos tipos $A$ y $B$ son isomorfos, es posible usar un término de tipo $A$ en cualquier lugar que se espere un término de tipo $B$.
+Es decir, si dos tipos $A$ y $B$ son isomorfos, es posible usar un término de tipo $A$ en cualquier lugar que se espere un término de tipo $B$ aplicando la conversión correspondiente.
 Trabajar con tipos isomorfos provee mayor flexibilidad en la construcción de programas y permite combinarlos de formas que normalmente no serían posibles.
 
-El enfoque principal de este trabajo se centra en uno de estos sistemas, conocido como Sistema~I.
-Aquí, se presenta una formalización de dicho sistema en el lenguaje Agda, además, se añade el tipo Top y los isomorfismos correspondientes para ampliar aún más la flexibilidad del sistema.
+Este trabajo se centra principalmente en el primero de estos sistemas, llamado Sistema~I.
+Aquí, se presenta una formalización de una adaptación de dicho sistema en el lenguaje Agda, además, se añade el tipo Top y los isomorfismos correspondientes para ampliar aún más la flexibilidad del sistema.
 Esta formalización va acompañada de pruebas formales que demuestran el cumplimiento de diversas propiedades, siendo la normalización fuerte una de las más cruciales.
 Es importante destacar que la prueba de normalización fuerte emplea una técnica distinta a la de candidatos de reducibilidad clásica, lo que contribuye a la originalidad y profundidad del trabajo.
 
 En esta tesina no solo se exploran los sistemas módulo isomorfismos sino también, los intricados mecanismos que sirven de motor para muchas implementaciones de cálculo lambda, como lo son las substituciones explícitas, que desempeñan un papel fundamental en la manipulación de términos dentro del sistema.
-Además, se exponen los fundamentos de la lógica intuicionista, estos explican la estrecha relación entre la programación y la lógica y permiten comprender la doble mirada que propone Sistema I, por un lado, puede ser visto como un lenguaje de programación y por el otro como un sistema de pruebas.
-Coincidentemente, es esta lógica intuicionista la que dio origen a los asistentes de pruebas como Coq y Agda.
+Además, se exponen los fundamentos de la correspondencia de Curry-Howard, esta explica la estrecha relación entre la programación y la lógica y permiten comprender la doble mirada que propone Sistema I, por un lado, puede ser visto como un lenguaje de programación y por el otro como un sistema de pruebas.
+Coincidentemente, esta correspondencia es la que dio origen a los asistentes de pruebas como Coq y Agda.
 Siendo este último el lenguaje escogido para realizar la formalización presentada en este trabajo.

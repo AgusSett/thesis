@@ -19,7 +19,7 @@
 Existen dos enfoques fundamentales para la introducción de sistemas de tipos en el cálculo lambda.
 Por un lado, se pueden definir primero los términos y luego los tipos, por lo tanto, los términos existen independientemente de los tipos y tienen significado por sí solos.
 Tiene sentido entonces definir el subconjunto de términos para los cuales existe alguna derivación de tipos, a este subconjunto se lo denomina términos ``bien tipados''.
-De hecho, para un término dado pueden existir más de un tipo posible, por ejemplo, la función identidad $\lambda x.x$ puede ser tipada como $A \rightarrow A$ o como $B \rightarrow B$.
+De hecho, para un término dado pueden existir más de un tipo posible, por ejemplo, la función identidad $\lambda x.x$ puede ser tipada como $\tau \rightarrow \tau$ o como $(\tau \rightarrow \tau) \rightarrow (\tau \rightarrow \tau)$.
 Desde este punto de vista, los juicios de tipado aseguran que los términos poseen ciertas propiedades.
 Este estilo es llamado ``tipos a la Curry''.
 
@@ -27,14 +27,14 @@ Por otro lado, es posible definir los tipos en primer lugar y luego los término
 Aquí no tiene sentido hablar de términos ``bien tipados'', ya que no pueden existir los términos ``mal tipados''.
 Por lo tanto, todo el significado recae sobre los juicios de tipado, en lugar de los términos.
 En cierta forma, los términos y las reglas de tipado están entrelazados.
-Aquí, las derivaciones de tipos son únicas, puesto que los términos $\lambda x^A.x$ y $\lambda x^B.x$ se consideran distintos.
+Aquí, las derivaciones de tipos son únicas, puesto que los términos $\lambda x^\tau.x$ y $\lambda x^{\tau \rightarrow \tau}.x$ se consideran distintos.
 A este enfoque se lo denomina ``tipos a la Church''.
 
 Reynolds \cite{reynolds_1998} acuñó las expresiones \textit{tipos intrínsecos} y \textit{tipos extrínsecos} para referirse a cada uno de estos dos enfoques.
 
 \subsection{Cálculo lambda con pares y tipo Top}
 
-En esta sección se presenta una formalización en Agda de un cálculo lambda simplemente tipado con pares extendido con tipos isomorfismos.
+En esta sección se presenta una formalización en Agda de un cálculo lambda simplemente tipado con pares extendido con tipos isomorfismos y toda la internalización que estos implican.
 Gran parte del código presentado en este trabajo está basado y adaptado a partir de un libro de Philip Wadler \cite{plfa}.
 La adaptación consiste principalmente en la adición de los isomorfismos de tipos, la regla de tipado $(\equiv)$ y la relación de isomorfismos de términos.
 
@@ -59,11 +59,16 @@ Luego se formalizan las variables intrínsecamente tipadas, que son representada
 
 \begin{codigo}
 	Tipo de dato de los contextos de tipado y variables intrínsecamente tipadas.
+	Los argumentos escritos entre $\{\}$ son implícitos, cuando se aplican los constructores, estos argumentos se omiten y Agda se encargara de inferir los valores correspondientes.
 	\ExecuteMetaData[code/context.tex]{ctx}
 \end{codigo}
 
 \begin{example}
-	Se escribe \bound{$\Gamma$} \const{$\ni$} \bound{A}, para el tipo de las variables que tienen tipo \bound{A} en el entorno de tipado \bound{$\Gamma$}
+	La proposición \bound{$\Gamma$} \const{$\ni$} \bound{A} indica que existe un tipo \bound{A} dentro del entorno \bound{$\Gamma$}.
+	Los términos construidos con \const{Z} y \const{s} constituyen pruebas para dichas proposiciones.
+	
+	Cuando el nombre de una definición no es relevante, Agda permite omitirlo utilizando un guion bajo \func{\_}.
+	
 	\ExecuteMetaData[code/context.tex]{example}
 \end{example}
 
@@ -74,7 +79,7 @@ A continuación se presentan los juicios de tipado, debido a que se utilizan tip
 	\input{code/term.tex}
 \end{codigo}
 
-Notar que el constructor \const{$[\_]\equiv\_$} corresponde a la regla de tipado $(\equiv)$ de Sistema I.
+Notar que el constructor \const{[\_]≡\_} corresponde a la regla de tipado $(\equiv)$ de Sistema I.
 En el constructor \const{$\pi$} se observa otro detalle importante, además de tomar como argumento el tipo \bound{C}, toma un argumento implícito que funciona como evidencia de que el tipo \bound{C} es o bien igual al tipo \bound{A}, o bien igual al tipo \bound{B}.
 Para ello se utilizan el tipo suma \type{$\_\uplus\_$} definido en el módulo \AgdaModule{Data.Sum} y la igualdad proposicional \type{$\_\cong\_$} definida en el módulo \AgdaModule{Relation.Binary.PropositionalEquality}.
 Estos dos tipos forman parte de la librería estándar de Agda.
@@ -113,7 +118,7 @@ Una vez definida la función \func{rename}, se puede implementar la aplicación 
 Para ello, se define de forma análoga, una función \func{exts} que extiende la sustitución cuando se atraviesa una abstracción.
 Utilizando la notación del álgebra-$\sigma$, se puede observar que aquí también se sigue la misma estructura: $`Z \bullet (\sigma \; \circ \text{rename } S\_)$.
 
-Luego se define la substitución simple \func{$\_[\_]$}, que dato un término \bound{N} cuya primera variable libre es de tipo \bound{B} y un término \bound{M} de tipo \bound{B}, reemplaza el índice 0 de \bound{N} utilizando \bound{M} y reduce en uno el resto de las variables libre.
+Luego se define la substitución simple \func{$\_[\_]$}, que dato un término \bound{N} cuya primera variable libre es de tipo \bound{B} y un término \bound{M} de tipo \bound{B}, reemplaza el índice 0 de \bound{N} utilizando \bound{M} y reduce en uno el resto de las variables libres.
 
 \begin{codigo}
 	Aplicación de substituciones sobre términos
@@ -126,11 +131,11 @@ El motivo principal por el cual es necesario implementar \func{rename}, es que s
 
 \begin{example}
 	La substitución simple reemplaza la primera variable libre por un término del mismo tipo que dicha variable.
-	Luego, el contexto del término resultante tendrá un elemento menos
+	Luego, el contexto del término resultante tendrá un elemento menos.
 	\ExecuteMetaData[code/example.tex]{subst1}
 \end{example}
 \begin{example}
-	Cuando se reemplaza un término con variables libres en el cuerpo de una abstracción, las mismas son renombradas para evitar que sean capturadas
+	Cuando se reemplaza un término con variables libres en el cuerpo de una abstracción, las mismas son renombradas para evitar que sean capturadas.
 	\ExecuteMetaData[code/example.tex]{subst2}
 \end{example}
 
@@ -157,10 +162,10 @@ Los isomorfismos de tipos que se incluyen en esta formalización corresponden al
 Además de los axiomas, se definen los constructores \const{sym} y \const{cong} que representan las simetrías y congruencias respectivamente.
 
 \begin{codigo}
-	Tipo de dato de los isomorfismos de tipos
+	Relación de equivalencia entre tipos isomorfos
 	\input{code/iso_type.tex}
 \end{codigo}
-Utilizando estos constructores es posible crear cualquier isomorfismo.
+Utilizando estos constructores es posible construir cualquier isomorfismo.
 Notar que no existe una regla para la transitividad, ya que es posible obtenerla aplicando dos veces el constructor \const{$[\_]\equiv\_$}.
 Por ejemplo, el término \const{[ trans} \bound{$iso_1$} \bound{$iso_2$} \const{]$\equiv$} \bound{t} puede ser construido como \const{[} \bound{$iso_2$} \const{]$\equiv$} (\const{[} \bound{$iso_1$} \const{]$\equiv$} \bound{t}).
 
@@ -169,8 +174,8 @@ Por ejemplo, el término \const{[ trans} \bound{$iso_1$} \bound{$iso_2$} \const{
 	\ExecuteMetaData[code/example.tex]{iso-type}
 \end{example}
 
-A continuación se presenta la formalización de la relación de isomorfismo de términos $(\rightleftarrows)$.
-Para ello se seleccionaron algunos isomorfismos entre términos cuya elección fue el resultado de varias decisiones de diseño basadas principalmente en dos objetivos.
+A continuación se presenta la formalización de la relación de simetría entre términos correspondientes de tipos isomorfos $(\rightleftarrows)$.
+La selección de isomorfismos entre términos aquí presentada, es el resultado de varias decisiones de diseño basadas principalmente en dos objetivos.
 
 En primer lugar, se agregaron todos los isomorfismos necesarios para que ningún término quede atascado y no existan eliminaciones en formas normales, esto tiene como consecuencia que todo término cerrado reduce siempre a un valor.
 Este punto es más evidente cuando se tiene en cuenta la prueba de progreso presentada más adelante.
@@ -191,7 +196,9 @@ La solución es definir nuevos constructores que embeban estas reglas, como por 
 Al igual que en la relación de reducción, los tipos intrínsecos garantizan que los términos transformados por los isomorfismos preservan sus tipos.
 Notar como todos los isomorfismos base presentan una regla ($\equiv$) del lado izquierdo, la cual desaparece del lado derecho.
 Por lo tanto, los isomorfismos solo pueden aplicarse para eliminar un constructor ($\equiv$) del término.
+%TODO:
 Este último punto es fundamental para preservar la propiedad de normalización.
+
 
 \begin{example}
 	El isomorfismo de término \const{sym-dist-$\lambdabar$} distribuye la abstracción sobre el par y elimina el constructor \const{[ sym dist ]$\equiv$} del término resultante.
@@ -212,7 +219,7 @@ En consecuencia, no puede darse el caso en el que un término reduzca, de forma 
 
 La propiedad de progreso dice que todo término puede o bien dar un paso de reducción, o bien se encuentra en un estado final.
 Si solo se consideran términos cerrados, es decir, que no contienen variables libres, los estados finales son los valores.
-Existen tres constructores para los valores, estos son, los pares de valores, las abstracciones y el término $\star$.
+Existen tres constructores para los valores: los pares de valores, las abstracciones y el término $\star$.
 
 \begin{codigo}
 	Tipo de dato de los valores
@@ -259,7 +266,7 @@ Se define una nueva relación \type{Progress}, que representa los tres posibles 
 	\ExecuteMetaData[code/progress.tex]{progress-type}
 \end{codigo}
 
-Luego, la prueba de progreso consiste en probar la propiedad \type{Progress} se cumple para todo término dado.
+Luego, la prueba de progreso consiste en probar que la propiedad \type{Progress} se cumple para todo término dado.
 
 En primer lugar, se presentan los casos para las variables y el término \const{$\star$}, donde simplemente se concluye que ambos se encuentran en formal normal.
 
@@ -284,20 +291,27 @@ Por otro lado, podría alcanzar un par en formal normal, en cuyo caso es posible
 
 \ExecuteMetaData[code/progress.tex]{progress-proj}
 
-La aplicación sigue la misma lógica, solo que en este caso se reduce primero la función y luego el argumento, cuando ambos términos llegan a una forma normal, se aplica la $\beta$-reducción.
+La aplicación sigue la misma lógica, solo que en este caso se reduce primero la función, luego el argumento, y, cuando ambos términos llegan a una forma normal, se aplica la $\beta$-reducción.
 Sin embargo, si la función se encuentra en formal neutral, entonces no es posible realizar la aplicación, pro lo que todo el término será neutral.
 
 \ExecuteMetaData[code/progress.tex]{progress-app}
 
 Por último se presenta el constructor \const{[}~\bound{iso}~\const{]≡}~\bound{N}.
 Al igual que en el resto de los casos, primero se reduce el subtérmino \bound{N}.
-Luego, para cada forma normal se deben tener en cuentas todos los isomorfismos que sean aplicables en cada caso.
+Luego, para cada forma normal se deben tener en cuenta todos los isomorfismos que sean aplicables en cada caso.
 
 \ExecuteMetaData[code/progress.tex]{progress-iso}
 
 Notar como solo es posible aplicar \const{step⇄ asso} cuando el elemento de la derecha es un par.
-En caso de que dicho elemento esté en forma neutral, es necesario convertilo a un par aplicando la regla $r \rightleftarrows \langle \pi_A (r), \pi_B(r) \rangle$ antes de poder aplicar \const{asso}.
-Por este motivo se añade el isomorfismo \const{asso-split} que combina ambas reglas en un solo paso.
+En caso de que dicho elemento esté en forma neutral, es necesario convertirlo a un par aplicando la regla $r \rightleftarrows \langle \pi_A (r), \pi_B(r) \rangle$ antes de poder aplicar \const{asso}.
+Por ejemplo, para reducir el siguiente término:
+
+\ExecuteMetaData[code/example.tex]{asso-split}
+
+Se requiere aplicar el isomorfismo \const{asso-split} que combina ambas reglas en un solo paso:
+
+\ExecuteMetaData[code/example.tex]{asso-split2}
+
 Lo mismo ocurre con el resto de los isomorfismos que presentan los sufijos \const{split} y \const{$\eta$}.
 
 Finalmente, si el término \bound{N} es neutral, se concluye que todo el término también es neutral.
@@ -307,7 +321,7 @@ En la formalización, el lenguaje es dirigido por sintaxis.
 Cuando se representan los términos usando tipos intrínsecos, la sintaxis del lenguaje contiene los isomorfismos de tipos.
 Por lo tanto, tiene sentido que la aplicación de los isomorfismos de términos también sea dirigida por sintaxis.
 
-Otra observación interesante es que gracias a la dualidad entre pruebas y programas que propone el paradigma de proposiciones como tipos, implementar y demostrar resultan ser la misma tarea.
+Otra observación interesante es que gracias a la dualidad entre pruebas y programas que propone el paradigma de Proposiciones como Tipos, implementar y demostrar resultan ser la misma tarea.
 Por lo tanto, la prueba \func{progress} es también un programa, que al ser aplicado sobre un término retorna el siguiente paso de reducción correspondiente a dicho término.
 
 \begin{example}
@@ -330,7 +344,7 @@ La definición aplica la prueba de progreso para obtener el nuevo término sobre
 
 Debido a que la recursión se realiza sobre el término resultante luego de un paso, Agda no tiene forma de determinar que dicho término es estructuralmente más pequeño que el argumento inicial.
 De hecho, probar la terminación de la evaluación, implicaría que todo término reduce a un valor en una cantidad finita de pasos, es decir, se estaría probando la propiedad de normalización.
-La prueba de dicha propiedad no es trivial, y se presentará en los siguientes capítulos.
+La prueba de dicha propiedad no es trivial, y se presentará en la siguiente sección.
 
 Por este motivo, es necesario añadir un argumento de tipo \type{$\mathbb{N}$} para que la definición sea aceptada por el chequeo de terminación de Agda.
 De este modo, la evaluación realizará a lo sumo $n$ llamadas recursivas.
@@ -594,7 +608,7 @@ Como detalle adicional, se elimina la substitución identidad aplicada al térmi
 \ExecuteMetaData[code/strong_norm_base.tex]{strong-norm}
 
 
-\subsection{Prueba para Sistema I}
+\subsection{Prueba para Sistema I con tipo Top}
 
 El primer paso para extender la prueba, es agregar en la definición de \type{SN}, la relación de isomorfismos entre términos.
 

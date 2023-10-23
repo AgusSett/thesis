@@ -4,13 +4,12 @@
 Para poder abstraernos de la forma de los programas y centrarnos en su significado, es necesario establecer cuáles son las formas que son combinables y cómo combinarlas.
 Para ello nos valdremos de la noción de isomorfismo entre tipos.
 El primer paso es considerar dos tipos $A$ y $B$ como isomorfos si existen dos programas $A \rightarrow B$ y $B \rightarrow A$, tal que al componerlos, en ambos sentidos, obtenemos como resultado la identidad.
-Por ejemplo, para probar que $A \rightarrow (B \times C) \equiv (A \rightarrow B) \times (A \Rightarrow C)$ es efectivamente un isomorfismo, se define un término $curry$ que dada una función devuelve su forma currificada, y un término $uncurry$ que realiza la operación inversa:
+Por ejemplo, para probar que los tipos $A \rightarrow (B \times C)$ y $(A \rightarrow B) \times (A \rightarrow C)$ son efectivamente isomorfos, se define un término $curry$ que dada una función devuelve su forma currificada, y un término $uncurry$ que realiza la operación inversa:
 
 \[ curry = \lambda x^{(A \times B) \rightarrow C}. \lambda a^A . \lambda b^B . x\langle a,b \rangle \]
 \[ uncurry = \lambda x^{A \rightarrow B \rightarrow C}. \lambda y^{A \times B} . x(\pi_1 y)(\pi_2 y) \]
 
-Luego, se demuestra por extensionalidad que para cualquier par $\langle u,v \rangle$ y función $f$ se cumple $uncurry \circ curry = id_{(A \times B) \rightarrow C}$:
-
+Luego, se demuestra que para cualquier par $\langle u,v \rangle$ y función $f$ se cumple:
 {\allowdisplaybreaks
 \begin{align*}
 	& (uncurry \circ curry) f \langle u,v \rangle \\
@@ -29,13 +28,15 @@ Luego, se demuestra por extensionalidad que para cualquier par $\langle u,v \ran
 	\hookrightarrow& \\
 	& (\lambda a^A . \lambda b^B . f\langle a,b \rangle) u \; v \\
 	\hookrightarrow& \\
-	& f\langle u,v \rangle \\
+	& f\langle u,v \rangle
 \end{align*}
 }
+
+Luego, se concluye que $uncurry \circ curry = id_{(A \times B) \rightarrow C}$ por extensionalidad.
 De forma similar se puede probar que $curry \circ uncurry = id_{A \Rightarrow B \Rightarrow C}$
 
-Di Cosmo \cite{MSCSSurvey05} caracterizó los conjuntos mínimos de isomorfismos que permiten construir todos los demás a partir de reglas de congruencia y transitividad.
-Se escribe $A \equiv B$ cuando $A$ y $B$ sean isomorfos.
+Di Cosmo \cite{MSCSSurvey05} caracterizó para Sistema F con pares, los conjuntos mínimos de isomorfismos que permiten construir todos los demás a partir de reglas de congruencia y transitividad.
+Se escribe $A \equiv B$ cuando $A$ y $B$ son isomorfos.
 
 \begin{table}[H]
 	\centering
@@ -87,6 +88,15 @@ Se escribe $A \equiv B$ cuando $A$ y $B$ sean isomorfos.
 	\caption{Isomorfismos de tipo en cálculo lambda tipado}
 \end{table}
 
+Estos isomorfismos están agrupados en distintas categorías.
+Por ejemplo, la categoría $Th^1$ corresponde al cálculo lambda simplemente tipado, dentro de esta, solo existe el isomorfismo $swap$.
+Si se añaden pares al cálculo, se obtienen los isomorfismos 1, 2, 3 y 4 de la tabla, dicho conjunto se denomina  $Th^1_\times$, notar que no se incluye $swap$, ya que es posible construirlo a partir de 1 y 3.
+Luego, se puede obtener el conjunto $Th^1_{\times T}$ añadiendo el tipo top al cálculo.
+
+Por otro lado, las categorías $Th^2$ corresponden al cálculo lambda de segundo orden, también llamado Sistema F.
+Este conjunto abarca los isomorfismos que se pueden construir usando el conector $\forall$, además del isomorfismo $swap$.
+De forma análoga, añadiendo pares y el tipo top a Sistema F se obtienen las categorías $Th^2_\times$ y $Th^2_{\times T}$ respectivamente.
+
 \subsection{Sistema I}
 
 Sistema I \cite{system-i} es un cálculo lambda simplemente tipado con pares donde los tipos isomorfos son considerados iguales.
@@ -130,8 +140,8 @@ Además, se añade la definición de una nueva regla de tipado llamada $(\equiv)
 	\end{prooftree}
 	\quad
 	\begin{prooftree}
-		\hypo{\Gamma \vdash \langle r, s \rangle : A \times B}
-		\infer1[($\times_e$)]{ \Gamma \vdash \pi_A\langle r, s \rangle : A }
+		\hypo{\Gamma \vdash r : A \times B}
+		\infer1[($\times_e$)]{ \Gamma \vdash \pi_A(r) : A }
 	\end{prooftree}
 	\caption{Reglas de tipado}
 \end{figure}
@@ -150,7 +160,7 @@ A continuación se presentan los cuatro isomorfismos que pertenecen a dicho conj
 	\caption{Isomorfismos de tipo en Sistema I}
 \end{figure}
 
-La regla $(\equiv)$ permite emplear términos $r:A$ en cualquier lugar que se necesite un tipo isomorfo a $A$. Por ejemplo:
+La regla $(\equiv)$ permite cambiar el tipo de un término por otro isomorfo a este. Por ejemplo:
 
 \begin{prooftree*}
 	\hypo{ \Gamma\vdash r: A }
@@ -164,15 +174,15 @@ La regla $(\equiv)$ permite emplear términos $r:A$ en cualquier lugar que se ne
 \end{prooftree*}
 
 La introducción de una relación de equivalencia en el nivel de los tipos, necesariamente deberá tener consecuencias en el nivel de los términos.
-Con las reglas de reducción usuales, un término como el del ejemplo anterior estaría en forma normal.
-Entonces, el siguiente paso es extender la relación de reducción con isomorfismos a nivel términos.
+Con las reglas de reducción usuales, un término como el del ejemplo anterior estaría en forma normal,  cuando en realidad no lo está, ya que contiene un $\beta$-redex.
+Entonces, el siguiente paso es extender la relación de reducción con isomorfismos a nivel de términos.
 Estas nuevas reglas permiten desatascar los términos que tipamos usando $(\equiv)$.
-Por ejemplo, es necesario definir la siguiente equivalencia de términos $\langle \lambda x^A.r, \lambda x^A.s \rangle \rightleftarrows \lambda x^A. \langle r, s \rangle$ para reducir el término del ejemplo anterior:
+Por ejemplo, es necesario definir la siguiente equivalencia de términos $\langle \lambda x^A.r, \lambda x^A.s \rangle \rightleftarrows \lambda x^A. \langle r, s \rangle$ para reducir el programa del ejemplo anterior:
 
 \begin{align*}
 	& \langle \lambda x.r, \lambda x.s \rangle \; t \\
 	\rightleftarrows& \\
-	& (\lambda x^A. \langle r, s \rangle)\; t \\
+	& (\lambda x. \langle r, s \rangle)\; t \\
 	\hookrightarrow& \\
 	& \langle r[t/x], s[t/x] \rangle
 \end{align*}
@@ -223,20 +233,20 @@ Luego, se escribe $\rightleftarrows^*$ para denotar la clausura reflexiva y tran
 Notar que $\rightleftarrows^*$ es una relación de equivalencia entre términos.
 
 El siguiente paso surge de notar que las nuevas reglas introducen problemas en la reducción clásica.
-Por un lado, las reglas de proyección $\pi_1$ y $\pi_2$ indexan el par a través de la posición de los elementos, pero el isomorfismo $\textsc{comm}$ permite cambiar el orden de un par, permitiendo así proyectar cualquiera de los dos elementos:
+Por un lado, las reglas de proyección $\pi_1$ y $\pi_2$ acceden al par a través de la posición de los elementos, pero el isomorfismo $\textsc{comm}$ permite cambiar el orden de un par, permitiendo así proyectar cualquiera de los dos elementos:
 
 \begin{align*}
 	\langle r, s \rangle& \hookrightarrow_{\pi_1} r \\
 	\langle r, s \rangle& \rightleftarrows_{\textsc{comm}} \langle s, r \rangle \hookrightarrow_{\pi_1} s
 \end{align*}
 
-Esto supone un problema para la preservación de tipos.
-La solución es indexar el elemento a través de su tipo, por lo que se define una nueva regla:
+Esto supone un problema para la preservación de tipos y además introduce no determinismo.
+La solución es acceder al elemento a través de su tipo, por lo que se define una nueva regla:
 
 \[ \text{si} \; r:A \quad \pi_A \langle r, s \rangle \hookrightarrow_{\pi} r \]
 
-Una consecuencia importante es que esta regla introduce no determinismo en el cálculo.
-Si $r$ y $s$ tienen tipo $A$, entonces $\pi_A \langle r, s \rangle$ puede reducir indistintamente a cualesquiera de los dos términos.
+Una consecuencia importante es que esta regla resuelve la preservación de tipos, pero mantiene el no determinismo en el cálculo.
+Si $r$ y $s$ tienen tipo $A$, entonces $\pi_A \langle r, s \rangle$ puede reducir indistintamente a cualquiera de los dos términos.
 Sin embargo, es posible codificar una proyección determinista incluso cuando ambos términos son del mismo tipo, por ejemplo, el par $\langle r, s \rangle: A \times A$
 se codifica como:
 \[ \langle \lambda x^\mathbb{X}.r, \lambda x^\mathbb{Y}.s \rangle : \mathbb{X} \rightarrow A \times \mathbb{Y} \rightarrow A \]
@@ -251,7 +261,7 @@ De forma análoga se puede codificar $\pi_2$.
 La $\beta$-reducción clásica también entra en conflicto con la preservación de tipos.
 Por ejemplo, el término $(\lambda x^A . \lambda y^B . r)ts$ donde $t:B$ y $s:A$ está bien tipado, pero para reducirlo correctamente primero se deben aplicar equivalencias para intercambiar el orden de $t$ y $s$.
 Sin embargo, no hay nada que impida aplicar la regla $\beta$, lo cual podría terminar reduciendo a un tipo equivocado.
-Para solucionar esto, se modifica la $\beta$-reducción y se añade una precondición que requiere que el término que se está aplicando tenga el mismo tipo que el argumento de la abstracción:
+Para solucionar esto, se modifica la $\beta$-reducción y se añade una condición que requiere que el término que se está aplicando tenga el mismo tipo que el argumento de la abstracción:
 
 \[ \text{si} \; s:A \quad (\lambda x^A.r) s \hookrightarrow_{\beta} r[s/x] \]
 
@@ -260,15 +270,15 @@ Por último se define la relación de reducción módulo isomorfismos:
 
 \[ \rightsquigarrow \; := \; \rightleftarrows^* \circ \hookrightarrow \circ \rightleftarrows^* \]
 
-Donde $r \rightsquigarrow s \iff r \rightleftarrows^* r' \hookrightarrow s' \rightleftarrows^* s$. Es decir, que primero los términos son transformados a una forma equivalente donde sea posible aplicar las eliminaciones, y luego se aplican las $\beta$-reducciones y proyecciones.
+Donde $r \rightsquigarrow s \iff r \rightleftarrows^* r' \hookrightarrow s' \rightleftarrows^* s$ para cierto $r'$ y $s'$. Es decir, que primero los términos son transformados a una forma equivalente donde sea posible aplicar las eliminaciones, y luego se aplican las $\beta$-reducciones y proyecciones.
 
 \subsubsection{Ejemplo}
-El término $\lambda x^A . \lambda y^B . \langle x,y \rangle$ tiene tipo $A \rightarrow B \rightarrow A \times B$ aplicando los isomorfismos \textsc{dist} y \textsc{curry} se obtiene el tipo $((A \times B) \rightarrow A) \times ((A \times B) \rightarrow B)$
+El término $\lambda x^A . \lambda y^B . \langle x,y \rangle$ tiene tipo $A \rightarrow B \rightarrow (A \times B)$ aplicando los isomorfismos \textsc{dist} y \textsc{curry} se obtiene el tipo $((A \times B) \rightarrow A) \times ((A \times B) \rightarrow B)$
 
 \begin{align*}
-	&A \rightarrow B \rightarrow A \times B \\
+	&A \rightarrow B \rightarrow (A \times B) \\
 	\equiv&_\textsc{curry} \\
-	&(A \times B) \rightarrow A \times B \\
+	&(A \times B) \rightarrow (A \times B) \\
 	\equiv&_\textsc{dist} \\
 	&((A \times B) \rightarrow A) \times ((A \times B) \rightarrow B)
 \end{align*}
@@ -276,7 +286,7 @@ El término $\lambda x^A . \lambda y^B . \langle x,y \rangle$ tiene tipo $A \rig
 Es decir, que una función que recibe dos argumentos por separado y retorna un par, puede ser vista como un par de funciones que toman ambos argumentos dentro de un par.
 Por lo tanto, es posible proyectar la función antes de aplicarla, y dados $s: A$ y $t: B$, se puede aplicar la función proyectada $\pi_{(A \times B) \rightarrow A}(\lambda x^A . \lambda y^B . \langle x,y \rangle) \langle s,t \rangle$
 
-A continuación se detalla la forma correcta de reducir dicho término:
+A continuación se detalla la forma de reducir dicho término:
 
 {\allowdisplaybreaks
 \begin{align*}
@@ -297,7 +307,7 @@ A continuación se detalla la forma correcta de reducir dicho término:
 }
 
 \subsection{SIP}
-Sistema I Polimórfico \cite{sip}, es una extensión que agrega polimorfismos a Sistema I, toma algunos de los isomorfismos del conjunto axiomático $Th^2_\times$.
+Sistema I Polimórfico \cite{sip}, es una extensión que agrega polimorfismo a Sistema I, toma algunos de los isomorfismos del conjunto axiomático $Th^2_\times$.
 A la gramática de tipos y términos definida en Sistema I, le agrega la gramática de tipos y términos correspondientes a Sistema F con pares.
 Sus tipos y términos son entonces los siguientes:
 
@@ -309,16 +319,16 @@ Las reglas de tipado de este cálculo surgen de tomar las reglas de Sistema I y 
 \begin{center}
 	\begin{prooftree}
 		\hypo{\Gamma \vdash r:A}
-		\hypo{X \notin FTV_c(\Gamma)}
+		\hypo{X \notin FTV(\Gamma)}
 		\infer2[($\forall_i$)]{ \Gamma \vdash \Lambda X.r : \forall X.A }
 	\end{prooftree} \quad
 	\begin{prooftree}
 		\hypo{\Gamma \vdash r: \forall X.A}
-		\infer1[($\forall_e$)]{ \Gamma \vdash \Lambda r[B] : A[B/X] }
+		\infer1[($\forall_e$)]{ \Gamma \vdash r[B] : A[B/X] }
 	\end{prooftree}
 \end{center}
 
-Donde $FTV_c(\Gamma)$ es el conjunto de variables de tipo libres en el contexto $\Gamma$.
+Donde $FTV(\Gamma)$ es el conjunto de variables de tipo libres en el contexto $\Gamma$.
 
 Los isomorfismos de carácter axiomático que se considerarán en este sistema son los siguientes:
 
@@ -332,7 +342,8 @@ Dado un isomorfismo de tipos con dos constructores involucrados, se construyen t
 Para cualquier par de conectivas, tenemos cuatro posibles formas de combinar sus reglas de tipado: introducción-introducción, introducción-eliminación, eliminación-introducción, y eliminación-eliminación.
 Cada una induce una equivalencia, y cada lado de la equivalencia estará dado por el orden en que se apliquen las conectivas.
 
-Por ejemplo, el isomorfismo $A \rightarrow (B \times C) \equiv (A \rightarrow B) \times (A \rightarrow C)$ emplea los conectores $\rightarrow$ y $\times$, SIP incluye solamente dos de las cuatro equivalencias:
+Por ejemplo, el isomorfismo $A \rightarrow (B \times C) \equiv (A \rightarrow B) \times (A \rightarrow C)$ emplea los conectores $\rightarrow$ y $\times$, SIP incluye solamente dos de las cuatro equivalencias de términos.
+Las siguientes derivaciones prueban que ambos términos tienen los tipos involucrados en el isomorfismo de tipo dado:
 
 \begin{itemize}
 	\item Introducción de $\rightarrow$ e introducción de $\times$: $\lambda x.\langle r,s \rangle \rightleftarrows \langle \lambda x.r, \lambda x.s \rangle$
@@ -381,8 +392,9 @@ Por ejemplo, el isomorfismo $A \rightarrow (B \times C) \equiv (A \rightarrow B)
 
 
 \subsection{$\lambda^+$}
-$\lambda^+$ \cite{lambda-plus} es una implementación en Haskell de una extensión que agrega naturales y recursión general a Sistema I.
+$\lambda^+$ \cite{lambda-plus} es una implementación en Haskell de una extensión que agrega números naturales y recursión general a Sistema I.
 Este trabajo muestra las dificultades de implementar un sistema de tipos módulo isomorfismos y las aplicaciones prácticas de un lenguaje de programación con dichas capacidades.
+
 Por ejemplo, utilizando los isomorfismos \textsc{curry} y \textsc{comm} es posible aplicar una función a sus argumentos dados en cualquier orden e incluso aplicar la función a solo un subconjunto de  argumentos.
 La idea es convertir todos los argumentos en forma de pares utilizando \textsc{curry}, y luego reordenarlos empleando conmutatividad y asociatividad de los pares:
 \begin{align*}
@@ -392,15 +404,25 @@ La idea es convertir todos los argumentos en forma de pares utilizando \textsc{c
 	S \rightarrow R \rightarrow T& 
 \end{align*}
 
-Un detalle interesante de este sistema, es la adición de una nueva regla llamada $\textsc{split}$ que no surge de ningún isomorfismo, sino que es necesaria para reducir términos que de otra forma quedarían atascados.
-Esta regla relaciona términos de la forma
-$\pi_{R \times S}(\langle r,s \rangle) \rightleftarrows \langle \pi_R(r), \pi_S(s) \rangle$
+Un detalle interesante de este sistema, es que a nivel implementación, se añade una nueva regla de reescritura llamada $dist_e$ que no surge de ningún isomorfismo, sino que es necesaria para reducir términos que de otra forma quedarían atascados.
+Esta regla reescribe términos de la forma
+$\pi_{R \times S}(\langle r,s \rangle) \hookrightarrow \langle \pi_R(r), \pi_S(s) \rangle$
 y permite desatascar proyecciones donde el argumento es una abstracción más algún otro término.
-Por ejemplo, dados los términos $\lambda x^{R \times S}.x: (R \times S) \rightarrow (R \times S)$ y $t : T$ y aplicando las reglas \textsc{dist} y \textsc{asso} se puede obtener un par $\langle \lambda x^{R \times S}.x, t \rangle: ((R \times S) \rightarrow R) \times (((R \times S) \rightarrow S) \times T)$ a continuación se muestra como emplear la regla \textsc{split} para reducir una proyección:
+
+Por ejemplo, dados los términos $\lambda x^{R \times S}.x: (R \times S) \rightarrow (R \times S)$ y $t : T$ se puede construir el par $\langle \lambda x^{R \times S}.x, t \rangle: (((R \times S) \rightarrow (R \times S)) \times T)$, luego aplicando las reglas \textsc{dist} y \textsc{asso} se obtiene la siguiente equivalencia:
+
+\begin{align*}
+	((R \times S) \rightarrow (R \times S)) \times T& \equiv_\textsc{dist} \\
+	(((R \times S) \rightarrow R) \times ((R \times S) \rightarrow S)) \times T& \equiv_\textsc{asso} \\
+	((R \times S) \rightarrow R) \times (((R \times S) \rightarrow S) \times T)& 
+\end{align*}
+
+Por lo tanto, la proyección $\pi_{((R \times S) \rightarrow S) \times T } \langle \lambda x^{R \times S}.x, t \rangle$ es está bien tipada.
+A continuación se muestra como emplear la regla $dist_e$ para reducir una proyección:
 
 \begin{align*}
 	& \pi_{((R \times S) \rightarrow S) \times T } \langle \lambda x^{R \times S}.x, t \rangle \\
-	\rightleftarrows& \\
+	\hookrightarrow&_{dist_e} \\
 	& \langle \pi_{(R \times S) \rightarrow S}(\lambda x^{R \times S}.x), \pi_T(t) \rangle \\
 	\hookrightarrow& \\
 	& \langle \pi_{(R \times S) \rightarrow S}(\lambda x^{R \times S}.x), t \rangle \\
@@ -408,12 +430,12 @@ Por ejemplo, dados los términos $\lambda x^{R \times S}.x: (R \times S) \righta
 	& \langle \lambda x^{R \times S}. \pi_S(x) , t \rangle \\
 \end{align*}
 
-Esto muestra que desde el punto de vista de la implementación, puede ser necesario agregar nuevas equivalencias de términos para lograr reducir a una forma normal.
-Este punto es importante, ya que la formalización de la propiedad de progreso implica demostrar que es posible reducir todas las eliminaciones hasta llegar a una forma normal, en simples palabras, el conjunto de equivalencias de términos es lo suficientemente grande como para desatascar cualquier término que pueda presentarse.
+Esto muestra que desde el punto de vista de la implementación, puede ser necesario agregar nuevas reglas de reescritura para lograr reducir a una forma normal.
+Este punto es importante, ya que la formalización de la propiedad de progreso implica demostrar que es posible reducir todas las eliminaciones hasta llegar a una forma normal, en simples palabras, el conjunto de reglas es lo suficientemente grande como para desatascar cualquier término que pueda presentarse.
 	
 \section{Tipos dependientes}
 
-Un tipo de datos dependientes es aquel cuya definición depende de valores.
+Un tipo de datos dependiente es aquel cuya definición depende de valores.
 Son usados para expresar una propiedad sobre los términos en el tipo de los mismos.
 Un ejemplo clásico que se suele dar a la hora de presentar los tipos dependientes, es el de los vectores de largo $n$:
 
@@ -428,20 +450,20 @@ Esto quiere decir que dentro de los tipos pueden aparecer términos, lo cual per
 
 Para entender la practicidad de un sistema de tipos con dicho nivel de especificidad, se comparan los siguientes programas:
 \begin{lstlisting}[mathescape, language=Haskell]
-	zeroesL :: $\mathbb{N}$ -> List $\mathbb{N}$
-	zeroesL 0       = []
-	zeroesL (suc n) = 0 :: (zeroesL n)
+	zerosL :: $\mathbb{N}$ -> List $\mathbb{N}$
+	zerosL 0       = []
+	zerosL (suc n) = 0 :: (zerosL n)
 	
-	zeroesV :: (n :: $\mathbb{N}$) -> Vec $\mathbb{N}$ n
-	zeroesV 0       = nil
-	zeroesV (suc n) = cons 0 (zeroesV n)
+	zerosV :: (n :: $\mathbb{N}$) -> Vec $\mathbb{N}$ n
+	zerosV 0       = nil
+	zerosV (suc n) = cons 0 (zerosV n)
 \end{lstlisting}
 
-Notar que el tipo de $zeroesV$ es dependiente e introduce una variable.
-Si bien la implementación dada para $zeroesL$ es correcta, nada impediría simplemente retornar \verb|[]| en todos los casos, por el contrario, en el caso \verb|(suc n)| de $zeroesV$ se estaría cometiendo un error de tipo si se tratara de retornar \verb|[]|, ya que se espera un término de tipo \verb|Vec| $\mathbb{N}$ \verb|(suc n)| y la lista vacía tiene tipo \verb|Vec| $\mathbb{N}$ \verb|0|.
+Notar que el tipo de $zerosV$ es dependiente e introduce una variable.
+Si bien la implementación dada para $zerosL$ es correcta, nada impediría simplemente retornar \verb|[]| en todos los casos, por el contrario, en el caso \verb|(suc n)| de $zerosV$ se estaría cometiendo un error de tipo si se tratara de retornar \verb|[]|, ya que se espera un término de tipo \verb|Vec| $\mathbb{N}$ \verb|(suc n)| y la lista vacía tiene tipo \verb|Vec| $\mathbb{N}$ \verb|0|.
 De cierta forma el tipo de las funciones está guiando su implementación, impidiendo, en este caso, retornar un vector de largo incorrecto.
 
-Otro ejemplo interesante que se logra con la programación con tipos dependientes es el operador de indexación. Sobre las listas, este operador se define como:
+Otro ejemplo interesante que se logra con la programación con tipos dependientes es el operador de acceso. Sobre las listas, este operador se define como:
 
 \begin{lstlisting}[mathescape, language=Haskell]
 	_!!_ :: List a -> $\mathbb{N}$ -> Maybe a
@@ -450,7 +472,7 @@ Otro ejemplo interesante que se logra con la programación con tipos dependiente
 	(x :: xs) !! (suc n) = xs !! n
 \end{lstlisting}
 
-Notar el uso del tipo de datos \verb|Maybe| para capturar los casos en que la indexación falla.
+Notar el uso del tipo de datos \verb|Maybe| para capturar los casos en que el acceso no es posible.
 
 Antes de presentar la implementación para vectores, es necesario definir el tipo de datos de los conjuntos finitos:
 
@@ -544,7 +566,7 @@ Básicamente, dice que a cada proposición en la lógica le corresponde un tipo,
 De hecho, esta relación es más profunda, ya que a cada prueba de una proposición dada, le corresponde un programa del tipo correspondiente, y viceversa.
 Es decir, ``pruebas como programas''.
 Incluso, es más profunda aún, en el sentido de que para cada forma de simplificar una prueba, existe una forma correspondiente de evaluar un programa, y viceversa.
-Por lo que tenemos, ``simplificación de pruebas como evaluación de programas''.
+Por lo que se tiene ``simplificación de pruebas como evaluación de programas''.
 
 Tal como lo explica Wadler en su artículo \cite{pas}, no se trata de una simple biyección entre proposiciones y tipos, sino de un verdadero isomorfismo que preserva la compleja estructura de pruebas y programas, simplificaciones y evaluaciones.
 
@@ -566,12 +588,12 @@ Las correspondencias que surgen de esta interpretación pueden resumirse de la s
 	\item El cuantificador existencial $\exists x:A.B$ se corresponde con el tipo $\Sigma x:A.B$.
 	Básicamente, esto es una familia de tipos indexada por $a : A$ donde a cada término $a$ le corresponde un tipo $B(a)$.
 	Los elementos canónicos de $\Sigma x:A.B$ son pares dependientes $\langle a, b \rangle$ donde $a:A$ y $b:B(a)$.
-	Cuando $B(a)$ es una función constante, este tipo es equivalente al producto cartesiano $A \times B$.
+	Cuando $B(x)$ es una función constante, este tipo es equivalente al producto cartesiano $A \times B$.
 	
 	
 	\item El cuantificador universal $\forall x:A.B$ se corresponde con $\Pi x:A.B$, al igual que para el tipo $\Sigma$, $B$ es una familia de tipos indexada por los términos de tipo $A$.
 	Los elementos canónicos de $\Pi x:A.B$ son funciones dependientes $a \rightarrow B(a)$.
-	Cuando $B(a)$ es una función constante, el tipo $\Pi$ es equivalente al tipo de las funciones ordinarias $A \rightarrow B$.
+	Cuando $B(x)$ es una función constante, el tipo $\Pi$ es equivalente al tipo de las funciones ordinarias $A \rightarrow B$.
 \end{itemize}
 
 
@@ -589,7 +611,7 @@ Sin embargo, puede que no siempre sea posible construir una prueba de dicha prop
 
 
 Se puede pensar a la teoría de tipos intuicionista como un lenguaje de programación funcional donde el sistema de tipos es tan rico que prácticamente cualquier propiedad concebible de un programa puede expresarse como un tipo.
-Todas las funciones de este lenguaje deben ser totales y computables, por lo que todos los programas deben necesariamente cumplir con la propiedad de terminación.
+Todas las funciones de este lenguaje deben ser totales y decidibles, por lo que todos los programas deben necesariamente cumplir con la propiedad de terminación.
 
 Filosófica y prácticamente, la teoría de tipos de Martin-Löf es un marco fundamental donde las matemáticas constructivas y la programación son, en un sentido profundo, lo mismo.
 
@@ -601,7 +623,7 @@ Debido al paradigma de las proposiciones como tipos, Agda también funciona como
 A diferencia de otros asistentes, como Coq, carece de un sistema de tácticas, por lo que las pruebas son escritas en un estilo de programación funcional, de hecho su sintaxis es similar a la de Haskell.
 
 Agda es un lenguaje total, es decir que todos los programas deben terminar, y todos los posibles casos de un pattern matching deben ser cubiertos, de otro modo la lógica sería inconsistente.
-Por este motivo, no todas las funciones recursivas están permitidas, Agda poseé un mecanismo de comprobación de terminación que acepta aquellas funciones que puede probar mecánicamente su terminación.
+Por este motivo, no todas las funciones recursivas están permitidas, Agda posee un mecanismo de comprobación de terminación que acepta aquellas funciones para las que puede probar mecánicamente su terminación.
 
 % TODO: Explicar simbolos, opperadores y Sets (universos)
 
@@ -628,7 +650,7 @@ Además, los términos tienen una única representación, es decir, no es necesa
 A nivel implementación, esta representación facilita la manipulación de términos, en especial, cuando se implementa la $\beta$-reducción.
 
 \section{Substituciones explícitas}
-Utilizando la representación de De Bruijn, las sustituciones son simplemente mapas de números naturales a términos, es decir que pueden interpretarse como una secuencia infinita de términos.
+Utilizando la representación de De Bruijn, las sustituciones son simplemente mapeos de números naturales a términos, es decir que pueden interpretarse como una secuencia infinita de términos.
 Por ejemplo:
 \[ (0\; 1\; 3)\{0\mapsto a, 1\mapsto b, 2\mapsto 0, 3\mapsto 1, \dots \} \rightarrow a\; b\; 1 \]
 
@@ -659,6 +681,7 @@ Notar como las variables libres del cuerpo de la abstracción se disminuyen en u
 
 
 En \cite{explicit_subs} se presenta el álgebra-$\sigma$ y los cuatro operadores que permiten construir estas secuencias.
+Donde se escribe $\llangle s \rrangle a$ para expresar la aplicación de la substitución $s$ sobre el término $a$.
 
 \begin{itemize}
 	\item $id$ es la substitución identidad $\{i \mapsto i\}$.
