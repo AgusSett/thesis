@@ -110,7 +110,7 @@ Notar que esta definición sigue la forma propuesta por Abadi: $Z \bullet (\rho 
 \end{codigo}
 
 \begin{example}
-	El renombre \const{S\_} simplemente suma uno a todas las variables libres del término
+	El renombre \const{S\_} simplemente suma uno a todas las variables libres del término.
 	\ExecuteMetaData[code/example.tex]{rename}
 \end{example}
 
@@ -196,8 +196,6 @@ La solución es definir nuevos constructores que embeban estas reglas, como por 
 Al igual que en la relación de reducción, los tipos intrínsecos garantizan que los términos transformados por los isomorfismos preservan sus tipos.
 Notar como todos los isomorfismos base presentan una regla ($\equiv$) del lado izquierdo, la cual desaparece del lado derecho.
 Por lo tanto, los isomorfismos solo pueden aplicarse para eliminar un constructor ($\equiv$) del término.
-%TODO:
-Este último punto es fundamental para preservar la propiedad de normalización.
 
 
 \begin{example}
@@ -257,9 +255,13 @@ Luego, es fácil ver que todo término cerrado en forma normal es un valor.
 
 \subsection{Estrategia de reducción}
 
-La formalización de progreso implementa una estrategia de reducción \textit{strong call-by-value}, es decir, reduce primero los argumentos de las aplicaciones antes de aplicar la $\beta$-reducción, y además, reduce debajo de los lambdas.
-
-Se define una nueva relación \type{Progress}, que representa los tres posibles resultados de aplicar la prueba de progreso sobre un término, estos son, dar un paso de reducción \type{$\_\hookrightarrow\_$}, aplicar un isomorfismo \type{$\_\rightleftarrows\_$}, o puede encontrarse que el término está en forma normal, en cuyo caso no es posible seguir reduciéndolo.
+Para representar la propiedad de progreso se define una nueva relación \type{Progress} sobre los términos.
+Los constructores de esta relación se corresponden con los tres posibles casos en los cuales se cumple la propiedad de progreso para un término, estos son:
+\begin{enumerate}
+	\item El término aplicar un isomorfismo \type{$\_\rightleftarrows\_$}.
+	\item El término puede dar un paso de reducción \type{$\_\hookrightarrow\_$}.
+	\item El término se encuentra en forma normal, en cuyo caso no es posible seguir reduciéndolo.
+\end{enumerate}
 
 \begin{codigo}
 	Propiedad de progreso
@@ -267,6 +269,7 @@ Se define una nueva relación \type{Progress}, que representa los tres posibles 
 \end{codigo}
 
 Luego, la prueba de progreso consiste en probar que la propiedad \type{Progress} se cumple para todo término dado.
+La formalización implementa una estrategia de reducción \textit{strong call-by-value}, es decir, reduce primero los argumentos de las aplicaciones antes de aplicar la $\beta$-reducción, y además, reduce debajo de los lambdas.
 
 En primer lugar, se presentan los casos para las variables y el término \const{$\star$}, donde simplemente se concluye que ambos se encuentran en formal normal.
 
@@ -282,7 +285,7 @@ Primero se realizan todos los pasos que sean posibles sobre el lado izquierdo, y
 
 \ExecuteMetaData[code/progress.tex]{progress-prod}
 
-Notar que las evidencias retornadas por las llamadas recursivas que indican que \bound{N} y \bound{M} están en forma normal, son utilizadas para probar que todo el par se encuentra en formal normal \const{N-$\langle$}~\bound{NN}~\const{,}~\bound{NM}~\const{$\rangle$}.
+Notar que las evidencias retornadas por las llamadas recursivas que indican que \bound{r} y \bound{s} están en forma normal, son utilizadas para probar que todo el par se encuentra en formal normal \const{N-$\langle$}~\bound{⇑r}~\const{,}~\bound{⇑s}~\const{$\rangle$}.
 
 Para las proyecciones se reduce primero el término que se está proyectando.
 Aquí se debe notar que existen dos posibles formas en las que la llamada recursiva puede alcanzar una forma normal.
@@ -296,8 +299,8 @@ Sin embargo, si la función se encuentra en formal neutral, entonces no es posib
 
 \ExecuteMetaData[code/progress.tex]{progress-app}
 
-Por último se presenta el constructor \const{[}~\bound{iso}~\const{]≡}~\bound{N}.
-Al igual que en el resto de los casos, primero se reduce el subtérmino \bound{N}.
+Por último se presenta el constructor \const{[}~\bound{iso}~\const{]≡}~\bound{t}.
+Al igual que en el resto de los casos, primero se reduce el subtérmino \bound{t}.
 Luego, para cada forma normal se deben tener en cuenta todos los isomorfismos que sean aplicables en cada caso.
 
 \ExecuteMetaData[code/progress.tex]{progress-iso}
@@ -314,7 +317,7 @@ Se requiere aplicar el isomorfismo \const{asso-split} que combina ambas reglas e
 
 Lo mismo ocurre con el resto de los isomorfismos que presentan los sufijos \const{split} y \const{$\eta$}.
 
-Finalmente, si el término \bound{N} es neutral, se concluye que todo el término también es neutral.
+Finalmente, si el término \bound{t} es neutral, se concluye que todo el término también es neutral.
 
 La definición de \func{progress} muestra claramente como cada isomorfismo de término se corresponde con un caso donde es necesario eliminar una regla $(\equiv)$ para poder continuar con la reducción.
 En la formalización, el lenguaje es dirigido por sintaxis.

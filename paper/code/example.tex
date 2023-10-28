@@ -1,64 +1,3 @@
-\begin{code}%
-\>[0]\AgdaKeyword{module}\AgdaSpace{}%
-\AgdaModule{Examples}\AgdaSpace{}%
-\AgdaKeyword{where}\<%
-\\
-%
-\\[\AgdaEmptyExtraSkip]%
-\>[0]\AgdaKeyword{open}\AgdaSpace{}%
-\AgdaKeyword{import}\AgdaSpace{}%
-\AgdaModule{Type}\<%
-\\
-\>[0]\AgdaKeyword{open}\AgdaSpace{}%
-\AgdaKeyword{import}\AgdaSpace{}%
-\AgdaModule{Term}\<%
-\\
-\>[0]\AgdaKeyword{open}\AgdaSpace{}%
-\AgdaKeyword{import}\AgdaSpace{}%
-\AgdaModule{Subs}\<%
-\\
-\>[0]\AgdaKeyword{open}\AgdaSpace{}%
-\AgdaKeyword{import}\AgdaSpace{}%
-\AgdaModule{IsoType}\<%
-\\
-\>[0]\AgdaKeyword{open}\AgdaSpace{}%
-\AgdaKeyword{import}\AgdaSpace{}%
-\AgdaModule{IsoTerm}\<%
-\\
-\>[0]\AgdaKeyword{open}\AgdaSpace{}%
-\AgdaKeyword{import}\AgdaSpace{}%
-\AgdaModule{Reduction}\<%
-\\
-\>[0]\AgdaKeyword{open}\AgdaSpace{}%
-\AgdaKeyword{import}\AgdaSpace{}%
-\AgdaModule{Progress}\<%
-\\
-\>[0]\AgdaKeyword{open}\AgdaSpace{}%
-\AgdaKeyword{import}\AgdaSpace{}%
-\AgdaModule{Eval}\<%
-\\
-\>[0]\AgdaKeyword{open}\AgdaSpace{}%
-\AgdaKeyword{import}\AgdaSpace{}%
-\AgdaModule{Relation.Binary.PropositionalEquality}\AgdaSpace{}%
-\AgdaKeyword{renaming}\AgdaSpace{}%
-\AgdaSymbol{(}\AgdaOperator{\AgdaDatatype{\AgdaUnderscore{}≡\AgdaUnderscore{}}}\AgdaSpace{}%
-\AgdaSymbol{to}\AgdaSpace{}%
-\AgdaOperator{\AgdaDatatype{\AgdaUnderscore{}≋\AgdaUnderscore{}}}\AgdaSymbol{)}\AgdaSpace{}%
-\AgdaKeyword{hiding}\AgdaSpace{}%
-\AgdaSymbol{(}\AgdaFunction{sym}\AgdaSymbol{;}\AgdaSpace{}%
-\AgdaOperator{\AgdaInductiveConstructor{[\AgdaUnderscore{}]}}\AgdaSymbol{)}\<%
-\\
-\>[0]\AgdaKeyword{open}\AgdaSpace{}%
-\AgdaKeyword{import}\AgdaSpace{}%
-\AgdaModule{Data.Sum.Base}\AgdaSpace{}%
-\AgdaKeyword{using}\AgdaSpace{}%
-\AgdaSymbol{(}\AgdaOperator{\AgdaDatatype{\AgdaUnderscore{}⊎\AgdaUnderscore{}}}\AgdaSymbol{;}\AgdaSpace{}%
-\AgdaInductiveConstructor{inj₁}\AgdaSymbol{;}\AgdaSpace{}%
-\AgdaInductiveConstructor{inj₂}\AgdaSymbol{)}\<%
-\\
-\>[0]\<%
-\end{code}
-
 %<*type>
 \begin{code}%
 \>[0]\AgdaFunction{fun}\AgdaSpace{}%
@@ -111,7 +50,8 @@
 \AgdaInductiveConstructor{Z}\AgdaSpace{}%
 \AgdaOperator{\AgdaInductiveConstructor{·}}\AgdaSpace{}%
 \AgdaOperator{\AgdaInductiveConstructor{`}}\AgdaSpace{}%
-\AgdaInductiveConstructor{Z}\AgdaSymbol{))}\<%
+\AgdaInductiveConstructor{Z}\AgdaSymbol{))}\AgdaSpace{}
+\AgdaComment{--\ λ x . y (y x)}\<%
 \\
 %
 \\[\AgdaEmptyExtraSkip]%
@@ -140,7 +80,8 @@
 \AgdaInductiveConstructor{Z}\AgdaSpace{}%
 \AgdaOperator{\AgdaInductiveConstructor{·}}\AgdaSpace{}%
 \AgdaOperator{\AgdaInductiveConstructor{`}}\AgdaSpace{}%
-\AgdaInductiveConstructor{Z}\AgdaSymbol{))}\<%
+\AgdaInductiveConstructor{Z}\AgdaSymbol{))}\AgdaSpace{}
+\AgdaComment{--\ λ y . λ x . y (y x)}\<%
 \\
 %
 \\[\AgdaEmptyExtraSkip]%
@@ -264,7 +205,8 @@
 	\AgdaInductiveConstructor{Z}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{·}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{`}}\AgdaSpace{}%
-	\AgdaInductiveConstructor{Z}\AgdaSymbol{))}\<%
+	\AgdaInductiveConstructor{Z}\AgdaSymbol{))}\AgdaSpace{}
+	\AgdaComment{--\ λ 1 (1 0)}\<%
 	\\
 	%
 	\\[\AgdaEmptyExtraSkip]%
@@ -296,7 +238,8 @@
 	\AgdaInductiveConstructor{Z}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{·}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{`}}\AgdaSpace{}%
-	\AgdaInductiveConstructor{Z}\AgdaSymbol{))}\<%
+	\AgdaInductiveConstructor{Z}\AgdaSymbol{))}\AgdaSpace{}
+	\AgdaComment{--\ λ 2 (2 0)}\<%
 	\\
 	%
 	\\[\AgdaEmptyExtraSkip]%
@@ -340,7 +283,8 @@
 	\AgdaInductiveConstructor{Z}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{·}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{`}}\AgdaSpace{}%
-	\AgdaInductiveConstructor{Z}\AgdaSymbol{)}\<%
+	\AgdaInductiveConstructor{Z}\AgdaSymbol{)}\AgdaSpace{}
+	\>[1]\AgdaComment{--\ λ 1 (1 0)}\<%
 	\\
 	%
 	\\[\AgdaEmptyExtraSkip]%
@@ -356,7 +300,8 @@
 	\AgdaSymbol{=}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{ƛ}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{`}}\AgdaSpace{}%
-	\AgdaInductiveConstructor{Z}\<%
+	\AgdaInductiveConstructor{Z}\AgdaSpace{}
+	\>[1]\AgdaComment{--\ λ 0}\<%
 	\\
 	%
 	\\[\AgdaEmptyExtraSkip]%
@@ -380,7 +325,8 @@
 	\AgdaInductiveConstructor{Z}\AgdaSymbol{)}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{·}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{`}}\AgdaSpace{}%
-	\AgdaInductiveConstructor{Z}\AgdaSymbol{)}\<%
+	\AgdaInductiveConstructor{Z}\AgdaSymbol{)}\AgdaSpace{}
+	\>[1]\AgdaComment{--\ λ (λ 0) ((λ 0) 0)}\<%
 	\\
 	%
 	\\[\AgdaEmptyExtraSkip]%
@@ -424,7 +370,8 @@
 	\AgdaOperator{\AgdaInductiveConstructor{·}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{`}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{S}}\AgdaSpace{}%
-	\AgdaInductiveConstructor{Z}\<%
+	\AgdaInductiveConstructor{Z}\AgdaSpace{}
+	\>[1]\AgdaComment{--\ λ 0 1}\<%
 	\\
 	%
 	\\[\AgdaEmptyExtraSkip]%
@@ -443,7 +390,8 @@
 	\AgdaOperator{\AgdaInductiveConstructor{`}}\AgdaSpace{}%
 	\AgdaInductiveConstructor{Z}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{·}}\AgdaSpace{}%
-	\AgdaInductiveConstructor{⋆}\<%
+	\AgdaInductiveConstructor{⋆}\AgdaSpace{}
+	\>[1]\AgdaComment{--\ 0 ⋆}\<%
 	\\
 	%
 	\\[\AgdaEmptyExtraSkip]%
@@ -471,7 +419,8 @@
 	\AgdaOperator{\AgdaInductiveConstructor{S}}\AgdaSpace{}%
 	\AgdaInductiveConstructor{Z}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{·}}\AgdaSpace{}%
-	\AgdaInductiveConstructor{⋆}\AgdaSymbol{))}\<%
+	\AgdaInductiveConstructor{⋆}\AgdaSymbol{))}\AgdaSpace{}
+	\>[1]\AgdaComment{--\ λ 0 (1 ⋆)}\<%
 	\\
 	%
 	\\[\AgdaEmptyExtraSkip]%
@@ -697,13 +646,7 @@
 \\[\AgdaEmptyExtraSkip]%
 \>[0]\AgdaFunction{\AgdaUnderscore{}}\AgdaSpace{}%
 \AgdaSymbol{:}\AgdaSpace{}%
-\AgdaSymbol{∀}\AgdaSpace{}%
-\AgdaSymbol{\{}\AgdaBound{A}\AgdaSpace{}%
-\AgdaBound{B}\AgdaSymbol{\}}\AgdaSpace{}%
-\AgdaSymbol{→}\AgdaSpace{}%
 \AgdaFunction{T₄}\AgdaSpace{}%
-\AgdaSymbol{\{}\AgdaBound{A}\AgdaSymbol{\}}\AgdaSpace{}%
-\AgdaSymbol{\{}\AgdaBound{B}\AgdaSymbol{\}}\AgdaSpace{}%
 \AgdaOperator{\AgdaDatatype{⇄}}\AgdaSpace{}%
 \AgdaOperator{\AgdaInductiveConstructor{[}}\AgdaSpace{}%
 \AgdaInductiveConstructor{sym}\AgdaSpace{}%
@@ -760,15 +703,9 @@ _ = ^ π (` (S Z) · N-⋆)
 %
 \\[\AgdaEmptyExtraSkip]%
 \>[0]\AgdaFunction{\AgdaUnderscore{}}\AgdaSpace{}%
-\AgdaSymbol{:}%
-\>[5]\AgdaSymbol{∀}\AgdaSpace{}%
-\AgdaSymbol{\{}\AgdaBound{A}\AgdaSpace{}%
-\AgdaBound{B}\AgdaSymbol{\}}\AgdaSpace{}%
-\AgdaSymbol{→}\AgdaSpace{}%
+\AgdaSymbol{:}\AgdaSpace{}%
 \AgdaFunction{progress}\AgdaSpace{}%
-\AgdaSymbol{(}\AgdaFunction{T₄}\AgdaSpace{}%
-\AgdaSymbol{\{}\AgdaBound{A}\AgdaSymbol{\}}\AgdaSpace{}%
-\AgdaSymbol{\{}\AgdaBound{B}\AgdaSymbol{\})}\AgdaSpace{}%
+\AgdaFunction{T₄}\AgdaSpace{}%
 \AgdaOperator{\AgdaDatatype{≋}}\AgdaSpace{}%
 \AgdaInductiveConstructor{step⇄}\AgdaSpace{}%
 \AgdaSymbol{(}\AgdaInductiveConstructor{ξ-≡}\AgdaSpace{}%
@@ -1111,6 +1048,8 @@ _ = ^ π (` (S Z) · N-⋆)
 %</eval2>
 %<*eval>
 \begin{code}%
+	\>[0]\AgdaComment{-- Ω = (λx:T.xx)(λx:T.xx) : T}\<
+	\\
 	\>[0]\AgdaFunction{Ω}\AgdaSpace{}%
 	\AgdaSymbol{:}\AgdaSpace{}%
 	\AgdaInductiveConstructor{∅}\AgdaSpace{}%

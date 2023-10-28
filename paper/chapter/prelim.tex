@@ -417,8 +417,8 @@ Por ejemplo, dados los términos $\lambda x^{R \times S}.x: (R \times S) \righta
 	((R \times S) \rightarrow R) \times (((R \times S) \rightarrow S) \times T)& 
 \end{align*}
 
-Por lo tanto, la proyección $\pi_{((R \times S) \rightarrow S) \times T } \langle \lambda x^{R \times S}.x, t \rangle$ es está bien tipada.
-A continuación se muestra como emplear la regla $dist_e$ para reducir una proyección:
+Por lo tanto, la proyección $\pi_{((R \times S) \rightarrow S) \times T } \langle \lambda x^{R \times S}.x, t \rangle$ está bien tipada.
+A continuación se muestra como emplear la regla $dist_e$ para reducir dicha proyección:
 
 \begin{align*}
 	& \pi_{((R \times S) \rightarrow S) \times T } \langle \lambda x^{R \times S}.x, t \rangle \\
@@ -465,7 +465,7 @@ De cierta forma el tipo de las funciones está guiando su implementación, impid
 
 Otro ejemplo interesante que se logra con la programación con tipos dependientes es el operador de acceso. Sobre las listas, este operador se define como:
 
-\begin{lstlisting}[mathescape, language=Haskell]
+\begin{lstlisting}[mathescape, language=Haskell, deletekeywords={zero}]
 	_!!_ :: List a -> $\mathbb{N}$ -> Maybe a
 	[] !! n              = nothing
 	(x :: xs) !! zero    = just x
@@ -476,7 +476,7 @@ Notar el uso del tipo de datos \verb|Maybe| para capturar los casos en que el ac
 
 Antes de presentar la implementación para vectores, es necesario definir el tipo de datos de los conjuntos finitos:
 
-\begin{lstlisting}[mathescape, language=Haskell]
+\begin{lstlisting}[mathescape, language=Haskell, deletekeywords={zero}]
 	data Fin $\mathbb{N}$ where
 	  zero : Fin (suc n)
 	  suc  : Fin n -> Fin (suc n)
@@ -486,7 +486,7 @@ Cada tipo \verb|Fin n| está habitado por $n$ elementos, estos serían, el eleme
 Notar que \verb|Fin 0| es un conjunto vacío, es decir que no existe ningún término con dicho tipo, o dicho de otra forma, el tipo \verb|Fin 0| no está habitado por ningún término.
 Luego, un vector de largo $n$ estará indexado por los elementos del conjunto \verb|Fin n|, que tiene cardinalidad exactamente igual a $n$.
 
-\begin{lstlisting}[mathescape, language=Haskell]
+\begin{lstlisting}[mathescape, language=Haskell, deletekeywords={zero}]
 	_!!v_ :: Vec a n -> Fin n -> a
 	(cons x v) !!v zero  = x
 	(cons x v) !!v suc i = v !!v i
@@ -561,7 +561,7 @@ En particular, $\lambda C$ tiene un sistema de tipos lo suficientemente expresiv
 
 
 \section{Proposiciones como Tipos}
-El paradigma de ``proposiciones como tipos'' describe la correspondencia entre la lógica y los lenguajes de programación.
+En teoría de tipos, el paradigma de ``proposiciones como tipos'' describe la correspondencia entre la lógica y los lenguajes de programación.
 Básicamente, dice que a cada proposición en la lógica le corresponde un tipo, y viceversa.
 De hecho, esta relación es más profunda, ya que a cada prueba de una proposición dada, le corresponde un programa del tipo correspondiente, y viceversa.
 Es decir, ``pruebas como programas''.
@@ -579,7 +579,7 @@ Las correspondencias que surgen de esta interpretación pueden resumirse de la s
 	\item La conjunción $A \wedge B$ se corresponde con el par $A \times B$.
 	Una prueba de la proposición $A \wedge B$ consiste de una prueba de $A$ y una prueba de $B$.
 	
-	\item La disyunción $A \vee B$ se corresponde con la suma disyunta $A + B$.
+	\item La disjunción $A \vee B$ se corresponde con la suma disjunta $A + B$.
 	Una prueba de la proposición $A \vee B$ consiste de una prueba de $A$ o una prueba de $B$.
 	
 	\item La implicación $A \Rightarrow B$ se corresponde con el espacio de funciones $A \rightarrow B$.
@@ -598,7 +598,7 @@ Las correspondencias que surgen de esta interpretación pueden resumirse de la s
 
 
 \section{Teoría de Tipos Intuicionista}
-La teoría de tipos intuicionista, también llamada teoría de tipos de Martin-Löf \cite{ITT} propone un sistema lógico formal y los fundamentos filosóficos para las matemáticas constructivas.
+La teoría de tipos intuicionista, también llamada teoría de tipos de Martin-Löf \cite{MLTT72, MLTT73, MLTT79, Bibliopolis} propone un sistema lógico formal y los fundamentos filosóficos para las matemáticas constructivas.
 
 Directamente influenciado por las ideas de Howard, Martin-Löf se basó en el principio de proposiciones como tipos y el constructivismo matemático para el desarrollo de su teoría.
 Este constructivismo requiere que las pruebas contengan un ``testigo'', una prueba de una proposición dada es un programa, por lo tanto, las proposiciones son verdaderas cuando su tipo está habitado por algún término.
@@ -622,7 +622,7 @@ Chalmers (Suiza).
 Debido al paradigma de las proposiciones como tipos, Agda también funciona como un asistente de pruebas.
 A diferencia de otros asistentes, como Coq, carece de un sistema de tácticas, por lo que las pruebas son escritas en un estilo de programación funcional, de hecho su sintaxis es similar a la de Haskell.
 
-Agda es un lenguaje total, es decir que todos los programas deben terminar, y todos los posibles casos de un pattern matching deben ser cubiertos, de otro modo la lógica sería inconsistente.
+Agda es una implementación de la Teoría de Tipos de Martin-Löf, para que la lógica sea consistente, los programas deben ser totales, es decir que todos los programas deben terminar, y todos los posibles casos de un pattern matching deben ser cubiertos.
 Por este motivo, no todas las funciones recursivas están permitidas, Agda posee un mecanismo de comprobación de terminación que acepta aquellas funciones para las que puede probar mecánicamente su terminación.
 
 % TODO: Explicar simbolos, opperadores y Sets (universos)
