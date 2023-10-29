@@ -662,7 +662,9 @@ El problema es que al eliminar un $\lambda$ todas las variables libres de $a$ qu
 
 \[ (\lambda a)b \rightarrow_{\beta} a \{ 0 \mapsto b, 1\mapsto 0, 2\mapsto 1, \dots \} \]
 
-El siguiente problema surge al intentar empujar la substitución dentro de una abstracción, en dicho caso, se debe evitar reemplazar el índice 0 por $b$, por lo que toda la secuencia se mueve un lugar a la derecha:
+
+El siguiente problema surge al intentar empujar la substitución dentro de una abstracción, por ejemplo si $a = \lambda c$, la sustitución que se aplique sobre $c$ no debería sustituir el índice 0, ya que  éste representa a la variable capturada por la abstracción, además los demás índices a sustituir en $c$ estarán bajo una ligadura.
+Para solucionar este problema se modifica la sustitución a aplicar sobre el cuerpo de una abstracción, eliminando la sustitución de 0 y aumentando en un 1 los demás índices a sustituir:
 
 \[ (\lambda c)\{ 0 \mapsto b, i+1\mapsto i \} = \lambda c \{ 0 \mapsto 0, 1 \mapsto b, 2\mapsto 1, 3\mapsto 2, \dots \} \]
 
@@ -677,8 +679,7 @@ El siguiente ejemplo muestra la forma correcta de realizar una $\beta$ reducció
 \lambda \; \textcolor{magenta}{2} \; (\textcolor{blue}{\lambda}\; \textcolor{orange}{5}\; \textcolor{blue}{0})\; (\textcolor{green}{\lambda\; 0}\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{6}\; \textcolor{blue}{0}))\;
 \]
 
-Notar como las variables libres del cuerpo de la abstracción se disminuyen en uno, las variables libres del argumento aumentan en uno por cada $\lambda$ que atraviesan, y las variables ligadas quedan intactas.
-
+Notar como las variables libres del cuerpo de la abstracción disminuyen en uno, mientras que en el argumento de la abstracción las variables libres aumentan en uno por cada $\lambda$ que atraviesan, y las variables ligadas quedan intactas.
 
 En \cite{explicit_subs} se presenta el álgebra-$\sigma$ y los cuatro operadores que permiten construir estas secuencias.
 Donde se escribe $\llangle s \rrangle a$ para expresar la aplicación de la substitución $s$ sobre el término $a$.
@@ -686,7 +687,7 @@ Donde se escribe $\llangle s \rrangle a$ para expresar la aplicación de la subs
 \begin{itemize}
 	\item $id$ es la substitución identidad $\{i \mapsto i\}$.
 	\item $\uparrow$ es el operador shift, y suma uno a cada índice $\{i \mapsto i+1\}$.
-	\item $a \bullet s$ es la concatenación del término $a$ con la substitución $s$, $\{0 \mapsto a, i+1 \mapsto s(i)\}$. Por ejemplo $a \bullet id = \{ 0 \mapsto a, 1 \mapsto 0, 2 \mapsto 1, 3 \mapsto 2, \dots \} = \{ 0 \mapsto a, i+1 \mapsto i \} $
+	\item $a \bullet s$ es la concatenación del término $a$ con la substitución $s$, que se define como $\{0 \mapsto a, i+1 \mapsto s(i)\}$. Por ejemplo $a \bullet id = \{ 0 \mapsto a, 1 \mapsto 0, 2 \mapsto 1, 3 \mapsto 2, \dots \} = \{ 0 \mapsto a, i+1 \mapsto i \} $
 	\item $s \circ t$ corresponde a la composición de substituciones, donde primero se aplica $s$ y luego $t$ $\{ i \mapsto \llangle t \rrangle (s(i)) \}$.
 \end{itemize}
 

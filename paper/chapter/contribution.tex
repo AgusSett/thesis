@@ -34,7 +34,7 @@ Reynolds \cite{reynolds_1998} acuñó las expresiones \textit{tipos intrínsecos
 
 \subsection{Cálculo lambda con pares y tipo Top}
 
-En esta sección se presenta una formalización en Agda de un cálculo lambda simplemente tipado con pares extendido con tipos isomorfismos y toda la internalización que estos implican.
+En esta sección se presenta una formalización en Agda de un cálculo lambda simplemente tipado con pares extendido con isomorfismos de tipo.
 Gran parte del código presentado en este trabajo está basado y adaptado a partir de un libro de Philip Wadler \cite{plfa}.
 La adaptación consiste principalmente en la adición de los isomorfismos de tipos, la regla de tipado $(\equiv)$ y la relación de isomorfismos de términos.
 
@@ -59,13 +59,15 @@ Luego se formalizan las variables intrínsecamente tipadas, que son representada
 
 \begin{codigo}
 	Tipo de dato de los contextos de tipado y variables intrínsecamente tipadas.
-	Los argumentos escritos entre $\{\}$ son implícitos, cuando se aplican los constructores, estos argumentos se omiten y Agda se encargara de inferir los valores correspondientes.
+	Los argumentos escritos entre $\{\}$ son implícitos, cuando se aplican los constructores, estos argumentos se omiten y Agda se encargará de inferir los valores correspondientes.
 	\ExecuteMetaData[code/context.tex]{ctx}
 \end{codigo}
 
+La proposición \bound{$\Gamma$} \const{$\ni$} \bound{A} indica que existe un tipo \bound{A} dentro del entorno \bound{$\Gamma$}, es decir que este es el tipo de las variables que tienen tipo \bound{A} en el entorno \bound{$\Gamma$}.
+Los términos construidos con \const{Z} y \const{S} corresponden los a índices de DeBruijn, los cuales constituyen pruebas para dichas proposiciones.
+
 \begin{example}
-	La proposición \bound{$\Gamma$} \const{$\ni$} \bound{A} indica que existe un tipo \bound{A} dentro del entorno \bound{$\Gamma$}.
-	Los términos construidos con \const{Z} y \const{s} constituyen pruebas para dichas proposiciones.
+	Las siguientes variables con tipos $\top$ y $\top \Rightarrow \top$ tipan en el contexto \const{$\emptyset , \top \Rightarrow \top , \top$} y constituyen una prueba de ello.
 	
 	Cuando el nombre de una definición no es relevante, Agda permite omitirlo utilizando un guion bajo \func{\_}.
 	
@@ -79,11 +81,15 @@ A continuación se presentan los juicios de tipado, debido a que se utilizan tip
 	\input{code/term.tex}
 \end{codigo}
 
+De manera similar a las variables, un término de tipo \bound{$\Gamma$} \type{$\vdash$} \bound{C} constituye una prueba de que el mismo tiene tipo \bound{C} en el entorno \bound{$\Gamma$}.
 Notar que el constructor \const{[\_]≡\_} corresponde a la regla de tipado $(\equiv)$ de Sistema I.
-En el constructor \const{$\pi$} se observa otro detalle importante, además de tomar como argumento el tipo \bound{C}, toma un argumento implícito que funciona como evidencia de que el tipo \bound{C} es o bien igual al tipo \bound{A}, o bien igual al tipo \bound{B}.
+En el constructor \const{$\pi$} se observa un detalle importante, además de tomar como argumento el tipo \bound{C}, toma un argumento implícito que funciona como evidencia de que el tipo \bound{C} es o bien igual al tipo \bound{A}, o bien igual al tipo \bound{B}.
 Para ello se utilizan el tipo suma \type{$\_\uplus\_$} definido en el módulo \AgdaModule{Data.Sum} y la igualdad proposicional \type{$\_\cong\_$} definida en el módulo \AgdaModule{Relation.Binary.PropositionalEquality}.
 Estos dos tipos forman parte de la librería estándar de Agda.
-Generalmente, se utiliza el símbolo $(\equiv)$ para denotar la igualdad proposicional, pero en ese caso, ese símbolo se utilizará para definir los isomorfismos de tipos, por lo tanto, se renombra el operador de la igualdad al símbolo $(\cong)$
+Generalmente, se utiliza el símbolo $(\equiv)$ para denotar la igualdad proposicional, pero en ese caso, ese símbolo se utilizará para definir los isomorfismos de tipos, por lo tanto, se renombra el operador de la igualdad al símbolo $(\cong)$.
+
+A continuación de muestran algunos ejemplos de términos que pueden construirse con la definición dada.
+Cada uno de ellos constituye una prueba de que tipa en el contexto dado.
 
 \begin{example}
 	Construcción de términos
@@ -110,7 +116,9 @@ Notar que esta definición sigue la forma propuesta por Abadi: $Z \bullet (\rho 
 \end{codigo}
 
 \begin{example}
-	El renombre \const{S\_} simplemente suma uno a todas las variables libres del término.
+	La función \func{rename} \const{S\_} simplemente suma uno a todas las variables libres del término.
+	Al aplicar dicho renombre sobre el término \func{M$_0$} se obtiene el término \func{M$_1$}.
+	
 	\ExecuteMetaData[code/example.tex]{rename}
 \end{example}
 
@@ -118,7 +126,7 @@ Una vez definida la función \func{rename}, se puede implementar la aplicación 
 Para ello, se define de forma análoga, una función \func{exts} que extiende la sustitución cuando se atraviesa una abstracción.
 Utilizando la notación del álgebra-$\sigma$, se puede observar que aquí también se sigue la misma estructura: $`Z \bullet (\sigma \; \circ \text{rename } S\_)$.
 
-Luego se define la substitución simple \func{$\_[\_]$}, que dato un término \bound{N} cuya primera variable libre es de tipo \bound{B} y un término \bound{M} de tipo \bound{B}, reemplaza el índice 0 de \bound{N} utilizando \bound{M} y reduce en uno el resto de las variables libres.
+Luego se define la substitución simple \func{$\_[\_]$}, que dado un término \bound{N} cuya primera variable libre es de tipo \bound{B} y un término \bound{M} de tipo \bound{B}, reemplaza la primera variable libre de \bound{N} por \bound{M} y reduce en uno el resto de las variables libres.
 
 \begin{codigo}
 	Aplicación de substituciones sobre términos
@@ -131,9 +139,13 @@ El motivo principal por el cual es necesario implementar \func{rename}, es que s
 
 \begin{example}
 	La substitución simple reemplaza la primera variable libre por un término del mismo tipo que dicha variable.
-	Luego, el contexto del término resultante tendrá un elemento menos.
+	En el siguiente ejemplo se sustituye la primer variable libre del termino \func{M$_2$} (el índice 1) por el término \func{M$_3$}, obteniéndose como resultado el término \func{M$_4$}.
+
 	\ExecuteMetaData[code/example.tex]{subst1}
 \end{example}
+
+En el ejemplo se puede ver que el contexto del término resultante tiene un elemento menos, esto es debido a que la substitución reemplaza la primer variable libre eliminándola.
+
 \begin{example}
 	Cuando se reemplaza un término con variables libres en el cuerpo de una abstracción, las mismas son renombradas para evitar que sean capturadas.
 	\ExecuteMetaData[code/example.tex]{subst2}
