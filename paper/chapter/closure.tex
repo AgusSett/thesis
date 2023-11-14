@@ -5,8 +5,8 @@ En esta representación, la propiedad de preservación de tipos es inherente al 
 En cierta forma, la relación $\rightleftarrows$ elimina los isomorfismos de tipo del término, del mismo modo que la relación $\hookrightarrow$ elimina las aplicaciones y proyecciones, este punto es fundamental para la terminación del cálculo, ya que evita que algunos isomorfismos de término, como por ejemplo $\langle r,s \rangle\rightleftarrows\langle s,r \rangle$, sean aplicados un número indefinido de veces.
 
 Otra característica interesante es que la prueba de normalización fuerte utiliza una técnica distinta a la empleada en la clásica prueba de candidatos de reducibilidad.
-La formalización de esta prueba se presentan en primer lugar para el cálculo lambda simplemente tipado con pares, lo cual puede ser considerado como un aporte secundario.
-Además, es importante destacar que debido a que este trabajo posee el formato de una tesina de grado, la exposición detallada y muchas veces intuitiva resulta un aporte a la comprensión de una prueba con una estructura compleja, como es el caso de la normalización fuerte.
+La formalización de esta prueba se presenta en primer lugar para el cálculo lambda simplemente tipado con pares, lo cual puede ser considerado como un aporte secundario.
+Además, es importante destacar que debido a que este trabajo posee el formato de una tesina de grado, la exposición es detallada, esto resulta un aporte a la comprensión de una prueba con una estructura compleja, como es el caso de la normalización fuerte.
 
 \section{Trabajo futuro}
 
@@ -18,7 +18,8 @@ Este proceso puede volverse engorroso cuando se trabaja con términos de tamaño
 En la práctica, por ejemplo cuando se programa en Haskell, solo se dan anotaciones de tipo a los términos de nivel superior y luego el \textit{type checker} del lenguaje puede inferir el resto de los tipos.
 
 En el libro \citetitle{plfa} \cite{plfa} se presenta una formalización de inferencia bidireccional de tipos, allí se implementa un algoritmo que a partir de simples anotaciones de tipo, retorna la derivación de tipos completa para un término dado, o un error en caso de que el término esté mal formado.
-Debido al paradigma de Proposiciones como Tipos, la formalización de este algoritmo funciona también como una prueba de que el tipado de términos en Sistema I es decidible.
+Un trabajo futuro podría ser la definición de un algoritmo similar al presentado en este libro que permita inferir los tipos de los términos definidos en esta formalización.
+Debido al paradigma de Proposiciones como Tipos, la formalización de este algoritmo para Sistema I funcionaría también como una prueba de que el tipado de los términos de este cálculo es decidible.
 
 \subsection{Formalización SIP}
 

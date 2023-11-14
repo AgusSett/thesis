@@ -821,9 +821,11 @@
 \AgdaSymbol{(}\AgdaFunction{rename}\AgdaSpace{}%
 \AgdaBound{ρ}\AgdaSpace{}%
 \AgdaBound{t}\AgdaSymbol{)}\<%
-\\
-%
+\end{code}
+%</sn-rename>
 \\[\AgdaEmptyExtraSkip]%
+%<*adec-rename>
+\begin{code}
 \>[0]\AgdaFunction{⟦⟧-rename}\AgdaSpace{}%
 \AgdaSymbol{:}\AgdaSpace{}%
 \AgdaSymbol{∀\{}\AgdaBound{Γ}\AgdaSpace{}%
@@ -977,6 +979,8 @@
 \AgdaInductiveConstructor{tt}\AgdaSpace{}%
 \AgdaSymbol{=}\AgdaSpace{}%
 \AgdaInductiveConstructor{tt}\<%
+\end{code}
+%</adec-rename>
 \\
 %
 \\[\AgdaEmptyExtraSkip]%
@@ -1024,8 +1028,6 @@
 \AgdaBound{t↪t''}\AgdaSymbol{)}\AgdaSpace{}%
 \AgdaSymbol{\}}\AgdaSpace{}%
 \AgdaSymbol{\}}\<%
-\end{code}
-%</sn-rename>
 
 %<*adecuacy-exts>
 \begin{code}%
@@ -1103,6 +1105,8 @@
 \AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
 \AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
 \AgdaBound{σ}\AgdaSymbol{)}\<%
+\end{code}
+%</adecuacy-rename>
 \\
 \>[0]\AgdaFunction{⊨rename}\AgdaSpace{}%
 \AgdaSymbol{\{}\AgdaArgument{σ}\AgdaSpace{}%
@@ -1132,8 +1136,6 @@
 \AgdaBound{ρ}\AgdaSpace{}%
 \AgdaSymbol{(}\AgdaBound{Lσ}\AgdaSpace{}%
 \AgdaBound{v}\AgdaSymbol{)}\<%
-\end{code}
-%</adecuacy-rename>
 
 %<*lemma-var>
 \begin{code}%
@@ -1281,7 +1283,10 @@
 	\AgdaSymbol{→}\<%
 	\\
 	\>[0][@{}l@{\AgdaIndent{0}}]%
-	\>[2]\AgdaDatatype{SN*}\AgdaSpace{}%
+	\>[2]\AgdaIndent{0}\AgdaIndent{0}\AgdaIndent{0}\AgdaIndent{0}\AgdaIndent{0}
+	\AgdaIndent{0}\AgdaIndent{0}\AgdaIndent{0}\AgdaIndent{0}\AgdaIndent{0}\AgdaIndent{0}\AgdaIndent{0}
+	\AgdaIndent{0}\AgdaIndent{0}\AgdaIndent{0}\AgdaIndent{0}\AgdaIndent{0}\AgdaIndent{0}\AgdaIndent{0}
+	\AgdaDatatype{SN*}\AgdaSpace{}%
 	\AgdaOperator{\AgdaFunction{⟦\AgdaUnderscore{}⟧}}\AgdaSpace{}%
 	\AgdaBound{a}\AgdaSpace{}%
 	\AgdaSymbol{→}\AgdaSpace{}%
