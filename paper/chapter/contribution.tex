@@ -226,22 +226,41 @@ Por otro lado, para desatascar algunos términos, es necesario incluir la $\eta$
 Si se incluyen estas reglas directamente, se pierde la propiedad de normalización, ya que por ejemplo nada impediría aplicar la $\eta$-expansión un número infinito de veces.
 La solución es definir nuevos constructores que embeban estas reglas, como por ejemplo \const{asso-split}.
 
-%TODO: terminar tabla
-\iffalse
+Para facilitar la comprensión del código, se presenta una tabla de equivalencias utilizando la misma notación que la presentada anteriormente para Sistema I.
+En esta se omiten las reglas de congruencia.
+
 \begin{figure}[H]
 	\centering
 	\begin{align}
 		\langle r,s \rangle &\rightleftarrows \langle s,r \rangle \tag{\textsc{comm}} \\
-		\langle r, \langle s,t \rangle \rangle &\rightleftarrows \langle \langle r, s \rangle, t \rangle \tag{\textsc{asso}} \\
-		\langle r, s \rangle &\rightleftarrows \langle \langle r, \pi_B (s) \rangle, \pi_C (s) \rangle \tag{\textsc{asso-split}} \\
-		\lambda x^A \langle r,s \rangle &\rightleftarrows \langle \lambda x^A.r, \lambda x^A.s \rangle \tag{$\textsc{dist}_{\lambda}$} \\
-		\langle r,s \rangle t &\rightleftarrows \langle r t, s t \rangle \tag{$\textsc{dist}_{app}$} \\
-		r \langle s, t \rangle &\rightleftarrows r s t \tag{\textsc{curry}} \\
-		\langle r, \star \rangle &\rightleftarrows r \\
-		r &\rightleftarrows \star \\
-		r &\rightleftarrows \star \\
+		%
+		\langle r, \langle s,t \rangle \rangle &\rightleftarrows \langle \langle r, s \rangle, t \rangle 	\tag{\textsc{asso}} \\
+		%
+		\langle r, s \rangle &\rightleftarrows \langle \langle r, \pi_B (s) \rangle, \pi_C (s) \rangle 	\tag{\textsc{asso-split}} \\
+		%
+		\lambda x^A \langle r,s \rangle &\rightleftarrows \langle \lambda x^A.r, \lambda x^A.s \rangle 	\tag{$\textsc{dist}_{\lambda}$} \\
+		%
+		\text{Si } r: B \times C \quad \lambda x^A r &\rightleftarrows \langle \lambda x^A. \pi_B(r), \lambda x^A.\pi_C(r) \rangle \tag{$\textsc{dist}_{\lambda}\textsc{-split}$} \\
+		%
+		\text{Si } r: A \rightarrow B, s : A \rightarrow C \quad \langle r,s \rangle &\rightleftarrows \lambda x^A \langle r \, x,s \, x \rangle \tag{$\textsc{dist}_{\lambda\eta}$} \\
+		%
+		\lambda x^A \lambda y^B t &\rightleftarrows \lambda z^{A \times B} t[\pi_A(z)/x, \pi_B(z)/y]
+		\tag{\textsc{curry}} \\
+		%
+		\text{Si } t: B \rightarrow C \quad \lambda x^A t &\rightleftarrows \lambda z^{A \times B} t[\pi_A(z)/x]\, \pi_B(z) \tag{$\textsc{curry}_{\eta}$} \\
+		%
+		\lambda x^{A \times B} t &\rightleftarrows \lambda y^A \lambda z^B t[\langle y, z \rangle/x] \tag{\textsc{uncurry}} \\
+		%
+		\langle r, \star \rangle &\rightleftarrows r \tag{$\textsc{id}_\times$} \\
+		%
+		\text{Si } r: \top \rightarrow A \quad r &\rightleftarrows r \, \star \tag{$\textsc{id}_\Rightarrow$} \\
+		%
+		r &\rightleftarrows \lambda x^\top r \tag{$\textsc{id}_\Rightarrow$} \\
+		%
+		\text{Si } r: A \rightarrow \top \quad r &\rightleftarrows \star \tag{\textsc{abs}}
 	\end{align}
 	
+\iffalse
 	\begin{prooftree}
 		\hypo{\lambda x.t \rightleftarrows \lambda x.r}
 		\infer1[$\zeta$]{ t \rightleftarrows r }
@@ -270,10 +289,10 @@ La solución es definir nuevos constructores que embeban estas reglas, como por 
 		\hypo{[iso]\!\!\equiv t \rightleftarrows [iso]\!\!\equiv r}
 		\infer1[$\xi\textendash\!\!\equiv$]{ t \rightleftarrows r }
 	\end{prooftree}
+\fi
 	
 	\caption{Reglas de equivalencia entre términos}
 \end{figure}
-\fi
 
 \begin{codigo}
 	Relación de isomorfismo de términos
@@ -536,19 +555,19 @@ Como se explicará más adelante, el objetivo de este predicado es añadir infor
 
 \ExecuteMetaData[code/strong_norm_base.tex]{sn-star}
 
+Es fácil ver que si un término cumple con el predicado \type{SN*} también cumple con \type{SN}
+
+\ExecuteMetaData[code/strong_norm_base.tex]{sn-star-sn}
+
 Luego, se define lo que se denomina \textit{interpretación del término}.
 Como se explicará más adelante, esta interpretación añade algunas hipótesis extra que permiten desatascar la prueba para los casos de las eliminaciones (proyecciones y aplicaciones).
 Para el caso de los productos, la interpretación provee evidencia de que los términos $a$ y $b$ del par son fuertemente nominalizares.
-Mientras que para el caso de la abstracción, la interpretación se define de modo que dado cualquier término $u$ fuertemente normalizante, permite concluir que $t [u]$ es fuertemente normalizante.
+Mientras que para el caso de la abstracción, la interpretación se define de modo que dado cualquier término $u$ fuertemente normalizante, permite concluir que $t [u]$ es fuertemente normalizante, donde $t$ es el cuerpo de la abstracción.
 
 \ExecuteMetaData[code/strong_norm_base.tex]{candidate}
 
 La definición utiliza los productos \func{$\_\times\_$} y el tipo top \type{$\top$} definidos en los módulos \AgdaModule{Data.Product} y \AgdaModule{Data.Unit} de la librería estándar.
 Para evitar una colisión de nombres con los constructores de tipos del cálculo, se renombran los tipos de la librería estándar como \func{$\_\otimes\_$} y \type{Top} respectivamente.
-
-Es fácil ver que si un término cumple con el predicado \type{SN*} también cumple con \type{SN}
-
-\ExecuteMetaData[code/strong_norm_base.tex]{sn-star-sn}
 
 Se puede extender la definición de interpretación a substituciones, para ello se define un predicado que establece que una substitución $\sigma$ es adecuada en un contexto $\Gamma$ y se escribe $\Gamma \vDash \sigma$, cuando todos los términos con los cuales son substituidas las variables en $\sigma$ cumplen con el predicado \snstar.
 
@@ -935,11 +954,18 @@ Aquí la llamada recursiva elimina un constructor \const{sn} del segundo argumen
 De esta forma, Agda puede garantizar que la función alcanzará un caso base y la recursión concluirá eventualmente.
 
 \begin{example}
-	~\newline
+	El siguiente ejemplo muestra una de las formas de construir el término $\Omega$ y su reducción.
+	Si bien existen varias alternativas para tipar este término, todas se basan en usar los isomorfismos \const{abs} o \const{id-⇒} para lograr la autoaplicación de un término de tipo $\top$.
+	
+	Esto no supone ningún problema para la preservación de la propiedad de normalización, ya que, por un lado, para poder aplicar la regla \const{β-ƛ} el término de la izquierda debe ser una abstracción, es decir, un término de la forma \const{ƛ} \bound{t}.
+	Por lo tanto, antes de poder aplicar un término (\const{[} \bound{iso} \const{]≡} \bound{r}) \const{·} \bound{s} se deben eliminar el constructor \const{[]≡} del lado izquierdo aplicando una equivalencia.
+	
+	Por otro lado, los términos producidos por las equivalencias \const{sym-abs} y \const{sym-id-⇒} añaden un nuevo binder que no captura ninguna variable dentro del cuerpo de la abstracción, esto no tiene ninguna utilidad real, ya que al ser aplicadas simplemente descartan su argumento.
+	
 	\ExecuteMetaData[code/example.tex]{eval}
 \end{example}
 
-La forma en la que se codifica la propiedad de normalización fuerte, y el hecho de que sea justamente esta propiedad la que nos permite realizar inducción sobre la relación $\rightsquigarrow$, no son casualidad.
+La forma en la que se codifica la propiedad de normalización fuerte, y el hecho de que sea justamente esta propiedad la que permite realizar inducción sobre la relación $\rightsquigarrow$, no son casualidad.
 Para entender los fundamentos que se esconden detrás de estas observaciones se presentan las siguientes definiciones.
 
 En teoría del orden, se dice que una relación está bien fundada cuando todas sus cadenas, de la forma $x_1 < x_2 < \dots < x_n$, tienen un largo acotado.
