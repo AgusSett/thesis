@@ -88,7 +88,7 @@ Para ello se utilizan el tipo suma \type{$\_\uplus\_$} definido en el módulo \A
 Estos dos tipos forman parte de la librería estándar de Agda.
 Generalmente, se utiliza el símbolo $(\equiv)$ para denotar la igualdad proposicional, pero en ese caso, ese símbolo se utilizará para definir los isomorfismos de tipos, por lo tanto, se renombra el operador de la igualdad al símbolo $(\cong)$.
 
-A continuación de muestran algunos ejemplos de términos que pueden construirse con la definición dada.
+A continuación se muestran algunos ejemplos de términos que pueden construirse con la definición dada.
 Cada uno de ellos constituye una prueba de que tipa en el contexto dado.
 
 \begin{example}
@@ -257,7 +257,9 @@ En esta se omiten las reglas de congruencia.
 		%
 		r &\rightleftarrows \lambda x^\top r \tag{$\textsc{id}_\Rightarrow$} \\
 		%
-		\text{Si } r: A \rightarrow \top \quad r &\rightleftarrows \star \tag{\textsc{abs}}
+		\text{Si } r: A \rightarrow \top \quad r &\rightleftarrows \star \tag{\textsc{abs}} \\
+		%
+		\text{Si } t: \top \quad t &\rightleftarrows \lambda x^A t \tag{\textsc{abs}}
 	\end{align}
 	
 \iffalse
@@ -494,7 +496,7 @@ El conjunto de términos fuertemente normalizantes puede definirse de manera ind
 	\end{prooftree}
 \end{center}
 
-Es decir, si todos los términos $t$, a los cuales puede reducir $s$ son fuertemente normalizantes, entonces $t$ también lo es. 
+Es decir, si todos los términos $t$, a los cuales puede reducir $s$ son fuertemente normalizantes, entonces $s$ también lo es. 
 
 En Agda se puede definir el conjunto $SN$ mediante el siguiente tipo de datos inductivo: 
 
@@ -504,7 +506,7 @@ En Agda se puede definir el conjunto $SN$ mediante el siguiente tipo de datos in
 \end{codigo}
 
 Notar que es trivial construir un término de tipo \type{SN} para un valor, ya que, al no existir ninguna reducción posible para los valores, simplemente se debe pasar la función vacía como argumento a \const{sn}.
-Estos representan los casos bases del tipo \type{SN}.
+Estos representan los casos base del tipo \type{SN}.
 
 \begin{example}
 	Cuando se construye un término de tipo \type{SN} \bound{t}, para cierto término \bound{t}, se deben tener en cuenta todos los pasos de reducción posible a partir de \bound{t}.
@@ -560,9 +562,9 @@ Es fácil ver que si un término cumple con el predicado \type{SN*} también cum
 \ExecuteMetaData[code/strong_norm_base.tex]{sn-star-sn}
 
 Luego, se define lo que se denomina \textit{interpretación del término}.
-Como se explicará más adelante, esta interpretación añade algunas hipótesis extra que permiten desatascar la prueba para los casos de las eliminaciones (proyecciones y aplicaciones).
-Para el caso de los productos, la interpretación provee evidencia de que los términos $a$ y $b$ del par son fuertemente nominalizares.
-Mientras que para el caso de la abstracción, la interpretación se define de modo que dado cualquier término $u$ fuertemente normalizante, permite concluir que $t [u]$ es fuertemente normalizante, donde $t$ es el cuerpo de la abstracción.
+Esta interpretación añade algunas hipótesis extra que permiten desatascar la prueba para los casos de las eliminaciones (proyecciones y aplicaciones).
+Para el caso de los productos, la interpretación provee evidencia de que los términos $a$ y $b$ del par son fuertemente normalizantes.
+Mientras que para el caso de la abstracción, la interpretación se define de modo que dado cualquier término $u$ fuertemente normalizante, permite concluir que $\rho (t) [u]$ es fuertemente normalizante, donde $t$ es el cuerpo de la abstracción.
 
 \ExecuteMetaData[code/strong_norm_base.tex]{candidate}
 
@@ -580,10 +582,13 @@ En particular, la substitución identidad \func{ids} es una substitución adecua
 
 Toda la complejidad de la prueba se centra en probar el teorema fundamental, el cual implica que para todo término \bound{t} y substitución adecuada \bound{σ} se cumple
 \snstar\parens{\subst{\bound{σ}}{\bound{t}}}.
-La prueba de este teorema corresponde a la definición de la función \func{adequacy}, que se define por inducción sobre el término.
-A continuación se presentará la función mostrando su definición para cada uno de los constructores de término.
+La prueba de este teorema corresponde a la definición de la función \func{adequacy}, que se define por inducción sobre el término \bound{t}.
+A continuación se presentará la función mostrando su definición para cada uno de los constructores de términos.
 
 \ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-type}
+
+La prueba de este teorema es extensa y requiere probar algunos lemas extra, que a su vez utilizan propiedades de las substituciones y renombres.
+Para simplificar la explicación, se presenta la prueba separada por casos y solo se mostrará el código completo de los lemas más relevantes, mientras que para los lemas auxiliares solo se presentará su tipo.
 
 \subsubsection{Caso variable}
 
@@ -605,6 +610,8 @@ Debido a que no existe ningún paso de reducción posible para el término \cons
 Para el caso del producto, se puede definir un lema que permite construir el predicado si se tiene como hipótesis que \snstar vale para los subtérminos $a$ y $b$ del par.
 
 \ExecuteMetaData[code/strong_norm_base.tex]{lemma-prod}
+
+%El lema define una función auxiliar \func{aux} que realiza pattern matching sobre el paso de reducción \bound{step}
 
 Luego, se utiliza la hipótesis inductiva en \func{adecuacy} sobre $a$ y $b$ para instanciar el lema
 
@@ -763,7 +770,7 @@ Para esta prueba es necesario definir un nuevo lema análogo a \func{rename↪}.
 Una modificación similar se realiza para extender el lema de la abstracción.
 \fi
 
-Por ejemplo, en la prueba del lema de la abstracción hora aparecen los dos constructores \const{inj₁} y \const{inj₂} del tipo suma.
+Por ejemplo, en la prueba del lema de la abstracción ahora aparecen los dos constructores \const{inj₁} e \const{inj₂} del tipo suma.
 
 \ExecuteMetaData[code/strong_norm.tex]{lemma-abs}
 
@@ -796,7 +803,7 @@ Aquí simplemente basta con instanciar el lema del producto utilizando las hipó
 \subsubsection{Caso asso}
 
 El caso de \textsc{asso} no tiene mayor dificultad.
-Notar como se aprovecha la naturaleza constructiva de las pruebas en Agda, combinando los lemas ya definidos hasta obtener un término del tipo esperado.
+Notar cómo se aprovecha la naturaleza constructiva de las pruebas en Agda, combinando los lemas ya definidos hasta obtener un término del tipo esperado.
 
 \ExecuteMetaData[code/strong_norm.tex]{iso-asso}
 

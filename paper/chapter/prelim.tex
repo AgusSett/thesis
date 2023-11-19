@@ -33,7 +33,7 @@ Luego, se demuestra que para cualquier par $\langle u,v \rangle$ y función $f$ 
 }
 
 Luego, se concluye que $uncurry \circ curry = id_{(A \times B) \rightarrow C}$ por extensionalidad.
-De forma similar se puede probar que $curry \circ uncurry = id_{A \Rightarrow B \Rightarrow C}$
+De forma similar se puede probar que $curry \circ uncurry = id_{A \rightarrow B \rightarrow C}$
 
 Di Cosmo \cite{MSCSSurvey05} caracterizó para Sistema F con pares, los conjuntos mínimos de isomorfismos que permiten construir todos los demás a partir de reglas de congruencia y transitividad.
 Se escribe $A \equiv B$ cuando $A$ y $B$ son isomorfos.
@@ -127,7 +127,7 @@ Además, se añade la definición de una nueva regla de tipado llamada $(\equiv)
 	\end{prooftree}
 	\quad
 	\begin{prooftree}
-		\hypo{\Gamma \vdash \lambda x.r : A \rightarrow B}
+		\hypo{\Gamma \vdash r : A \rightarrow B}
 		\hypo{\Gamma \vdash s:A}
 		\infer2[($\Rightarrow_e$)]{ \Gamma \vdash rs : B }
 	\end{prooftree}
