@@ -262,37 +262,6 @@ En esta se omiten las reglas de congruencia.
 		\text{Si } t: \top \quad t &\rightleftarrows \lambda x^A t \tag{\textsc{abs}}
 	\end{align}
 	
-\iffalse
-	\begin{prooftree}
-		\hypo{\lambda x.t \rightleftarrows \lambda x.r}
-		\infer1[$\zeta$]{ t \rightleftarrows r }
-	\end{prooftree} \quad
-	\begin{prooftree}
-		\hypo{ts \rightleftarrows rs}
-		\infer1[$\xi\textendash\cdot_1$]{ t \rightleftarrows r }
-	\end{prooftree} \quad
-	\begin{prooftree}
-		\hypo{st \rightleftarrows sr}
-		\infer1[$\xi\textendash\cdot_2$]{ t \rightleftarrows r }
-	\end{prooftree} \\ \vspace{1em}
-	\begin{prooftree}
-		\hypo{\langle t, s \rangle \rightleftarrows \langle r, s \rangle}
-		\infer1[$\xi\textendash\langle,\rangle_1$]{ t \rightleftarrows r }
-	\end{prooftree} \quad
-	\begin{prooftree}
-		\hypo{\langle s, t \rangle \rightleftarrows \langle s, r \rangle}
-		\infer1[$\xi\textendash\langle,\rangle_2$]{ t \rightleftarrows r }
-	\end{prooftree} \quad
-	\begin{prooftree}
-		\hypo{\pi_A t \rightleftarrows \pi_A r}
-		\infer1[$\xi\textendash\pi$]{ t \rightleftarrows r }
-	\end{prooftree} \\ \vspace{1em}
-	\begin{prooftree}
-		\hypo{[iso]\!\!\equiv t \rightleftarrows [iso]\!\!\equiv r}
-		\infer1[$\xi\textendash\!\!\equiv$]{ t \rightleftarrows r }
-	\end{prooftree}
-\fi
-	
 	\caption{Reglas de equivalencia entre términos}
 \end{figure}
 
@@ -545,7 +514,7 @@ Además, se utilizó como referencia una formalización de candidatos de reducib
 
 Con el objetivo de facilitar la comprensión de la prueba, la misma será presentada en dos partes.
 En esta sección se explicará la prueba para cálculo lambda simplemente tipado con pares, es decir, sin incluir la relación de isomorfismos entre términos.
-Y en la siguiente sección se presentarán los cambios necesarios para extender la prueba a Sistema-I.
+Y en la siguiente sección se presentarán los cambios necesarios para extender la prueba a Sistema I.
 
 
 Por lo tanto, se define el tipo de datos \type{SN} utilizando solo la relación \type{$\_\hookrightarrow\_$}

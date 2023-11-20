@@ -390,6 +390,31 @@ Las siguientes derivaciones prueban que ambos términos tienen los tipos involuc
 	\end{center}
 \end{itemize}
 
+Ejemplo
+
+\[
+	\pi_{\forall A.(A \rightarrow A)} (\Lambda A . \langle x^A.x, t \rangle) : \forall A.(A \rightarrow A)
+\]
+
+\begin{center}
+	\begin{prooftree}
+		\hypo{\Gamma \vdash x : A}
+		\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x^A.x : A \rightarrow A }
+		\hypo{\Gamma \vdash t: B}
+		\infer2[($\times_i$)]{ \Gamma \vdash \langle x^A.x, t \rangle : (A \rightarrow A) \times B }
+		\infer1[($\forall_i$)]{ \Gamma \vdash \Lambda A . \langle x^A.x, t \rangle : \forall A. ((A \rightarrow A) \times B) }
+		\infer1[($\equiv$)]{ \Gamma \vdash \Lambda A . \langle x^A.x, t \rangle : \forall A. (A \rightarrow A) \times \forall A.B }
+		\infer1[($\times_e$)]{ \Gamma \vdash \pi_{\forall A.(A \rightarrow A)} (\Lambda A . \langle x^A.x, t \rangle) : \forall A.(A \rightarrow A) }
+	\end{prooftree}
+\end{center}
+
+\begin{align*}
+	&\pi_{\forall A.(A \rightarrow A)} (\Lambda A . \langle x^A.x, t \rangle) \\
+	\rightleftarrows&_{(\textsc{p-dist})} \\
+	&\pi_{\forall A.(A \rightarrow A)} \langle \Lambda A. x^A.x, \Lambda A. t \rangle \\
+	\hookrightarrow&_\pi \\
+	&\Lambda A. x^A.x
+\end{align*}
 
 \subsection{$\lambda^+$}
 $\lambda^+$ \cite{lambda-plus} es una implementación en Haskell de una extensión que agrega números naturales y recursión general a Sistema I.
