@@ -6,10 +6,10 @@
 \newcommand{\cand}[1]{\func{⟦}#1\func{⟧}}
 
 \newcommand{\parens}[1]{\AgdaSymbol{(}#1\AgdaSymbol{)}}
-\newcommand{\subst}[2]{\func{⟪}\AgdaSpace{}#1\AgdaSpace{}\func{⟫}\AgdaSpace{}#2}
-\newcommand{\cons}[2]{#1 \func{•} #2}
+\newcommand{\subst}[2]{\func{⟪}~#1~\func{⟫}~#2}
+\newcommand{\cons}[2]{#1~\func{•}~#2}
 \newcommand{\ids}{\func{ids}}
-\newcommand{\comp}[2]{#1 \func{∘} #2}
+\newcommand{\comp}[2]{#1~\func{∘}~#2}
 
 
 \section{Formalización}
@@ -232,34 +232,34 @@ En esta se omiten las reglas de congruencia.
 \begin{figure}[H]
 	\centering
 	\begin{align}
-		\langle r,s \rangle &\rightleftarrows \langle s,r \rangle \tag{\textsc{comm}} \\
+		& &\langle r,s \rangle &\rightleftarrows \langle s,r \rangle \tag{\textsc{comm}} \\
 		%
-		\langle r, \langle s,t \rangle \rangle &\rightleftarrows \langle \langle r, s \rangle, t \rangle 	\tag{\textsc{asso}} \\
+		& &\langle r, \langle s,t \rangle \rangle &\rightleftarrows \langle \langle r, s \rangle, t \rangle 	\tag{\textsc{asso}} \\
 		%
-		\langle r, s \rangle &\rightleftarrows \langle \langle r, \pi_B (s) \rangle, \pi_C (s) \rangle 	\tag{\textsc{asso-split}} \\
+		& &\langle r, s \rangle &\rightleftarrows \langle \langle r, \pi_B (s) \rangle, \pi_C (s) \rangle 	\tag{\textsc{asso-split}} \\
 		%
-		\lambda x^A \langle r,s \rangle &\rightleftarrows \langle \lambda x^A.r, \lambda x^A.s \rangle 	\tag{$\textsc{dist}_{\lambda}$} \\
+		& &\lambda x^A. \langle r,s \rangle &\rightleftarrows \langle \lambda x^A.r, \lambda x^A.s \rangle 	\tag{$\textsc{dist}_{\lambda}$} \\
 		%
-		\text{Si } r: B \times C \quad \lambda x^A r &\rightleftarrows \langle \lambda x^A. \pi_B(r), \lambda x^A.\pi_C(r) \rangle \tag{$\textsc{dist}_{\lambda}\textsc{-split}$} \\
+		&\text{Si } r: B \times C &\lambda x^A. r &\rightleftarrows \langle \lambda x^A. \pi_B(r), \lambda x^A.\pi_C(r) \rangle \tag{$\textsc{dist}_{\lambda}\textsc{-split}$} \\
 		%
-		\text{Si } r: A \rightarrow B, s : A \rightarrow C \quad \langle r,s \rangle &\rightleftarrows \lambda x^A \langle r \, x,s \, x \rangle \tag{$\textsc{dist}_{\lambda\eta}$} \\
+		&\text{Si } r: A \rightarrow B, s : A \rightarrow C &\langle r,s \rangle &\rightleftarrows \lambda x^A. \langle r \, x,s \, x \rangle \tag{$\textsc{dist}_{\lambda\eta}$} \\
 		%
-		\lambda x^A \lambda y^B t &\rightleftarrows \lambda z^{A \times B} t[\pi_A(z)/x, \pi_B(z)/y]
+		& &\lambda x^A. \lambda y^B. t &\rightleftarrows \lambda z^{A \times B}. t[\pi_A(z)/x, \pi_B(z)/y]
 		\tag{\textsc{curry}} \\
 		%
-		\text{Si } t: B \rightarrow C \quad \lambda x^A t &\rightleftarrows \lambda z^{A \times B} t[\pi_A(z)/x]\, \pi_B(z) \tag{$\textsc{curry}_{\eta}$} \\
+		&\text{Si } t: B \rightarrow C &\lambda x^A. t &\rightleftarrows \lambda z^{A \times B}. t[\pi_A(z)/x]\, \pi_B(z) \tag{$\textsc{curry}_{\eta}$} \\
 		%
-		\lambda x^{A \times B} t &\rightleftarrows \lambda y^A \lambda z^B t[\langle y, z \rangle/x] \tag{\textsc{uncurry}} \\
+		& &\lambda x^{A \times B}. t &\rightleftarrows \lambda y^A. \lambda z^B. t[\langle y, z \rangle/x] \tag{\textsc{uncurry}} \\
 		%
-		\langle r, \star \rangle &\rightleftarrows r \tag{$\textsc{id}_\times$} \\
+		& &\langle r, \star \rangle &\rightleftarrows r \tag{$\textsc{id}_\times$} \\
 		%
-		\text{Si } r: \top \rightarrow A \quad r &\rightleftarrows r \, \star \tag{$\textsc{id}_\Rightarrow$} \\
+		&\text{Si } r: \top \rightarrow A &r &\rightleftarrows r \, \star \tag{$\textsc{id}_\Rightarrow$} \\
 		%
-		r &\rightleftarrows \lambda x^\top r \tag{$\textsc{id}_\Rightarrow$} \\
+		& &r &\rightleftarrows \lambda x^\top. r \tag{$\textsc{id}_\Rightarrow$} \\
 		%
-		\text{Si } r: A \rightarrow \top \quad r &\rightleftarrows \star \tag{\textsc{abs}} \\
+		&\text{Si } r: A \rightarrow \top &r &\rightleftarrows \star \tag{\textsc{abs}} \\
 		%
-		\text{Si } t: \top \quad t &\rightleftarrows \lambda x^A t \tag{\textsc{abs}}
+		&\text{Si } t: \top &t &\rightleftarrows \lambda x^A. t \tag{\textsc{abs}}
 	\end{align}
 	
 	\caption{Reglas de equivalencia entre términos}
@@ -420,7 +420,7 @@ A través de la aplicación sucesiva de la prueba de progreso se puede definir l
 Para esto, se define la relación \type{$\_\rightsquigarrow\_$}, que representa la clausura reflexiva y transitiva de la unión entre las relaciones \type{$\_\hookrightarrow\_$} y \type{$\_\rightleftarrows\_$}.
 
 \begin{codigo}
-	Relación de reducción
+	Clausura reflexiva y transitiva de la unión entre las relaciones \type{$\_\hookrightarrow\_$} y \type{$\_\rightleftarrows\_$}.
 	\ExecuteMetaData[code/eval.tex]{relation}
 \end{codigo}
 
@@ -580,7 +580,14 @@ Para el caso del producto, se puede definir un lema que permite construir el pre
 
 \ExecuteMetaData[code/strong_norm_base.tex]{lemma-prod}
 
-%El lema define una función auxiliar \func{aux} que realiza pattern matching sobre el paso de reducción \bound{step}
+Para construir el segundo argumento de \const{sn*} se define una función auxiliar \func{aux} que toma cualquier paso de reducción y muestra que el reducto es \snstar.
+En este caso, para el paso de reducción \bound{step} existen dos posibilidades, la congruencia a izquierda o la congruencia a derecha del par:
+\begin{itemize}
+	\item En el caso de la congruencia a izquierda, el paso \bound{step} tiene forma $a \hookrightarrow a'$ por lo que se debe mostrar que $\langle a', b \rangle$ es \snstar.
+	Para esto se realiza una llamada recursiva al lema.
+	El lema requiere \snstar \bound{a'}, por lo que se utiliza la hipótesis \bound{SNa}, la cual dice que todo reducto de \bound{a} es \snstar, en conjunto con el paso de reducción $a \hookrightarrow a'$.
+	\item El caso de la congruencia a derecha es análogo al primero, la diferencia es que se usa la hipótesis \bound{SNb} para obtener \snstar \bound{b'}.
+\end{itemize}
 
 Luego, se utiliza la hipótesis inductiva en \func{adecuacy} sobre $a$ y $b$ para instanciar el lema
 
@@ -595,6 +602,14 @@ Aquí se vuelve evidente por qué es necesario generalizar la propiedad \type{SN
 La interpretación de un par $\langle a, b \rangle$ tiene forma \snstar\bound{a} \func{⊗} \snstar\bound{b} y esto es precisamente lo que se necesita para probar ambos casos.
 
 \ExecuteMetaData[code/strong_norm_base.tex]{lemma-proj}
+
+El paso de reducción tiene tres constructores posibles:
+\begin{itemize}
+	\item El caso de la congruencia se resuelve de la misma forma que para los pares.
+	\item El caso de la proyección izquierda implica que $t$ tiene forma $\langle a, b \rangle$ y se debe mostrar que el reducto $a$ es \snstar, para ello se utiliza la hipótesis \bound{SN*a} de la interpretación del par.
+	\item El caso de la proyección derecha se resuelve de forma análoga usando la hipótesis \bound{SN*b}.
+\end{itemize}
+
 \ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-proj}
 
 \subsubsection{Caso aplicación}
@@ -604,13 +619,20 @@ Por otro lado, la solución para el caso de la $\beta$-reducción es similar al 
 %Para el constructor \const{β-ƛ}, el término $a$ es de la forma $\lambda\; t$, por lo que se debe obtener \snstar(\bound{t}\func{[}\bound{b}\func{]}).
 
 \ExecuteMetaData[code/strong_norm_base.tex]{lemma-app}
-\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-app}
 
-La interpretación \bound{La} será de la forma
-\snstar\bound{u}
-\AgdaSymbol{→}
-\snstar\parens{\subst{\cons{\bound{u}}{\parens{\comp{\ids}{\bound{$\rho$}}}}}{\bound{t}}}
-es decir que basta con aplicar dicha función a \bound{SN*b}.
+El paso de reducción tiene tres posibles constructores, congruencia a izquierda, congruencia a derecha y la $\beta$-reducción:
+
+\begin{itemize}
+	\item Las congruencias se resuelve del mismo modo que las presentadas anteriormente, usando las hipótesis \bound{SNa} y \bound{SNb} respectivamente.
+	\item El caso de la $\beta$-reducción implica que el término $a$ tiene forma $\lambda\; t$ y se debe mostrar que $t [b]$ es \snstar.
+	La interpretación \bound{La} será de la forma
+	\snstar\bound{u}
+	\AgdaSymbol{→}
+	\snstar\parens{\subst{\cons{\bound{u}}{\parens{\comp{\ids}{\bound{$\rho$}}}}}{\bound{t}}}
+	es decir que basta con aplicar dicha función a \bound{SN*b}.
+\end{itemize}
+
+\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-app}
 
 Notar cómo las interpretaciones de los términos permiten resolver los casos de eliminación (proyección y aplicación), pero, por otro lado, los casos de introducción (producto y abstracción) se vuelven más complejos, ya que son estos donde se construyen dichas interpretaciones.
 Esta construcción es simple para los productos, puesto que se puede deducir de forma directa aplicando la hipótesis inductiva en \func{adecuacy}.	
@@ -706,15 +728,15 @@ Como detalle adicional, se elimina la substitución identidad aplicada al térmi
 \AgdaSymbol{:}
 \AgdaSymbol{∀\{}\bound{Γ}
 \bound{A}\AgdaSymbol{\}}
-\AgdaSymbol{\{}\bound{N}
+\AgdaSymbol{\{}\bound{t}
 \AgdaSymbol{:}
 \bound{Γ}
 \type{⊢}
 \bound{A}\AgdaSymbol{\}}
 \AgdaSymbol{→}
-\subst{\ids}{\bound{N}}
+\subst{\ids}{\bound{t}}
 \type{≡}
-\bound{N}
+\bound{t}
 
 \ExecuteMetaData[code/strong_norm_base.tex]{strong-norm}
 
@@ -752,10 +774,12 @@ A modo de ejemplo se presenta el lema correspondiente al producto, y se omiten l
 
 \ExecuteMetaData[code/strong_norm.tex]{lemma-prod}
 
-El lema para el constructor de isomorfismos es donde se concentra la mayor complejidad de la prueba, ya que se deben resolver los casos de todos los isomorfismos de términos.
-Para empezar, la definición es casi idéntica a la presentada anteriormente, la diferencia es que ahora cuando se realiza pattern matching sobre el paso de reducción en la función \func{aux}, se deben resolver todos los casos correspondientes a cada unos de los constructores del tipo \type{⇄}.
+Notar que ahora el paso de reducción tiene cuatro constructores posibles, dos congruencias correspondientes a la relación \type{$\hookrightarrow$} y dos correspondientes a \type{$\rightleftarrows$}.
 
-Debido a la extensión de este lema, se lo presentará divido en secciones y solo se mostrarán los casos más relevantes.
+El lema para el constructor de isomorfismos es donde se concentra la mayor complejidad de la prueba, ya que se deben resolver los casos de todos los isomorfismos de términos.
+Para empezar, la definición es casi idéntica a la presentada anteriormente, la diferencia es que ahora cuando se realiza pattern matching sobre el paso de reducción en la función \func{aux}, se deben resolver todos los casos correspondientes a cada uno de los constructores del tipo \type{⇄}.
+
+Debido a la extensión de este lema, se lo presentará la función \func{aux} dividido en secciones y solo se mostrarán los casos más relevantes.
 
 \ExecuteMetaData[code/strong_norm.tex]{lemma-iso-type}
 
@@ -764,14 +788,14 @@ La idea de la prueba es utilizar los lemas anteriormente definidos para los dist
 
 \subsubsection{Caso comm}
 
-Por ejemplo, el isomorfismo \textsc{comm} es uno de los casos más simples que ilustra la técnica utilizada.
+Por ejemplo, el isomorfismo \textsc{comm} $\langle r,s \rangle \rightleftarrows \langle s,r \rangle$ es uno de los casos más simples que ilustra la técnica utilizada.
 Aquí simplemente basta con instanciar el lema del producto utilizando las hipótesis provistas por la interpretación del par.
 
 \ExecuteMetaData[code/strong_norm.tex]{iso-comm}
 
 \subsubsection{Caso asso}
 
-El caso de \textsc{asso} no tiene mayor dificultad.
+El caso de \textsc{asso} $\langle r, \langle s,t \rangle \rangle \rightleftarrows \langle \langle r, s \rangle, t \rangle$ no tiene mayor dificultad.
 Notar cómo se aprovecha la naturaleza constructiva de las pruebas en Agda, combinando los lemas ya definidos hasta obtener un término del tipo esperado.
 
 \ExecuteMetaData[code/strong_norm.tex]{iso-asso}
@@ -780,71 +804,90 @@ Notar cómo se aprovecha la naturaleza constructiva de las pruebas en Agda, comb
 
 Este caso presenta la dificultad de instanciar y construir la interpretación de la abstracción.
 Además, se presentan dos nuevos lemas que se emplearán en múltiples isomorfismos.
-En primer lugar, se define un lema que permite concluir \snstar\bound{t} a partir de \snstar \const{ƛ} \bound{t}.
+En primer lugar, se define un lema que permite concluir \snstar\bound{t} a partir de \snstar (\const{ƛ} \bound{t}).
 La idea del lema es substituir la primera variable del término por el índice cero, obteniendo de esa forma exactamente el mismo término.
 
 \ExecuteMetaData[code/strong_norm.tex]{lemma-sub}
 
-Este lema resulta de utilidad en los casos en los que se debe construir algo a partir del cuerpo de una abstracción.
+Este lema resulta de utilidad en los casos en los que se debe construir álgo a partir del cuerpo de una abstracción, en particular, permite resolver el caso de \const{dist-ƛ} $\langle \lambda x^A.r, \lambda x^A.s \rangle \rightleftarrows \lambda x^A. \langle r,s \rangle$.
 
 \ExecuteMetaData[code/strong_norm.tex]{iso-dist}
+
+El lema de la abstracción tiene dos argumentos:
+\begin{itemize}
+	\item En el primero es la interpretación de $ƛ \langle r, s \rangle$, es decir, se debe mostrar que para todo término \snstar \bound{u}, el término $\langle r, s \rangle [u] = \langle r[u], s[u] \rangle$ es también \snstar.
+	Las hipótesis \bound{Lr} y \bound{Ls} corresponden a las interpretaciones \cand{\const{ƛ} \bound{r}} y \cand{\const{ƛ} \bound{s}} respectivamente, por lo que pueden ser utilizadas para obtener \snstar (\bound{r}\func{[}\bound{u}\func{]}) y \snstar (\bound{s}\func{[}\bound{u}\func{]}).
+	\item El segundo argumento requiere mostrar que $\langle r, s \rangle$ es \snstar.
+	Esto puede obtenerse simplemente aplicando el lema \func{lemma-sub} sobre las hipótesis.
+\end{itemize}
 
 En segundo lugar, se define un lema que se empleará para probar la propiedad de la interpretación de la abstracción, en los casos donde se deba $\eta$-expandir un término.
 La clave de este lema está en notar que 
 \subst{\cons{\bound{u}}{\parens{\comp{\ids}{\bound{$\rho$}}}}}{\parens{\func{rename} \const{S\_} \bound{t}}}
-es equivalente a \subst{\comp{\ids}{\bound{$\rho$}}}{\bound{t}} que a su vez es equivalente a \func{rename} \bound{$\rho$} \bound{t}
+es equivalente a \subst{\comp{\ids}{\bound{$\rho$}}}{\bound{t}} que a su vez es equivalente a \func{rename} \bound{$\rho$} \bound{t}.
 
 \ExecuteMetaData[code/strong_norm.tex]{lemma-S}
 
 Utilizando este lema se pueden resolver los casos correspondientes a los constructores que combinan la $\eta$-expansión con el isomorfismo \textsc{dist}.
-Se presenta a modo de ejemplo el caso del constructor \const{dist-ƛηₗᵣ}.
+Se presenta a modo de ejemplo el caso del constructor \const{dist-ƛηₗᵣ} $\langle r,s \rangle \rightleftarrows \lambda x^A. \langle r \, x,s \, x \rangle$.
 
 \ExecuteMetaData[code/strong_norm.tex]{iso-distlr}
+
+Para obtener los argumentos del lema de la abstracción se sigue un razonamiento similar al caso anterior.
+Los puntos a destacar son:
+\begin{itemize}
+	\item En el primer argumento se utiliza el nuevo lema \func{lemma-S} para obtener \\ \snstar(\subst{\cons{\bound{u}}{\parens{\comp{\ids}{\bound{$\rho$}}}}}{\parens{\func{rename}~\const{S\_}~\bound{r}}}) a partir de \bound{SNr}, y lo mismo aplica para \bound{SNs}.
+	\item En el segundo argumento se utiliza el lema \func{SN*-rename} para obtener \snstar(\func{rename}~\const{S\_}~\bound{r}) a partir de \bound{SNr}, y lo mismo aplica para \bound{SNs}.
+\end{itemize}
 
 \subsubsection{Caso congruencia abstracción}
 
 El siguiente caso presenta un isomorfismo donde aparece una substitución en el término de la derecha.
-Coloquialmente, la substitución \func{σ-cong⇒₁} reemplaza el primer índice del término por
+Coloquialmente, la substitución
+\func{σ-cong⇒₁} \bound{iso} =
+\cons
+{\const{[} \bound{iso} \const{]≡} \parens{\const{` Z}}}
+{\parens{\comp{\ids}{\const{S\_}}}}
+reemplaza el primer índice del término por
 \const{[} \bound{iso} \const{]≡} \parens{\const{` Z}}
 y deja el resto de los índices intactos.
 La hipótesis \bound{Lt} permite obtener un término de la forma
 \snstar
-\parens{\subst{\cons{\bound{u}}{\parens{\comp{\ids}{\bound{$\rho$}}}}}{\bound{t}}}
-, entonces, la estrategia será hallar un renombre $\rho$ y un término $u$ que den como resultado el término esperado en cada caso.
-
-Para instanciar el lema de la abstracción, las dos hipótesis requeridas en este caso son:
-
-\vspace{1em}
-\snstar
-\parens{\subst
-	{\cons
-		{\bound{u}}
-		{\parens{\comp{\ids}{\bound{$\rho$}}}}}
-	{\parens{\subst
-		{\cons
-			{\const{[} \bound{iso} \const{]≡} \parens{\const{` Z}}}
-			{\parens{\comp{\ids}{\const{S\_}}}}}
-		{\bound{t}}}}}
-
-\snstar
-\subst
-{\cons
-	{\const{[} \bound{iso} \const{]≡} \parens{\const{` Z}}}
-	{\parens{\comp{\ids}{\const{S\_}}}}}
-{\bound{t}}
-\vspace{1em}
-
-La segunda es la más sencilla, ya que se puede concluir directamente a partir de \bound{Lt}.
-Por otro lado, para resolver la primera, se debe notar que es posible combinar las dos substituciones en una sola 
-\subst
-{\cons
-	{\const{[} \bound{iso} \const{]≡} \bound{u}}
-	{\parens{\comp{\ids}{\bound{$\rho$}}}}}
-{\bound{t}}
+\parens{\subst{\cons{\bound{u}}{\parens{\comp{\ids}{\bound{$\rho$}}}}}{\bound{t}}}, entonces, la estrategia será hallar un renombre $\rho$ y un término $u$ que den como resultado el término esperado en cada caso.
 
 \ExecuteMetaData[code/strong_norm.tex]{iso-cong-lam1}
 
-Es importante entender como se pueden combinar múltiples substituciones en una sola, que pueda ser obtenida a través de la interpretación de la abstracción.
+Para instanciar el lema de la abstracción, las dos hipótesis requeridas en este caso son:
+\begin{itemize}
+	\item Una prueba de que para todo término \snstar \bound{u} se cumple \\
+	\snstar
+	\parens{\subst
+		{\cons
+			{\bound{u}}
+			{\parens{\comp{\ids}{\bound{$\rho$}}}}}
+		{\parens{\subst
+				{\cons
+					{\const{[}~\bound{iso}~\const{]≡}~\parens{\const{`~Z}}}
+					{\parens{\comp{\ids}{\const{S\_}}}}}
+				{\bound{t}}}}}.
+	Se debe notar que es posible combinar las dos substituciones en una sola
+	\snstar (\subst
+	{\cons
+		{\const{[} \bound{iso} \const{]≡} \bound{u}}
+		{\parens{\comp{\ids}{\bound{$\rho$}}}}}
+	{\bound{t}}).
+	Esta última expresión es posible obtenerla a partir de \bound{Lt}.
+	
+	\item Una prueba de
+	\snstar
+	\subst
+	{\cons
+		{\const{[} \bound{iso} \const{]≡} \parens{\const{` Z}}}
+		{\parens{\comp{\ids}{\const{S\_}}}}}
+	{\bound{t}} que puede obtenerse directamente a partir de \bound{Lt}.
+\end{itemize}
+
+Es importante entender cómo se pueden combinar múltiples substituciones en una sola, que pueda ser obtenida a través de la interpretación de la abstracción.
 Esta técnica será la clave para resolver los constructores correspondientes al isomorfismo \textsc{curry}, los cuales también presentan substituciones.
 
 \subsubsection{Caso curry}
@@ -853,9 +896,9 @@ La estrategia para los dos constructores correspondientes a este isomorfismo ser
 \subst{\cons{\const{` Z}}{\comp{\ids}{\const{S\_}}}}{\bound{t}} \type{≡} \bound{t}
 para concluir la segunda hipótesis.
 
-El constructor \const{curry} tiene la particularidad de que la interpretación de su hipótesis tiene la forma 
+El constructor \const{curry} $\lambda x^A. \lambda y^B. t \rightleftarrows \lambda z^{A \times B}. t[\pi_A(z)/x, \pi_B(z)/y]$ tiene la particularidad de que la interpretación de su hipótesis tiene la forma 
 \cand{ \const{ƛ} \const{ƛ} \bound{t} }
-, por lo tanto, instanciandola una vez se puede obtener una segunda interpretación de la forma
+, por lo tanto, instanciandolá una vez se puede obtener una segunda interpretación de la forma
 \cand{ \const{ƛ}
 \parens{\subst{\func{exts} \parens{\cons{\bound{u}}{\parens{\comp{\ids}{\bound{$\rho$}}}}}}{\bound{t}}} }
 la cual puede ser nuevamente instanciada para obtener
@@ -874,7 +917,7 @@ Es posible obtener esta forma utilizando la interpretación presentada en el pá
 \ExecuteMetaData[code/strong_norm.tex]{lemma-curry}
 \ExecuteMetaData[code/strong_norm.tex]{iso-curry}
 
-Para el caso \const{uncurry} se debe realizar, en cierta forma, un razonamiento opuesto.
+Para el caso \const{uncurry} $\lambda x^{A \times B}. t \rightleftarrows \lambda y^A. \lambda z^B. t[\langle y, z \rangle/x]$ se debe realizar, en cierta forma, un razonamiento opuesto.
 Si en el caso anterior se utilizaron dos hipótesis anidadas para instanciar un solo \func{lemma-ƛ}, en este caso se utilizará una sola hipótesis para instanciar dos \func{lemma-ƛ} anidados.
 
 El primer lema requiere obtener
