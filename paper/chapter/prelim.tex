@@ -337,7 +337,41 @@ Los isomorfismos de carácter axiomático que se considerarán en este sistema s
 	\forall X.(A \times B) &\equiv \forall X.A \times \forall X.B \tag{\textsc{p-dist}}
 \end{align*}
 
-Un aspecto interesante de este trabajo, es que presenta la técnica utilizada para obtener las equivalencias de términos inducidas por un isomorfismo de tipos.
+Del mismo modo que Sistema I permite proyectar abstracciones de términos, en SIP es posible proyectar abstracciones de tipos.
+Por ejemplo, utilizando los isomorfismos $(\textsc{dist})$ y $(\textsc{p-dist})$ se puede construir el siguiente término:
+
+\[
+	\pi_{\forall A.(A \rightarrow B)} (\Lambda A. \lambda x^A. \langle r, s \rangle) : \forall A.(A \rightarrow B)
+\]
+
+Su derivación de tipos es:
+
+\begin{center}
+	\begin{prooftree}
+		\hypo{\Gamma \vdash r: B}
+		\hypo{\Gamma \vdash s: C}
+		\infer2[($\times_i$)]{ \Gamma \vdash \langle r, s \rangle : B \times C }
+		\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x^A. \langle r, s \rangle : A \rightarrow (B \times C) }
+		\infer1[($\forall_i$)]{ \Gamma \vdash \Lambda A. \lambda x^A. \langle r, s \rangle : \forall A. (A \rightarrow (B \times C)) }
+		\infer1[($\equiv$)]{ \Gamma \vdash \Lambda A. \lambda x^A. \langle r, s \rangle : \forall A. (A \rightarrow B) \times \forall A. (A \rightarrow C) }
+		\infer1[($\times_e$)]{ \Gamma \vdash \pi_{\forall A.(A \rightarrow B)} (\Lambda A. \lambda x^A. \langle r, s \rangle) : \forall A.(A \rightarrow B) }
+	\end{prooftree}
+\end{center}
+
+Una forma de reducir este término es la siguiente:
+
+\begin{align*}
+	&\pi_{\forall A.(A \rightarrow B)} (\Lambda A. \lambda x^A. \langle r, s \rangle) \\
+	\rightleftarrows& \\
+	&\pi_{\forall A.(A \rightarrow B)} (\Lambda A. \langle \lambda x^A.r, \lambda x^A.s \rangle) \\
+	\rightleftarrows& \\
+	&\pi_{\forall A.(A \rightarrow B)} (\langle \Lambda A. \lambda x^A.r, \Lambda A. \lambda x^A.s \rangle) \\
+	\hookrightarrow&_\pi \\
+	&\Lambda A. \lambda x^A.r
+\end{align*}
+
+
+Este trabajo presenta en detalla la técnica utilizada para obtener las equivalencias de términos inducidas por un isomorfismo de tipos.
 Dado un isomorfismo de tipos con dos constructores involucrados, se construyen términos aplicando de diferentes maneras las reglas de tipado relacionadas con los constructores.
 Para cualquier par de conectivas, tenemos cuatro posibles formas de combinar sus reglas de tipado: introducción-introducción, introducción-eliminación, eliminación-introducción, y eliminación-eliminación.
 Cada una induce una equivalencia, y cada lado de la equivalencia estará dado por el orden en que se apliquen las conectivas.
@@ -390,31 +424,6 @@ Las siguientes derivaciones prueban que ambos términos tienen los tipos involuc
 	\end{center}
 \end{itemize}
 
-Ejemplo
-
-\[
-	\pi_{\forall A.(A \rightarrow A)} (\Lambda A . \langle x^A.x, t \rangle) : \forall A.(A \rightarrow A)
-\]
-
-\begin{center}
-	\begin{prooftree}
-		\hypo{\Gamma \vdash x : A}
-		\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x^A.x : A \rightarrow A }
-		\hypo{\Gamma \vdash t: B}
-		\infer2[($\times_i$)]{ \Gamma \vdash \langle x^A.x, t \rangle : (A \rightarrow A) \times B }
-		\infer1[($\forall_i$)]{ \Gamma \vdash \Lambda A . \langle x^A.x, t \rangle : \forall A. ((A \rightarrow A) \times B) }
-		\infer1[($\equiv$)]{ \Gamma \vdash \Lambda A . \langle x^A.x, t \rangle : \forall A. (A \rightarrow A) \times \forall A.B }
-		\infer1[($\times_e$)]{ \Gamma \vdash \pi_{\forall A.(A \rightarrow A)} (\Lambda A . \langle x^A.x, t \rangle) : \forall A.(A \rightarrow A) }
-	\end{prooftree}
-\end{center}
-
-\begin{align*}
-	&\pi_{\forall A.(A \rightarrow A)} (\Lambda A . \langle x^A.x, t \rangle) \\
-	\rightleftarrows&_{(\textsc{p-dist})} \\
-	&\pi_{\forall A.(A \rightarrow A)} \langle \Lambda A. x^A.x, \Lambda A. t \rangle \\
-	\hookrightarrow&_\pi \\
-	&\Lambda A. x^A.x
-\end{align*}
 
 \subsection{$\lambda^+$}
 $\lambda^+$ \cite{lambda-plus} es una implementación en Haskell de una extensión que agrega números naturales y recursión general a Sistema I.
