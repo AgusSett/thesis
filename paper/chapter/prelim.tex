@@ -4,7 +4,7 @@
 Para poder abstraernos de la forma de los programas y centrarnos en su significado, es necesario establecer cuáles son las formas que son combinables y cómo combinarlas.
 Para ello nos valdremos de la noción de isomorfismo entre tipos.
 El primer paso es considerar dos tipos $A$ y $B$ como isomorfos si existen dos programas $A \rightarrow B$ y $B \rightarrow A$, tal que al componerlos, en ambos sentidos, obtenemos como resultado la identidad.
-Por ejemplo, para probar que los tipos $A \rightarrow (B \times C)$ y $(A \rightarrow B) \times (A \rightarrow C)$ son efectivamente isomorfos, se define un término $curry$ que dada una función devuelve su forma currificada, y un término $uncurry$ que realiza la operación inversa:
+Por ejemplo, para probar que los tipos $(A \times B) \rightarrow C$ y $A \rightarrow B \rightarrow C$ son efectivamente isomorfos, se define un término $curry$ que dada una función devuelve su forma currificada, y un término $uncurry$ que realiza la operación inversa:
 
 \[ curry = \lambda x^{(A \times B) \rightarrow C}. \lambda a^A . \lambda b^B . x\langle a,b \rangle \]
 \[ uncurry = \lambda x^{A \rightarrow B \rightarrow C}. \lambda y^{A \times B} . x(\pi_1 y)(\pi_2 y) \]
@@ -153,8 +153,8 @@ A continuación se presentan los cuatro isomorfismos que pertenecen a dicho conj
 	\begin{align*}
 		A \times B &\equiv B \times A \tag{\textsc{comm}} \\
 		A \times (B \times C) &\equiv (A \times B) \times C \tag{\textsc{asso}} \\
-		(A \times B) \rightarrow C &\equiv A \rightarrow (B \rightarrow C) \tag{\textsc{dist}} \\
-		A \rightarrow (B \times C) &\equiv (A \rightarrow B) \times (A \rightarrow C) \tag{\textsc{curry}}
+		(A \times B) \rightarrow C &\equiv A \rightarrow (B \rightarrow C) \tag{\textsc{curry}} \\
+		A \rightarrow (B \times C) &\equiv (A \rightarrow B) \times (A \rightarrow C) \tag{\textsc{dist}}
 	\end{align*}
 	
 	\caption{Isomorfismos de tipo en Sistema I}
@@ -187,7 +187,7 @@ Por ejemplo, es necesario definir la siguiente equivalencia de términos $\langl
 	& \langle r[t/x], s[t/x] \rangle
 \end{align*}
 
-Es importante destacar que dependiendo del conjunto de isomorfismos de términos que se incluyen, se obtienen sistemas de cálculo con distintas propiedades, incluir demasiados puede desencadenar en no terminación, y si se incluyen pocos pueden aparecer eliminaciones en formas normales.
+Es importante destacar que dependiendo del conjunto de equivalencias entre términos que se incluyen, se obtienen sistemas de cálculo con distintas propiedades, incluir demasiados puede desencadenar en no terminación, y si se incluyen pocos pueden aparecer eliminaciones en formas normales.
 
 A continuación, se presentan las reglas propuestas por Sistema I, las cuales fueron elegidas con el objetivo de obtener un cálculo fuertemente normalizante y consistente:
 
@@ -236,8 +236,8 @@ El siguiente paso surge de notar que las nuevas reglas introducen problemas en l
 Por un lado, las reglas de proyección $\pi_1$ y $\pi_2$ acceden al par a través de la posición de los elementos, pero el isomorfismo $\textsc{comm}$ permite cambiar el orden de un par, permitiendo así proyectar cualquiera de los dos elementos:
 
 \begin{align*}
-	\langle r, s \rangle& \hookrightarrow_{\pi_1} r \\
-	\langle r, s \rangle& \rightleftarrows_{\textsc{comm}} \langle s, r \rangle \hookrightarrow_{\pi_1} s
+	\pi_1 \langle r, s \rangle& \hookrightarrow_{\pi_1} r \\
+	\pi_1 \langle r, s \rangle& \rightleftarrows_{\textsc{comm}} \pi_1 \langle s, r \rangle \hookrightarrow_{\pi_1} s
 \end{align*}
 
 Esto supone un problema para la preservación de tipos y además introduce no determinismo.
@@ -311,7 +311,7 @@ Sistema I Polimórfico \cite{sip}, es una extensión que agrega polimorfismo a S
 A la gramática de tipos y términos definida en Sistema I, le agrega la gramática de tipos y términos correspondientes a Sistema F con pares.
 Sus tipos y términos son entonces los siguientes:
 
-\[ A := X \mid A \Rightarrow A \mid A \times A \mid \forall X.A \]
+\[ A := X \mid A \rightarrow A \mid A \times A \mid \forall X.A \]
 \[ t := x \mid \lambda^Ax.t \mid t t \mid \langle t,t \rangle \mid \pi_A t \mid \Lambda X.t \mid t[A] \]
 
 Las reglas de tipado de este cálculo surgen de tomar las reglas de Sistema I y agregar las correspondientes a polimorfismo de Sistema F:
@@ -371,7 +371,7 @@ Una forma de reducir este término es la siguiente:
 \end{align*}
 
 
-Este trabajo presenta en detalla la técnica utilizada para obtener las equivalencias de términos inducidas por un isomorfismo de tipos.
+Este trabajo presenta en detalle la técnica utilizada para obtener las equivalencias de términos inducidas por un isomorfismo de tipos.
 Dado un isomorfismo de tipos con dos constructores involucrados, se construyen términos aplicando de diferentes maneras las reglas de tipado relacionadas con los constructores.
 Para cualquier par de conectivas, tenemos cuatro posibles formas de combinar sus reglas de tipado: introducción-introducción, introducción-eliminación, eliminación-introducción, y eliminación-eliminación.
 Cada una induce una equivalencia, y cada lado de la equivalencia estará dado por el orden en que se apliquen las conectivas.
@@ -494,7 +494,7 @@ Para entender la practicidad de un sistema de tipos con dicho nivel de especific
 \end{lstlisting}
 
 Notar que el tipo de $zerosV$ es dependiente e introduce una variable.
-Si bien la implementación dada para $zerosL$ es correcta, nada impediría simplemente retornar \verb|[]| en todos los casos, por el contrario, en el caso \verb|(suc n)| de $zerosV$ se estaría cometiendo un error de tipo si se tratara de retornar \verb|[]|, ya que se espera un término de tipo \verb|Vec| $\mathbb{N}$ \verb|(suc n)| y la lista vacía tiene tipo \verb|Vec| $\mathbb{N}$ \verb|0|.
+Si bien la implementación dada para $zerosL$ es correcta, nada impediría simplemente retornar \verb|[]| en todos los casos, por el contrario, en el caso \verb|(suc n)| de $zerosV$ se estaría cometiendo un error de tipo si se tratara de retornar \verb|[]|, ya que se espera un término de tipo \verb|Vec|~$\mathbb{N}$~\verb|(suc n)| y la lista vacía tiene tipo \verb|Vec|~$\mathbb{N}$~\verb|0|.
 De cierta forma el tipo de las funciones está guiando su implementación, impidiendo, en este caso, retornar un vector de largo incorrecto.
 
 Otro ejemplo interesante que se logra con la programación con tipos dependientes es el operador de acceso. Sobre las listas, este operador se define como:
@@ -523,10 +523,10 @@ Luego, un vector de largo $n$ estará indexado por los elementos del conjunto \v
 \begin{lstlisting}[mathescape, language=Haskell, deletekeywords={zero}]
 	_!!v_ :: Vec a n -> Fin n -> a
 	(cons x v) !!v zero  = x
-	(cons x v) !!v suc i = v !!v i
+	(cons x v) !!v (suc i) = v !!v i
 \end{lstlisting}
 
-La definición del operador sobre vectores no requiere el uso del tipo \verb|Maybe|, ya q el segundo argumento está restringido a ser un natural entre cero y el largo del vector menos uno.
+La definición del operador sobre vectores no requiere el uso del tipo \verb|Maybe|, ya que el segundo argumento está restringido a ser un natural entre cero y el largo del vector menos uno.
 Notar que en la implementación ya no aparece el caso \verb|nil|, porque eso implicaría que $n = 0$, pero el parámetro $n$ del tipo dependiente está forzando al argumento \verb|Fin| a tener la misma cantidad de elementos que el vector, por lo que dicho argumento debería ser un elemento de \verb|Fin 0|, el cual es un conjunto vacío.
 Esto es lo que se denomina un ``patrón absurdo'', y como es imposible que dicho patrón ocurra, se lo excluye de la implementación.
 
@@ -632,7 +632,7 @@ Las correspondencias que surgen de esta interpretación pueden resumirse de la s
 
 
 \section{Teoría de Tipos Intuicionista}
-La teoría de tipos intuicionista, también llamada teoría de tipos de Martin-Löf \cite{MLTT72, MLTT73, MLTT79, Bibliopolis} propone un sistema lógico formal y los fundamentos filosóficos para las matemáticas constructivas.
+La Teoría de Tipos Intuicionista, también llamada Teoría de Tipos de Martin-Löf \cite{MLTT72, MLTT73, MLTT79, Bibliopolis} propone un sistema lógico formal y los fundamentos filosóficos para las matemáticas constructivas.
 
 Directamente influenciado por las ideas de Howard, Martin-Löf se basó en el principio de proposiciones como tipos y el constructivismo matemático para el desarrollo de su teoría.
 Este constructivismo requiere que las pruebas contengan un ``testigo'', una prueba de una proposición dada es un programa, por lo tanto, las proposiciones son verdaderas cuando su tipo está habitado por algún término.
@@ -647,7 +647,7 @@ Sin embargo, puede que no siempre sea posible construir una prueba de dicha prop
 Se puede pensar a la teoría de tipos intuicionista como un lenguaje de programación funcional donde el sistema de tipos es tan rico que prácticamente cualquier propiedad concebible de un programa puede expresarse como un tipo.
 Todas las funciones de este lenguaje deben ser totales y decidibles, por lo que todos los programas deben necesariamente cumplir con la propiedad de terminación.
 
-Filosófica y prácticamente, la teoría de tipos de Martin-Löf es un marco fundamental donde las matemáticas constructivas y la programación son, en un sentido profundo, lo mismo.
+Filosófica y prácticamente, la Teoría de Tipos de Martin-Löf es un marco fundamental donde las matemáticas constructivas y la programación son, en un sentido profundo, lo mismo.
 
 
 \section{Agda}
@@ -656,7 +656,7 @@ Chalmers (Suiza).
 Debido al paradigma de las proposiciones como tipos, Agda también funciona como un asistente de pruebas.
 A diferencia de otros asistentes, como Coq, carece de un sistema de tácticas, por lo que las pruebas son escritas en un estilo de programación funcional, de hecho su sintaxis es similar a la de Haskell.
 
-Agda es una implementación de la Teoría de Tipos de Martin-Löf, para que la lógica sea consistente, los programas deben ser totales, es decir que todos los programas deben terminar, y todos los posibles casos de un pattern matching deben ser cubiertos.
+Agda es una implementación de la Teoría de Tipos de Martin-Löf, para que la lógica sea consistente, los programas deben ser totales, es decir que todos los programas deben terminar, y todos los posibles casos de un \textit{pattern matching} deben ser cubiertos.
 Por este motivo, no todas las funciones recursivas están permitidas, Agda posee un mecanismo de comprobación de terminación que acepta aquellas funciones para las que puede probar mecánicamente su terminación.
 
 % TODO: Explicar simbolos, opperadores y Sets (universos)

@@ -2,8 +2,9 @@
 \newcommand{\bound}[1]{\AgdaBound{#1}}
 \newcommand{\func}[1]{\AgdaFunction{#1}}
 \newcommand{\type}[1]{\AgdaDatatype{#1}}
-\newcommand{\snstar}{\type{SN*} \func{⟦\_⟧} }
+\newcommand{\snstar}{\type{SN*}~\func{⟦\_⟧}~}
 \newcommand{\cand}[1]{\func{⟦}#1\func{⟧}}
+\newcommand{\pair}[2]{\const{⟨}~#1~\const{,}~#2~\const{⟩}}
 
 \newcommand{\parens}[1]{\AgdaSymbol{(}#1\AgdaSymbol{)}}
 \newcommand{\subst}[2]{\func{⟪}~#1~\func{⟫}~#2}
@@ -36,11 +37,10 @@ Reynolds \cite{reynolds_1998} acuñó las expresiones \textit{tipos intrínsecos
 
 En esta sección se presenta una formalización en Agda de un cálculo lambda simplemente tipado con pares extendido con isomorfismos de tipo.
 Gran parte del código presentado en este trabajo está basado y adaptado a partir de un libro de Philip Wadler \cite{plfa}.
-La adaptación consiste principalmente en la adición de los isomorfismos de tipos, la regla de tipado $(\equiv)$ y la relación de isomorfismos de términos.
+La adaptación consiste principalmente en la adición de los isomorfismos de tipos, la regla de tipado $(\equiv)$ y la relación de equivalencia entre términos.
 
-En primera instancia se definen los tipos del lenguaje, existen cuatro constructores de tipos.
-Por un lado, los tipos base son, el tipo atómico \const{$\tau$} y el tipo top \const{$\top$}.
-Y, por otro lado, el tipo de las funciones \const{$\_\Rightarrow\_$} y los pares \const{$\_\times\_$}.
+En primera instancia se definen los tipos del lenguaje, existen tres constructores de tipos.
+El tipo top \const{$\top$}, el tipo de las funciones \const{$\_\Rightarrow\_$} y los pares \const{$\_\times\_$}.
 
 \begin{codigo}
 	Tipo de dato de los tipos
@@ -64,7 +64,7 @@ Luego se formalizan las variables intrínsecamente tipadas, que son representada
 \end{codigo}
 
 La proposición \bound{$\Gamma$} \const{$\ni$} \bound{A} indica que existe un tipo \bound{A} dentro del entorno \bound{$\Gamma$}, es decir que este es el tipo de las variables que tienen tipo \bound{A} en el entorno \bound{$\Gamma$}.
-Los términos construidos con \const{Z} y \const{S} corresponden los a índices de DeBruijn, los cuales constituyen pruebas para dichas proposiciones.
+Los términos construidos con \const{Z} y \const{S} corresponden a los índices de De Bruijn, los cuales constituyen pruebas para dichas proposiciones.
 
 \begin{example}
 	Las siguientes variables con tipos $\top$ y $\top \Rightarrow \top$ tipan en el contexto \const{$\emptyset , \top \Rightarrow \top , \top$} y constituyen una prueba de ello.
@@ -216,17 +216,17 @@ Si bien la existencia de este término parece suponer un impedimento para el cum
 A continuación se presenta la formalización de la relación de simetría entre términos correspondientes a tipos isomorfos $(\rightleftarrows)$.
 La selección de isomorfismos entre términos aquí presentada, es el resultado de varias decisiones de diseño basadas principalmente en dos objetivos.
 
-En primer lugar, se agregaron todos las equivalencias necesarias para que ningún término quede atascado y no existan eliminaciones en formas normales, esto tiene como consecuencia que todo término cerrado reduce siempre a un valor.
+En primer lugar, se agregaron todas las equivalencias necesarias para que ningún término quede atascado y no existan eliminaciones en formas normales, esto tiene como consecuencia que todo término cerrado reduce siempre a un valor.
 Este punto es más evidente cuando se tiene en cuenta la prueba de progreso presentada más adelante.
 
 El segundo objetivo es preservar la propiedad de normalización y evitar que su prueba se torne demasiado compleja.
-Una consecuencia directa de esto, son los constructores con el prefijo \const{sym-}, todos ellos se podrían obtener a partir de los isomorfismos base combinados con un constructor \const{sym} tal y como se construyen los isomorfismos de tipos.
+Una consecuencia directa de esto, son los constructores con el prefijo \const{sym-}, todos ellos se podrían obtener a partir de las equivalencias base combinadas con un constructor \const{sym} tal y como se construyen los isomorfismos de tipos.
 Sin embargo, incluir el constructor \const{sym} genera problemas a la hora de formalizar la prueba de normalización fuerte.
 Por otro lado, para desatascar algunos términos, es necesario incluir la $\eta$-expansión y una regla \textsc{split} $r \rightleftarrows \langle \pi_A\; r , \pi_B\; r \rangle$ donde $r: A \times B$.
 Si se incluyen estas reglas directamente, se pierde la propiedad de normalización, ya que por ejemplo nada impediría aplicar la $\eta$-expansión un número infinito de veces.
 La solución es definir nuevos constructores que embeban estas reglas, como por ejemplo \const{asso-split}.
 
-Para facilitar la comprensión del código, se presenta una tabla de equivalencias utilizando la misma notación que la presentada anteriormente para Sistema I.
+Para facilitar la comprensión del código, se presenta una tabla de equivalencias utilizando la misma notación que la tabla presentada anteriormente para Sistema I.
 En esta se omiten las reglas de congruencia.
 
 \begin{figure}[H]
@@ -270,7 +270,7 @@ En esta se omiten las reglas de congruencia.
 	\input{code/iso_term.tex}
 \end{codigo}
 
-Al igual que en la relación de reducción, los tipos intrínsecos garantizan que los términos transformados por la relación \const{[\_]$\equiv$\_} preservan sus tipos.
+Al igual que en la relación de reducción, los tipos intrínsecos garantizan que los términos transformados por la relación \type{$\_\rightleftarrows\_$} preservan sus tipos.
 Notar como todos los constructores presentan una regla ($\equiv$) del lado izquierdo, la cual o bien desaparece del lado derecho, o bien se simplifica el isomorfismo de tipo aplicado.
 Por ejemplo, el constructor \const{comm} elimina la regla \const{[ comm ]$\equiv$\_} del término, mientras que el constructor \const{cong$\Rightarrow_2$} simplifica el isomorfismo \const{[ cong$\Rightarrow_2$}~\bound{iso}~\const{]$\equiv$\_} a \const{[}~\bound{iso}~\const{]$\equiv$\_}.
 Por lo tanto, las equivalencias solo pueden aplicarse para eliminar o simplificar un constructor ($\equiv$) del término.
@@ -289,7 +289,7 @@ Por lo tanto, las equivalencias solo pueden aplicarse para eliminar o simplifica
 \subsection{Preservación de tipos}
 
 Es importante destacar que la representación con tipos intrínsecos provee implícitamente la propiedad de preservación.
-La relación de isomorfismo de términos \type{$\_\rightleftarrows\_$} y la relación de reducción \type{$\_\hookrightarrow\_$} solo pueden relacionar términos del mismo tipo. 
+La relación de equivalencia entre términos \type{$\_\rightleftarrows\_$} y la relación de reducción \type{$\_\hookrightarrow\_$} solo pueden relacionar términos del mismo tipo. 
 En consecuencia, no puede darse el caso en el que un término reduzca, de forma errónea, a otro de un tipo distinto.
 
 
@@ -320,6 +320,7 @@ Donde $var$ son las variables y la categoría sintáctica $neu$ caracteriza a la
 
 \begin{codigo}
 	Definición inductiva de las formas neutrales y normales
+	\ExecuteMetaData[code/progress.tex]{neutral} \\
 	\ExecuteMetaData[code/progress.tex]{normal}
 \end{codigo}
 
@@ -352,7 +353,9 @@ Los constructores de esta relación se corresponden con los tres posibles casos 
 
 Luego, la prueba de progreso consiste en probar que la propiedad \type{Progress} se cumple para todo término dado.
 La formalización implementa una estrategia de reducción \textit{strong call-by-value}, es decir, reduce primero los argumentos de las aplicaciones antes de aplicar la $\beta$-reducción, y además, reduce debajo de los lambdas.
+El orden de reducción escogido no tiene importancia, la prueba puede ser realizada siguiendo cualquier orden, aquí se lo menciona simplemente para facilitar la comprensión del código.
 
+Debido a la longitud de esta función se la presentará separada por casos.
 En primer lugar, se presentan los casos para las variables y el término \const{$\star$}, donde simplemente se concluye que ambos se encuentran en formal normal.
 
 \ExecuteMetaData[code/progress.tex]{progress-base}
@@ -506,16 +509,15 @@ El objetivo final de esta sección será entonces, definir una función que dado
 
 La prueba aquí presentada está basada y extendida a partir de una formalización realizada por 
 Andras Kovacs\footnote{\citeurl{Kovacs}} para cálculo lambda simplemente tipado.
-A su vez, el trabajo de Kovacs se basa en la tesis de Steven Schäfer \cite{Schafer}, donde se formaliza la prueba de normalización fuerte para Sistema-F en Coq.
+A su vez, el trabajo de Kovacs se basa en la tesis de Steven Schäfer \cite{Schafer}, donde se formaliza la prueba de normalización fuerte para Sistema F en Coq.
 La técnica utilizada por Schäfer difiere en ciertos aspectos con la prueba de candidatos de reducibilidad de Girard \cite{Girard}.
 Además, se utilizó como referencia una formalización de candidatos de reducibilidad en Agda realizada por Pablo Barenbaum\footnote{\citeurl{Barenbaum}}.
 
 \subsection{Prueba para STLC con pares y Top}
 
 Con el objetivo de facilitar la comprensión de la prueba, la misma será presentada en dos partes.
-En esta sección se explicará la prueba para cálculo lambda simplemente tipado con pares, es decir, sin incluir la relación de isomorfismos entre términos.
-Y en la siguiente sección se presentarán los cambios necesarios para extender la prueba a Sistema I.
-
+En esta sección se explicará la prueba para cálculo lambda simplemente tipado con pares, es decir, sin incluir la relación de equivalencia entre términos.
+Y en la siguiente sección se presentarán los cambios necesarios para extender la prueba a Sistema I con tipo Top.
 
 Por lo tanto, se define el tipo de datos \type{SN} utilizando solo la relación \type{$\_\hookrightarrow\_$}
 
@@ -540,7 +542,7 @@ Mientras que para el caso de la abstracción, la interpretación se define de mo
 La definición utiliza los productos \func{$\_\times\_$} y el tipo top \type{$\top$} definidos en los módulos \AgdaModule{Data.Product} y \AgdaModule{Data.Unit} de la librería estándar.
 Para evitar una colisión de nombres con los constructores de tipos del cálculo, se renombran los tipos de la librería estándar como \func{$\_\otimes\_$} y \type{Top} respectivamente.
 
-Se puede extender la definición de interpretación a substituciones, para ello se define un predicado que establece que una substitución $\sigma$ es adecuada en un contexto $\Gamma$ y se escribe $\Gamma \vDash \sigma$, cuando todos los términos con los cuales son substituidas las variables en $\sigma$ cumplen con el predicado \snstar.
+Se puede extender la definición de interpretación a substituciones, para ello se define un predicado que establece que una substitución $\sigma$ es adecuada en un contexto $\Gamma$, y se escribe $\Gamma \vDash \sigma$, cuando todos los términos por los cuales son substituidas las variables en $\sigma$ cumplen con el predicado \snstar.
 
 \ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-subst}
 
@@ -640,7 +642,7 @@ Sin embargo, como se verá más adelante, obtener la interpretación correspondi
 
 \subsubsection{Caso isomorfismo}
 
-Este caso no presenta mayores dificultades. Sin embargo, la mayor parte de la complejidad para la extensión de la prueba a Sistema-I, se encuentra al añadir todos los constructores de isomorfismos de términos a este lema.
+Este caso no presenta mayores dificultades. Sin embargo, la mayor parte de la complejidad para la extensión de la prueba a Sistema I, se encuentra al añadir todos los constructores de isomorfismos de términos a este lema.
 
 \ExecuteMetaData[code/strong_norm_base.tex]{lemma-iso}
 \ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-iso}
@@ -708,7 +710,7 @@ en una sola substitución y demostrar que aplicar dicha combinación es equivale
 
 %\ExecuteMetaData[code/strong_norm_base.tex]{subst-split-simple}
 
-Usando los teoremas presentados ahora es posible definir el caso de adequacy para la abstracción.
+Usando los teoremas presentados ahora es posible definir el caso de \func{adequacy} para la abstracción.
 
 \begin{samepage}
 	\ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-abs}
@@ -742,7 +744,7 @@ Como detalle adicional, se elimina la substitución identidad aplicada al térmi
 
 \subsection{Prueba para Sistema I con tipo Top}
 
-El primer paso para extender la prueba, es agregar en la definición de \type{SN}, la relación de isomorfismos entre términos.
+El primer paso para extender la prueba, es agregar en la definición de \type{SN}, la relación de equivalencia entre términos.
 
 \ExecuteMetaData[code/strong_norm.tex]{SN}
 \ExecuteMetaData[code/strong_norm.tex]{sn-star}
@@ -776,10 +778,10 @@ A modo de ejemplo se presenta el lema correspondiente al producto, y se omiten l
 
 Notar que ahora el paso de reducción tiene cuatro constructores posibles, dos congruencias correspondientes a la relación \type{$\hookrightarrow$} y dos correspondientes a \type{$\rightleftarrows$}.
 
-El lema para el constructor de isomorfismos es donde se concentra la mayor complejidad de la prueba, ya que se deben resolver los casos de todos los isomorfismos de términos.
+El lema para el constructor de isomorfismos es donde se concentra la mayor complejidad de la prueba, ya que se deben resolver los casos de todos las equivalencias de términos.
 Para empezar, la definición es casi idéntica a la presentada anteriormente, la diferencia es que ahora cuando se realiza pattern matching sobre el paso de reducción en la función \func{aux}, se deben resolver todos los casos correspondientes a cada uno de los constructores del tipo \type{⇄}.
 
-Debido a la extensión de este lema, se lo presentará la función \func{aux} dividido en secciones y solo se mostrarán los casos más relevantes.
+Debido a la extensión de este lema, se presentará la función \func{aux} dividida en secciones y solo se mostrarán los casos más relevantes.
 
 \ExecuteMetaData[code/strong_norm.tex]{lemma-iso-type}
 
@@ -813,18 +815,20 @@ Este lema resulta de utilidad en los casos en los que se debe construir álgo a 
 
 \ExecuteMetaData[code/strong_norm.tex]{iso-dist}
 
+\newcommand{\substu}{\subst{\cons{\bound{u}}{\parens{\comp{\ids}{\bound{$\rho$}}}}}}
+
 El lema de la abstracción tiene dos argumentos:
 \begin{itemize}
-	\item En el primero es la interpretación de $ƛ \langle r, s \rangle$, es decir, se debe mostrar que para todo término \snstar \bound{u}, el término $\langle r, s \rangle [u] = \langle r[u], s[u] \rangle$ es también \snstar.
-	Las hipótesis \bound{Lr} y \bound{Ls} corresponden a las interpretaciones \cand{\const{ƛ} \bound{r}} y \cand{\const{ƛ} \bound{s}} respectivamente, por lo que pueden ser utilizadas para obtener \snstar (\bound{r}\func{[}\bound{u}\func{]}) y \snstar (\bound{s}\func{[}\bound{u}\func{]}).
+	\item El primero es la interpretación \cand{\const{ƛ} \pair{\bound{r}}{\bound{s}}}, es decir, se debe mostrar que para todo término \snstar \bound{u}, se cumple \snstar (\pair{\substu\bound{r}}{\substu\bound{s}}).
+	Las hipótesis \bound{Lr} y \bound{Ls} corresponden a las interpretaciones \cand{\const{ƛ} \bound{r}} y \cand{\const{ƛ} \bound{s}} respectivamente, por lo que pueden ser utilizadas para obtener \snstar(\substu\bound{r}) y \snstar(\substu\bound{s}).
 	\item El segundo argumento requiere mostrar que $\langle r, s \rangle$ es \snstar.
 	Esto puede obtenerse simplemente aplicando el lema \func{lemma-sub} sobre las hipótesis.
 \end{itemize}
 
 En segundo lugar, se define un lema que se empleará para probar la propiedad de la interpretación de la abstracción, en los casos donde se deba $\eta$-expandir un término.
-La clave de este lema está en notar que 
-\subst{\cons{\bound{u}}{\parens{\comp{\ids}{\bound{$\rho$}}}}}{\parens{\func{rename} \const{S\_} \bound{t}}}
-es equivalente a \subst{\comp{\ids}{\bound{$\rho$}}}{\bound{t}} que a su vez es equivalente a \func{rename} \bound{$\rho$} \bound{t}.
+%La clave de este lema está en notar que 
+%\subst{\cons{\bound{u}}{\parens{\comp{\ids}{\bound{$\rho$}}}}}{\parens{\func{rename} \const{S\_} \bound{t}}}
+%es equivalente a \subst{\comp{\ids}{\bound{$\rho$}}}{\bound{t}} que a su vez es equivalente a \func{rename} \bound{$\rho$} \bound{t}.
 
 \ExecuteMetaData[code/strong_norm.tex]{lemma-S}
 
@@ -837,6 +841,9 @@ Para obtener los argumentos del lema de la abstracción se sigue un razonamiento
 Los puntos a destacar son:
 \begin{itemize}
 	\item En el primer argumento se utiliza el nuevo lema \func{lemma-S} para obtener \\ \snstar(\subst{\cons{\bound{u}}{\parens{\comp{\ids}{\bound{$\rho$}}}}}{\parens{\func{rename}~\const{S\_}~\bound{r}}}) a partir de \bound{SNr}, y lo mismo aplica para \bound{SNs}.
+	
+	%\snstar(\pair{(\substu \parens{\func{rename}~\const{S\_}~\bound{r}})\const{·}\bound{u}}{(\substu \parens{\func{rename}~\const{S\_}~\bound{s}})\const{·}\bound{u}})
+	
 	\item En el segundo argumento se utiliza el lema \func{SN*-rename} para obtener \snstar(\func{rename}~\const{S\_}~\bound{r}) a partir de \bound{SNr}, y lo mismo aplica para \bound{SNs}.
 \end{itemize}
 
@@ -875,8 +882,7 @@ Para instanciar el lema de la abstracción, las dos hipótesis requeridas en est
 	{\cons
 		{\const{[} \bound{iso} \const{]≡} \bound{u}}
 		{\parens{\comp{\ids}{\bound{$\rho$}}}}}
-	{\bound{t}}).
-	Esta última expresión es posible obtenerla a partir de \bound{Lt}.
+	{\bound{t}}), y esta última expresión es posible obtenerla a partir de \bound{Lt}, tomando $\rho =$ \bound{$\rho$} y $u =$ \const{[}~\bound{iso}~\const{]≡}~\bound{u}.
 	
 	\item Una prueba de
 	\snstar
@@ -884,7 +890,7 @@ Para instanciar el lema de la abstracción, las dos hipótesis requeridas en est
 	{\cons
 		{\const{[} \bound{iso} \const{]≡} \parens{\const{` Z}}}
 		{\parens{\comp{\ids}{\const{S\_}}}}}
-	{\bound{t}} que puede obtenerse directamente a partir de \bound{Lt}.
+	{\bound{t}} que puede obtenerse directamente a partir de \bound{Lt}, tomando $\rho =$ \const{S\_} y $u =$ \const{[}~\bound{iso}~\const{]≡}~\parens{\const{` Z}}.
 \end{itemize}
 
 Es importante entender cómo se pueden combinar múltiples substituciones en una sola, que pueda ser obtenida a través de la interpretación de la abstracción.
@@ -892,7 +898,7 @@ Esta técnica será la clave para resolver los constructores correspondientes al
 
 \subsubsection{Caso curry}
 
-La estrategia para los dos constructores correspondientes a este isomorfismo será, en primer lugar, definir un lema que pruebe la primera hipótesis de \func{lemma-ƛ}, y luego aprovechar el hecho de que
+La estrategia para los dos constructores correspondientes a este isomorfismo será, en primer lugar, definir un lema que pruebe la primera hipótesis del \func{lemma-ƛ}, y luego aprovechar el hecho de que
 \subst{\cons{\const{` Z}}{\comp{\ids}{\const{S\_}}}}{\bound{t}} \type{≡} \bound{t}
 para concluir la segunda hipótesis.
 
@@ -901,18 +907,28 @@ El constructor \const{curry} $\lambda x^A. \lambda y^B. t \rightleftarrows \lamb
 , por lo tanto, instanciandolá una vez se puede obtener una segunda interpretación de la forma
 \cand{ \const{ƛ}
 \parens{\subst{\func{exts} \parens{\cons{\bound{u}}{\parens{\comp{\ids}{\bound{$\rho$}}}}}}{\bound{t}}} }
-la cual puede ser nuevamente instanciada para obtener
-\subst{\cons{\bound{u₁}}{\parens{\comp{\ids}{\bound{$\rho_1$}}}}}{\parens{\subst{\func{exts} \parens{\cons{\bound{u}}{\parens{\comp{\ids}{\bound{$\rho$}}}}}}{\bound{t}}}}
+la cual puede ser nuevamente instanciada para obtener:
 
-Por otro lado, se debe notar que es posible reescribir el objetivo del lema de una forma equivalente
-\subst
-{\cons{\const{π} \bound{B} \AgdaSymbol{\{}\const{inj₂} \const{refl}\AgdaSymbol{\}} \bound{u}}{\ids}}
+\begin{center}
+	\snstar\subst{\cons{\bound{u₁}}{\parens{\comp{\ids}{\bound{$\rho_1$}}}}}{\parens{\subst{\func{exts} \parens{\cons{\bound{u}}{\parens{\comp{\ids}{\bound{$\rho$}}}}}}{\bound{t}}}}	
+\end{center}
+
+
+Por otro lado, se debe notar que es posible reescribir la substitución que aparece en la conclusión del lema de una forma equivalente:
+\begin{align*}
+&\substu(\subst{\func{σ-curry}}{\bound{t}}) \\
+=& \\
+&\substu(\subst{\cons{\const{$\pi$}~\bound{B}~(\const{` Z})}{\cons{\const{$\pi$}~\bound{A}~(\const{` Z})}{\parens{\comp{\ids}{\const{S\_}}}}}}{\bound{t}}) \\
+=& \\
+&\subst
+{\cons{\const{π}~\bound{B}~\bound{u}}{\ids}}
 {\parens{\subst
-		{\func{exts} \parens{\cons
-				{\const{π} \bound{A} \AgdaSymbol{\{}\const{inj₁} \const{refl}\AgdaSymbol{\}} \bound{u}}
+		{\func{exts}~\parens{\cons
+				{\const{π}~\bound{A}~\bound{u}}
 				{\comp{\ids}{\bound{ρ}}}}}
-		{\bound{t}}}}.
-Es posible obtener esta forma utilizando la interpretación presentada en el párrafo anterior.
+		{\bound{t}}}}
+\end{align*}
+Es posible obtener esta última expresión utilizando las dos interpretaciones anidadas presentadas en el párrafo anterior.
 
 \ExecuteMetaData[code/strong_norm.tex]{lemma-curry}
 \ExecuteMetaData[code/strong_norm.tex]{iso-curry}
