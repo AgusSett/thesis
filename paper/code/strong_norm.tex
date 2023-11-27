@@ -1232,10 +1232,7 @@
 \\
 \>[4][@{}l@{\AgdaIndent{0}}]%
 \>[6]\AgdaSymbol{(}\AgdaFunction{subst-curry-split}\AgdaSpace{}%
-\AgdaSymbol{\{}\AgdaArgument{Σ}\AgdaSpace{}%
-\AgdaSymbol{=}\AgdaSpace{}%
-\AgdaInductiveConstructor{∅}\AgdaSymbol{\}}\AgdaSpace{}%
-\AgdaSymbol{\{}\AgdaArgument{N}\AgdaSpace{}%
+\AgdaSymbol{\{}\AgdaArgument{t}\AgdaSpace{}%
 \AgdaSymbol{=}\AgdaSpace{}%
 \AgdaBound{t}\AgdaSymbol{\})}\<%
 \\
@@ -1397,7 +1394,7 @@
 \AgdaBound{B}\AgdaSpace{}%
 \AgdaOperator{\AgdaDatatype{⊢}}\AgdaSpace{}%
 \AgdaBound{C}\AgdaSymbol{\}}\AgdaSpace{}%
-\AgdaSymbol{\{}\AgdaBound{u}\AgdaSpace{}%
+\AgdaSymbol{\{}\AgdaBound{u₁}\AgdaSpace{}%
 \AgdaSymbol{:}\AgdaSpace{}%
 \AgdaBound{Δ}\AgdaSpace{}%
 \AgdaOperator{\AgdaDatatype{⊢}}\AgdaSpace{}%
@@ -1412,9 +1409,9 @@
 \AgdaSymbol{→}\AgdaSpace{}%
 \AgdaDatatype{SN*}\AgdaSpace{}%
 \AgdaOperator{\AgdaFunction{⟦\AgdaUnderscore{}⟧}}\AgdaSpace{}%
-\AgdaBound{u}\AgdaSpace{}%
+\AgdaBound{u₁}\AgdaSpace{}%
 \AgdaSymbol{→}\AgdaSpace{}%
-\AgdaSymbol{(}\AgdaBound{ρ}\AgdaSpace{}%
+\AgdaSymbol{(}\AgdaBound{ρ₁}\AgdaSpace{}%
 \AgdaSymbol{:}\AgdaSpace{}%
 \AgdaFunction{Rename}\AgdaSpace{}%
 \AgdaBound{Γ}\AgdaSpace{}%
@@ -1425,11 +1422,11 @@
 \>[2]\AgdaDatatype{SN*}\AgdaSpace{}%
 \AgdaOperator{\AgdaFunction{⟦\AgdaUnderscore{}⟧}}\AgdaSpace{}%
 \AgdaSymbol{(}\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
-\AgdaBound{u}\AgdaSpace{}%
+\AgdaBound{u₁}\AgdaSpace{}%
 \AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
 \AgdaSymbol{(}\AgdaFunction{ids}\AgdaSpace{}%
 \AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
-\AgdaBound{ρ}\AgdaSymbol{)}\AgdaSpace{}%
+\AgdaBound{ρ₁}\AgdaSymbol{)}\AgdaSpace{}%
 \AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
 \AgdaSymbol{(}\AgdaOperator{\AgdaInductiveConstructor{ƛ}}\AgdaSpace{}%
 \AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
@@ -1450,12 +1447,12 @@
 \AgdaSymbol{\{}\AgdaArgument{t}\AgdaSpace{}%
 \AgdaSymbol{=}\AgdaSpace{}%
 \AgdaBound{t}\AgdaSymbol{\}}\AgdaSpace{}%
-\AgdaSymbol{\{}\AgdaArgument{u}\AgdaSpace{}%
+\AgdaSymbol{\{}\AgdaArgument{u₁}\AgdaSpace{}%
 \AgdaSymbol{=}\AgdaSpace{}%
-\AgdaBound{u}\AgdaSymbol{\}}\AgdaSpace{}%
+\AgdaBound{u₁}\AgdaSymbol{\}}\AgdaSpace{}%
 \AgdaBound{Lt}\AgdaSpace{}%
-\AgdaBound{SNu}\AgdaSpace{}%
-\AgdaBound{ρ}\AgdaSpace{}%
+\AgdaBound{SNu₁}\AgdaSpace{}%
+\AgdaBound{ρ₁}\AgdaSpace{}%
 \AgdaSymbol{=}\<%
 \\
 \>[0][@{}l@{\AgdaIndent{0}}]%
@@ -1463,12 +1460,12 @@
 \\
 \>[2][@{}l@{\AgdaIndent{0}}]%
 \>[4]\AgdaSymbol{(λ}\AgdaSpace{}%
-\AgdaSymbol{\{}\AgdaBound{\AgdaUnderscore{}}\AgdaSymbol{\}\{}\AgdaBound{ρ₁}\AgdaSymbol{\}\{}\AgdaBound{u₁}\AgdaSymbol{\}}\AgdaSpace{}%
-\AgdaBound{SNu₁}\AgdaSpace{}%
+\AgdaSymbol{\{}\AgdaBound{\AgdaUnderscore{}}\AgdaSymbol{\}\{}\AgdaBound{ρ₂}\AgdaSymbol{\}\{}\AgdaBound{u₂}\AgdaSymbol{\}}\AgdaSpace{}%
+\AgdaBound{SNu₂}\AgdaSpace{}%
 \AgdaSymbol{→}\AgdaSpace{}%
 \AgdaFunction{lemma-uncurry₂}\AgdaSpace{}%
-\AgdaBound{SNu₁}\AgdaSpace{}%
-\AgdaBound{ρ₁}\AgdaSymbol{)}\<%
+\AgdaBound{SNu₂}\AgdaSpace{}%
+\AgdaBound{ρ₂}\AgdaSymbol{)}\<%
 \\
 %
 \>[4]\AgdaSymbol{(}\AgdaFunction{transport}\AgdaSpace{}%
@@ -1476,10 +1473,7 @@
 \AgdaOperator{\AgdaFunction{⟦\AgdaUnderscore{}⟧}}\AgdaSymbol{)}\<%
 \\
 \>[4][@{}l@{\AgdaIndent{0}}]%
-\>[6]\AgdaSymbol{(}\AgdaFunction{Z-weaken}\AgdaSpace{}%
-\AgdaSymbol{\{}\AgdaArgument{Σ}\AgdaSpace{}%
-\AgdaSymbol{=}\AgdaSpace{}%
-\AgdaInductiveConstructor{∅}\AgdaSymbol{\})}\<%
+\>[6]\AgdaSymbol{(}\AgdaFunction{Z-weaken}\AgdaSymbol{)}\<%
 \\
 %
 \>[6]\AgdaSymbol{(}\AgdaFunction{lemma-uncurry₂}\AgdaSpace{}%
@@ -1529,11 +1523,11 @@
 \AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
 \AgdaSymbol{(}\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
 \AgdaFunction{exts}\AgdaSpace{}%
-\AgdaSymbol{(}\AgdaBound{u}\AgdaSpace{}%
+\AgdaSymbol{(}\AgdaBound{u₁}\AgdaSpace{}%
 \AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
 \AgdaFunction{ids}\AgdaSpace{}%
 \AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
-\AgdaBound{ρ}\AgdaSymbol{)}\AgdaSpace{}%
+\AgdaBound{ρ₁}\AgdaSymbol{)}\AgdaSpace{}%
 \AgdaOperator{\AgdaFunction{⟫}}\AgdaSpace{}%
 \AgdaSymbol{(}\AgdaOperator{\AgdaFunction{⟪}}\AgdaSpace{}%
 \AgdaFunction{σ-uncurry}\AgdaSpace{}%
@@ -1557,10 +1551,7 @@
 \>[6][@{}l@{\AgdaIndent{0}}]%
 \>[8]\AgdaSymbol{(}\AgdaFunction{sym}\AgdaSpace{}%
 \AgdaSymbol{(}\AgdaFunction{subst-uncurry-split}\AgdaSpace{}%
-\AgdaSymbol{\{}\AgdaArgument{Σ}\AgdaSpace{}%
-\AgdaSymbol{=}\AgdaSpace{}%
-\AgdaInductiveConstructor{∅}\AgdaSymbol{\}}\AgdaSpace{}%
-\AgdaSymbol{\{}\AgdaArgument{N}\AgdaSpace{}%
+\AgdaSymbol{\{}\AgdaArgument{t}\AgdaSpace{}%
 \AgdaSymbol{=}\AgdaSpace{}%
 \AgdaBound{t}\AgdaSymbol{\}))}\<%
 \\
@@ -1570,13 +1561,13 @@
 \AgdaSymbol{=}\AgdaSpace{}%
 \AgdaBound{ρ₂}\AgdaSpace{}%
 \AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
-\AgdaBound{ρ}\AgdaSymbol{\}}\AgdaSpace{}%
+\AgdaBound{ρ₁}\AgdaSymbol{\}}\AgdaSpace{}%
 \AgdaSymbol{\{}\AgdaArgument{u}\AgdaSpace{}%
 \AgdaSymbol{=}\AgdaSpace{}%
 \AgdaOperator{\AgdaInductiveConstructor{⟨}}\AgdaSpace{}%
 \AgdaFunction{rename}\AgdaSpace{}%
 \AgdaBound{ρ₂}\AgdaSpace{}%
-\AgdaBound{u}\AgdaSpace{}%
+\AgdaBound{u₁}\AgdaSpace{}%
 \AgdaOperator{\AgdaInductiveConstructor{,}}\AgdaSpace{}%
 \AgdaBound{u₂}\AgdaSpace{}%
 \AgdaOperator{\AgdaInductiveConstructor{⟩}}\AgdaSymbol{\}}\AgdaSpace{}\<%
@@ -1585,7 +1576,7 @@
 \>[9]\AgdaSymbol{(}\AgdaFunction{lemma-⟨,⟩}\AgdaSpace{}%
 \AgdaSymbol{(}\AgdaFunction{SN*-rename}\AgdaSpace{}%
 \AgdaBound{ρ₂}\AgdaSpace{}%
-\AgdaBound{SNu}\AgdaSymbol{)}\AgdaSpace{}%
+\AgdaBound{SNu₁}\AgdaSymbol{)}\AgdaSpace{}%
 \AgdaBound{SNu₂}\AgdaSymbol{))}\<%
 \end{code}
 %</lemma-uncurry>
@@ -2190,9 +2181,9 @@
 			\AgdaSymbol{=}\AgdaSpace{}%
 			\AgdaBound{A}\AgdaSymbol{\}\{}\AgdaArgument{B}\AgdaSpace{}%
 			\AgdaSymbol{=}\AgdaSpace{}%
-			\AgdaBound{B}\AgdaSymbol{\}\{}\AgdaArgument{r}\AgdaSpace{}%
+			\AgdaBound{B}\AgdaSymbol{\}\{}\AgdaArgument{t}\AgdaSpace{}%
 			\AgdaSymbol{=}\AgdaSpace{}%
-			\AgdaBound{r}\AgdaSymbol{\}))}\AgdaSpace{}%
+			\AgdaBound{t}\AgdaSymbol{\}))}\AgdaSpace{}%
 			\AgdaSymbol{=}\<%
 			\\
 			\>[8][@{}l@{\AgdaIndent{0}}]%
@@ -2206,7 +2197,7 @@
 			\AgdaFunction{lemma-curry}\AgdaSpace{}%
 			\AgdaSymbol{\{}\AgdaArgument{t}\AgdaSpace{}%
 			\AgdaSymbol{=}\AgdaSpace{}%
-			\AgdaBound{r}\AgdaSymbol{\}}\AgdaSpace{}%
+			\AgdaBound{t}\AgdaSymbol{\}}\AgdaSpace{}%
 			\AgdaBound{Lt}\AgdaSpace{}%
 			\AgdaBound{SNu}\AgdaSpace{}%
 			\AgdaBound{ρ}\AgdaSymbol{)}\<%
@@ -2217,16 +2208,13 @@
 			\AgdaOperator{\AgdaFunction{⟦\AgdaUnderscore{}⟧}}\AgdaSymbol{)}\<%
 			\\
 			\>[12][@{}l@{\AgdaIndent{0}}]%
-			\>[14]\AgdaSymbol{(}\AgdaFunction{Z-weaken}\AgdaSpace{}%
-			\AgdaSymbol{\{}\AgdaArgument{Σ}\AgdaSpace{}%
-			\AgdaSymbol{=}\AgdaSpace{}%
-			\AgdaInductiveConstructor{∅}\AgdaSymbol{\})}\<%
+			\>[14]\AgdaSymbol{(}\AgdaFunction{Z-weaken}\AgdaSymbol{)}\<%
 			\\
 			%
 			\>[14]\AgdaSymbol{(}\AgdaFunction{lemma-curry}\AgdaSpace{}%
 			\AgdaSymbol{\{}\AgdaArgument{t}\AgdaSpace{}%
 			\AgdaSymbol{=}\AgdaSpace{}%
-			\AgdaBound{r}\AgdaSymbol{\}}\AgdaSpace{}%
+			\AgdaBound{t}\AgdaSymbol{\}}\AgdaSpace{}%
 			\AgdaSymbol{\{}\AgdaArgument{u}\AgdaSpace{}%
 			\AgdaSymbol{=}\AgdaSpace{}%
 			\AgdaOperator{\AgdaInductiveConstructor{`}}\AgdaSpace{}%
@@ -2305,9 +2293,9 @@
 			\AgdaSymbol{\AgdaUnderscore{})}\AgdaSpace{}%
 			\AgdaSymbol{(}\AgdaInductiveConstructor{inj₂}\AgdaSpace{}%
 			\AgdaSymbol{(}\AgdaInductiveConstructor{uncurry}\AgdaSpace{}%
-			\AgdaSymbol{\{}\AgdaArgument{r}\AgdaSpace{}%
+			\AgdaSymbol{\{}\AgdaArgument{t}\AgdaSpace{}%
 			\AgdaSymbol{=}\AgdaSpace{}%
-			\AgdaBound{r}\AgdaSymbol{\}))}\AgdaSpace{}%
+			\AgdaBound{t}\AgdaSymbol{\}))}\AgdaSpace{}%
 			\AgdaSymbol{=}\<%
 			\\
 			\>[8][@{}l@{\AgdaIndent{0}}]%
@@ -2333,16 +2321,13 @@
 			\AgdaOperator{\AgdaFunction{⟦\AgdaUnderscore{}⟧}}\AgdaSymbol{)}\<%
 			\\
 			\>[12][@{}l@{\AgdaIndent{0}}]%
-			\>[14]\AgdaSymbol{(}\AgdaFunction{Z-weaken}\AgdaSpace{}%
-			\AgdaSymbol{\{}\AgdaArgument{Σ}\AgdaSpace{}%
-			\AgdaSymbol{=}\AgdaSpace{}%
-			\AgdaInductiveConstructor{∅}\AgdaSymbol{\})}\<%
+			\>[14]\AgdaSymbol{(}\AgdaFunction{Z-weaken}\AgdaSymbol{)}\<%
 			\\
 			%
 			\>[14]\AgdaSymbol{(}\AgdaFunction{lemma-uncurry}\AgdaSpace{}%
 			\AgdaSymbol{\{}\AgdaArgument{t}\AgdaSpace{}%
 			\AgdaSymbol{=}\AgdaSpace{}%
-			\AgdaBound{r}\AgdaSymbol{\}}\AgdaSpace{}%
+			\AgdaBound{t}\AgdaSymbol{\}}\AgdaSpace{}%
 			\AgdaSymbol{\{}\AgdaArgument{u}\AgdaSpace{}%
 			\AgdaSymbol{=}\AgdaSpace{}%
 			\AgdaOperator{\AgdaInductiveConstructor{`}}\AgdaSpace{}%
@@ -2478,9 +2463,9 @@
 			\AgdaSymbol{\AgdaUnderscore{})}\AgdaSpace{}%
 			\AgdaSymbol{(}\AgdaInductiveConstructor{inj₂}\AgdaSpace{}%
 			\AgdaSymbol{(}\AgdaInductiveConstructor{cong⇒₁}\AgdaSpace{}%
-			\AgdaSymbol{\{}\AgdaArgument{r}\AgdaSpace{}%
+			\AgdaSymbol{\{}\AgdaArgument{t}\AgdaSpace{}%
 			\AgdaSymbol{=}\AgdaSpace{}%
-			\AgdaBound{r}\AgdaSymbol{\}\{}\AgdaArgument{iso}\AgdaSpace{}%
+			\AgdaBound{t}\AgdaSymbol{\}\{}\AgdaArgument{iso}\AgdaSpace{}%
 			\AgdaSymbol{=}\AgdaSpace{}%
 			\AgdaBound{iso}\AgdaSymbol{\}))}\AgdaSpace{}%
 			\AgdaSymbol{=}\<%
@@ -2508,12 +2493,9 @@
 			\>[14][@{}l@{\AgdaIndent{0}}]%
 			\>[16]\AgdaSymbol{(}\AgdaFunction{sym}\AgdaSpace{}%
 			\AgdaSymbol{(}\AgdaFunction{subst-cong⇒₁-split}\AgdaSpace{}%
-			\AgdaSymbol{\{}\AgdaArgument{Σ}\AgdaSpace{}%
+			\AgdaSymbol{\{}\AgdaArgument{t}\AgdaSpace{}%
 			\AgdaSymbol{=}\AgdaSpace{}%
-			\AgdaInductiveConstructor{∅}\AgdaSymbol{\}}\AgdaSpace{}%
-			\AgdaSymbol{\{}\AgdaArgument{N}\AgdaSpace{}%
-			\AgdaSymbol{=}\AgdaSpace{}%
-			\AgdaBound{r}\AgdaSymbol{\}))}\<%
+			\AgdaBound{t}\AgdaSymbol{\}))}\<%
 			\\
 			%
 			\>[16]\AgdaSymbol{(}\AgdaBound{Lt}\AgdaSpace{}%

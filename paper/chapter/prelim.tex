@@ -35,7 +35,7 @@ Luego, se demuestra que para cualquier par $\langle u,v \rangle$ y función $f$ 
 Luego, se concluye que $uncurry \circ curry = id_{(A \times B) \rightarrow C}$ por extensionalidad.
 De forma similar se puede probar que $curry \circ uncurry = id_{A \rightarrow B \rightarrow C}$
 
-Di Cosmo \cite{MSCSSurvey05} caracterizó para Sistema F con pares, los conjuntos mínimos de isomorfismos que permiten construir todos los demás a partir de reglas de congruencia y transitividad.
+Di Cosmo \cite{MSCSSurvey05} caracterizó para Sistema F con pares y tipo top, los conjuntos mínimos de isomorfismos que permiten construir todos los demás a partir de reglas de congruencia y transitividad.
 Se escribe $A \equiv B$ cuando $A$ y $B$ son isomorfos.
 
 \begin{table}[H]
@@ -59,8 +59,6 @@ Se escribe $A \equiv B$ cuando $A$ y $B$ son isomorfos.
 			\item $\forall X. (A \times B) \equiv \forall X.A \times \forall X.B$
 			\item $\forall X.\textbf{T} \equiv \textbf{T}$ \tikzmark{botTh2xT}
 			
-			\item[split] $\forall X. (A \times B) \equiv \forall X \forall Y.A \times \forall X. (B [Y/X])$ \tikzmark{split}
-			
 		\end{enumerate}
 		
 		\begin{tikzpicture}[overlay, remember picture]
@@ -79,10 +77,6 @@ Se escribe $A \equiv B$ cuando $A$ y $B$ son isomorfos.
 			\draw [decoration={calligraphic brace,amplitude=0.4em},very thick,decorate]
 			let \p1=(pic cs:topTh1xT), \p2=(pic cs:botTh2xT) in
 			(23em, \y1+0.8em) -- node[right=0.6em] {$Th^2_{\times T}$} (23em, \y2);
-			
-			\draw [decoration={calligraphic brace,amplitude=0.4em},very thick,decorate]
-			let \p1=(pic cs:topTh1xT), \p2=(pic cs:split) in
-			(27em, \y1+0.8em) -- node[right=0.6em] {$-10, 11 = Th^{ML}$} (27em, \y2);
 		\end{tikzpicture}
 	\end{minipage}
 	\caption{Isomorfismos de tipo en cálculo lambda tipado}
@@ -103,7 +97,7 @@ Sistema I \cite{system-i} es un cálculo lambda simplemente tipado con pares don
 Su gramática para tipos es la misma que en el cálculo lambda tradicional, mientras que su gramática para términos difiere únicamente en la proyección, que se da con respecto al tipo y no a la posición:
 
 \[ A := \tau \mid A \rightarrow A \mid A \times A \]
-\[ t := x \mid \lambda^A.x \mid t t \mid \langle t, t \rangle \mid \pi_A t \]
+\[ t := x \mid \lambda x^A.t \mid t t \mid \langle t, t \rangle \mid \pi_A t \]
 
 Las reglas de tipado estarán dadas por las del cálculo lambda simplemente tipado con pares, con la modificación de que la eliminación de la conjunción se produce respecto al tipo y no a la posición.
 Además, se añade la definición de una nueva regla de tipado llamada $(\equiv)$
@@ -187,8 +181,6 @@ Por ejemplo, es necesario definir la siguiente equivalencia de términos $\langl
 	& \langle r[t/x], s[t/x] \rangle
 \end{align*}
 
-Es importante destacar que dependiendo del conjunto de equivalencias entre términos que se incluyen, se obtienen sistemas de cálculo con distintas propiedades, incluir demasiados puede desencadenar en no terminación, y si se incluyen pocos pueden aparecer eliminaciones en formas normales.
-
 A continuación, se presentan las reglas propuestas por Sistema I, las cuales fueron elegidas con el objetivo de obtener un cálculo fuertemente normalizante y consistente:
 
 \begin{figure}[H]
@@ -232,6 +224,24 @@ A continuación, se presentan las reglas propuestas por Sistema I, las cuales fu
 Luego, se escribe $\rightleftarrows^*$ para denotar la clausura reflexiva y transitiva de la relación $\rightleftarrows$.
 Notar que $\rightleftarrows^*$ es una relación de equivalencia entre términos.
 
+Es importante destacar que dependiendo del conjunto de equivalencias entre términos que se incluyen, se obtienen sistemas de cálculo con distintas propiedades, incluir demasiados puede desencadenar en no terminación, y si se incluyen pocos pueden aparecer eliminaciones en formas normales.
+Por ejemplo, el término $(\lambda x^A.\lambda y^B.r)\, s$ donde $s : B$ contiene una eliminación, sin embargo, no es posible reducirlo en Sistema I.
+Pero si se añade la regla ``Si $t : A \rightarrow B$ entonces $t \hookrightarrow_\eta \lambda x^A.t x$'' entonces es posible derivar:
+\begin{align*}
+	&(\lambda x^A.\lambda y^B.r)\,s \\
+	\hookrightarrow&_\eta \\
+	&\lambda z^A.((\lambda x^A.\lambda y^B.r)\,s\,z) \\
+	\rightleftarrows&_{\textsc{curry}} \\
+	&\lambda z^A.((\lambda x^A.\lambda y^B.r)\,\langle s,z \rangle) \\
+	\rightleftarrows&_{\textsc{comm}} \\
+	&\lambda z^A.((\lambda x^A.\lambda y^B.r)\,\langle z,s \rangle) \\
+	\rightleftarrows&_{\textsc{curry}} \\
+	&\lambda z^A.((\lambda x^A.\lambda y^B.r)\,z\,s) \\
+	\hookrightarrow&_\beta \\
+	&\lambda z^A.((\lambda x^A.\lambda y^B.r[z/x])\,s)
+\end{align*}
+En \cite{system-i} se conjetura que la extensión de Sistema I con una regla de $\eta$-expansión produce un sistema donde no existen eliminaciones en formas normales, y dicha extensión se propone como un posible trabajo futuro.
+
 El siguiente paso surge de notar que las nuevas reglas introducen problemas en la reducción clásica.
 Por un lado, las reglas de proyección $\pi_1$ y $\pi_2$ acceden al par a través de la posición de los elementos, pero el isomorfismo $\textsc{comm}$ permite cambiar el orden de un par, permitiendo así proyectar cualquiera de los dos elementos:
 
@@ -272,42 +282,54 @@ Por último se define la relación de reducción módulo isomorfismos:
 
 Donde $r \rightsquigarrow s \iff r \rightleftarrows^* r' \hookrightarrow s' \rightleftarrows^* s$ para cierto $r'$ y $s'$. Es decir, que primero los términos son transformados a una forma equivalente donde sea posible aplicar las eliminaciones, y luego se aplican las $\beta$-reducciones y proyecciones.
 
-\subsubsection{Ejemplo}
-El término $\lambda x^A . \lambda y^B . \langle x,y \rangle$ tiene tipo $A \rightarrow B \rightarrow (A \times B)$ aplicando los isomorfismos \textsc{dist} y \textsc{curry} se obtiene el tipo $((A \times B) \rightarrow A) \times ((A \times B) \rightarrow B)$
-
-\begin{align*}
-	&A \rightarrow B \rightarrow (A \times B) \\
-	\equiv&_\textsc{curry} \\
-	&(A \times B) \rightarrow (A \times B) \\
-	\equiv&_\textsc{dist} \\
-	&((A \times B) \rightarrow A) \times ((A \times B) \rightarrow B)
-\end{align*}
-
-Es decir, que una función que recibe dos argumentos por separado y retorna un par, puede ser vista como un par de funciones que toman ambos argumentos dentro de un par.
-Por lo tanto, es posible proyectar la función antes de aplicarla, y dados $s: A$ y $t: B$, se puede aplicar la función proyectada $\pi_{(A \times B) \rightarrow A}(\lambda x^A . \lambda y^B . \langle x,y \rangle) \langle s,t \rangle$
+\subsubsection{Ejemplos}
+El término $\lambda x^A. \langle r,s \rangle$ tiene tipo $A \rightarrow (B \times C)$ aplicando el isomorfismo \textsc{dist} se obtiene el tipo $(A \rightarrow B) \times (A \rightarrow C)$.
+Es decir, que una función que recibe un argumento y retorna un par, puede ser vista como un par de funciones.
+Por lo tanto, es posible proyectar la función antes de aplicarla, y dado $a: A$, se puede aplicar la función proyectada $\pi_{A \rightarrow B}(\lambda x^A . \langle r,s \rangle)\, a$
 
 A continuación se detalla la forma de reducir dicho término:
 
-{\allowdisplaybreaks
 \begin{align*}
-	&\pi_{(A \times B) \rightarrow A}(\lambda x^A . \lambda y^B . \langle x,y \rangle)\, \langle s,t \rangle \\
+	&\pi_{A \rightarrow B}(\lambda x^A . \langle r,s \rangle)\, a \\
 	\rightleftarrows&_{\textsc{dist}_\lambda} \\
-	&\pi_{(A \times B) \rightarrow A}(\lambda x^A. \langle \lambda y^B.x, \lambda y^B.y \rangle)\, \langle s,t \rangle \\
-	\rightleftarrows&_{\textsc{dist}_\lambda} \\
-	&\pi_{(A \times B) \rightarrow A}(\langle \lambda x^A.\lambda y^B.x, \lambda x^A.\lambda y^B.y \rangle)\, \langle s,t \rangle \\
+	&\pi_{A \rightarrow B}(\langle \lambda x^A.r, \lambda x^A.s \rangle)\, a \\
 	\hookrightarrow&_\pi \\
-	&(\lambda x^A.\lambda y^B.x)\, \langle s,t \rangle \\
-	\rightleftarrows&_{\textsc{curry}} \\
-	&(\lambda x^A.\lambda y^B.x)\, s \, t \\
+	&(\lambda x^A. r)\, a \\
 	\hookrightarrow&_\beta \\
-	&(\lambda y^B.s)\, t \\
-	\hookrightarrow&_\beta \\
-	s
+	&r[a/x]
 \end{align*}
-}
+
+El término $\lambda x^A. \lambda y^B. r$ tiene tipo $A \rightarrow B \rightarrow C$ aplicando los isomorfismos \textsc{curry} y \textsc{comm} se obtiene el tipo $B \rightarrow A \rightarrow C$:
+\begin{align*}
+	&A \rightarrow B \rightarrow C \\
+	\equiv&_\textsc{curry} \\
+	&(A \times B) \rightarrow C \\
+	\equiv&_\textsc{comm} \\
+	&(B \times A) \rightarrow C \\
+	\equiv&_\textsc{curry} \\
+	&B \rightarrow A \rightarrow C
+\end{align*}
+Es decir que, dada una función con múltiples argumentos es posible aplicarlos en cualquier orden.
+Dados $a: A$ y $b : B$ se puede aplicar la función $(\lambda x^A. \lambda y^B. r)\, b\, a$.
+
+A continuación se detalla la forma de reducir dicho término:
+
+\begin{align*}
+	&(\lambda x^A. \lambda y^B. r)\, b\, a \\
+	\rightleftarrows&_\textsc{curry} \\
+	&(\lambda x^A. \lambda y^B. r)\, \langle b,a \rangle \\
+	\rightleftarrows&_\textsc{comm} \\
+	&(\lambda x^A. \lambda y^B. r)\, \langle a,b \rangle \\
+	\rightleftarrows&_\textsc{curry} \\
+	&(\lambda x^A. \lambda y^B. r)\, a\, b \\
+	\hookrightarrow&_\beta \\
+	&(\lambda y^B. r[a/x])\, b \\
+	\hookrightarrow&_\beta \\
+	&r[a/x, b/y]
+\end{align*}
 
 \subsection{SIP}
-Sistema I Polimórfico \cite{sip}, es una extensión que agrega polimorfismo a Sistema I, toma algunos de los isomorfismos del conjunto axiomático $Th^2_\times$.
+Sistema I Polimórfico \cite{sip, sip-paper}, es una extensión que agrega polimorfismo a Sistema I, toma algunos de los isomorfismos del conjunto axiomático $Th^2_\times$.
 A la gramática de tipos y términos definida en Sistema I, le agrega la gramática de tipos y términos correspondientes a Sistema F con pares.
 Sus tipos y términos son entonces los siguientes:
 
@@ -341,7 +363,7 @@ Del mismo modo que Sistema I permite proyectar abstracciones de términos, en SI
 Por ejemplo, utilizando los isomorfismos $(\textsc{dist})$ y $(\textsc{p-dist})$ se puede construir el siguiente término:
 
 \[
-	\pi_{\forall A.(A \rightarrow B)} (\Lambda A. \lambda x^A. \langle r, s \rangle) : \forall A.(A \rightarrow B)
+	\pi_{\forall X.(A \rightarrow B)} (\Lambda X. \lambda x^A. \langle r, s \rangle) : \forall X.(A \rightarrow B)
 \]
 
 Su derivación de tipos es:
@@ -352,22 +374,22 @@ Su derivación de tipos es:
 		\hypo{\Gamma \vdash s: C}
 		\infer2[($\times_i$)]{ \Gamma \vdash \langle r, s \rangle : B \times C }
 		\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x^A. \langle r, s \rangle : A \rightarrow (B \times C) }
-		\infer1[($\forall_i$)]{ \Gamma \vdash \Lambda A. \lambda x^A. \langle r, s \rangle : \forall A. (A \rightarrow (B \times C)) }
-		\infer1[($\equiv$)]{ \Gamma \vdash \Lambda A. \lambda x^A. \langle r, s \rangle : \forall A. (A \rightarrow B) \times \forall A. (A \rightarrow C) }
-		\infer1[($\times_e$)]{ \Gamma \vdash \pi_{\forall A.(A \rightarrow B)} (\Lambda A. \lambda x^A. \langle r, s \rangle) : \forall A.(A \rightarrow B) }
+		\infer1[($\forall_i$)]{ \Gamma \vdash \Lambda X. \lambda x^A. \langle r, s \rangle : \forall X. (A \rightarrow (B \times C)) }
+		\infer1[($\equiv$)]{ \Gamma \vdash \Lambda X. \lambda x^A. \langle r, s \rangle : \forall X. (A \rightarrow B) \times \forall X. (A \rightarrow C) }
+		\infer1[($\times_e$)]{ \Gamma \vdash \pi_{\forall X.(A \rightarrow B)} (\Lambda X. \lambda x^A. \langle r, s \rangle) : \forall X.(A \rightarrow B) }
 	\end{prooftree}
 \end{center}
 
 Una forma de reducir este término es la siguiente:
 
 \begin{align*}
-	&\pi_{\forall A.(A \rightarrow B)} (\Lambda A. \lambda x^A. \langle r, s \rangle) \\
+	&\pi_{\forall X.(A \rightarrow B)} (\Lambda X. \lambda x^A. \langle r, s \rangle) \\
 	\rightleftarrows& \\
-	&\pi_{\forall A.(A \rightarrow B)} (\Lambda A. \langle \lambda x^A.r, \lambda x^A.s \rangle) \\
+	&\pi_{\forall X.(A \rightarrow B)} (\Lambda X. \langle \lambda x^A.r, \lambda x^A.s \rangle) \\
 	\rightleftarrows& \\
-	&\pi_{\forall A.(A \rightarrow B)} (\langle \Lambda A. \lambda x^A.r, \Lambda A. \lambda x^A.s \rangle) \\
+	&\pi_{\forall X.(A \rightarrow B)} (\langle \Lambda X. \lambda x^A.r, \Lambda X. \lambda x^A.s \rangle) \\
 	\hookrightarrow&_\pi \\
-	&\Lambda A. \lambda x^A.r
+	&\Lambda X. \lambda x^A.r
 \end{align*}
 
 
@@ -376,7 +398,7 @@ Dado un isomorfismo de tipos con dos constructores involucrados, se construyen t
 Para cualquier par de conectivas, tenemos cuatro posibles formas de combinar sus reglas de tipado: introducción-introducción, introducción-eliminación, eliminación-introducción, y eliminación-eliminación.
 Cada una induce una equivalencia, y cada lado de la equivalencia estará dado por el orden en que se apliquen las conectivas.
 
-Por ejemplo, el isomorfismo $A \rightarrow (B \times C) \equiv (A \rightarrow B) \times (A \rightarrow C)$ emplea los conectores $\rightarrow$ y $\times$, SIP incluye solamente dos de las cuatro equivalencias de términos.
+Por ejemplo, el isomorfismo $A \rightarrow (B \times C) \equiv (A \rightarrow B) \times (A \rightarrow C)$ emplea los conectores $\rightarrow$ y $\times$. SIP incluye solamente dos de las cuatro equivalencias de términos.
 Las siguientes derivaciones prueban que ambos términos tienen los tipos involucrados en el isomorfismo de tipo dado:
 
 \begin{itemize}
