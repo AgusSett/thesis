@@ -1,0 +1,61 @@
+\documentclass[]{report}
+\usepackage[a4paper]{geometry}
+\usepackage[spanish]{babel}
+\usepackage{hyperref}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{ebproof}
+\usepackage{float}
+\usepackage[conor]{agda}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\usepackage[style=alphabetic]{biblatex}
+\addbibresource{references.bib}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing,calc,tikzmark,calligraphy}
+\usetikzlibrary{arrows.meta,positioning,matrix}
+\setlength{\headheight}{13.07225pt}
+
+%opening
+\title{
+	\includegraphics[width=5cm]{logo.png} \\
+	\vspace{0.3cm}
+	\huge Facultad de Ciencias Exactas,\\ Ingeniería y Agrimensura \\
+	\vspace{0.5cm}
+	\Large Departamento de Ciencias de la Computación \\
+	\vspace{1cm}
+	\Huge \textbf{Formalización de Sistema I con tipo Top}
+}
+\author{
+	\textbf{Autor} \\ Agustin Francisco Settimo \and
+	\textbf{Directora} \\ Cecilia Manzino \and
+	\textbf{Co-Director} \\ Cristian Sottile}
+\date{Noviembre 2023}
+
+\begin{document}
+	
+	\maketitle
+	\tableofcontents
+	
+	\begin{abstract}
+	\input{abstract}
+	\end{abstract}
+	
+	\chapter{Introducción}
+	\input{chapter/intro}
+	
+	\chapter{Preliminares}
+	\input{chapter/prelim}
+	
+	\chapter{Aportes}
+	\input{chapter/contribution}
+	
+	\chapter{Conclusiones}
+	\input{chapter/closure}
+	
+	\printbibliography
+
+\end{document}
+
+

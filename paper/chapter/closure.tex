@@ -1,0 +1,30 @@
+En este trabajo se analizaron los aportes previos realizados en torno a la familia de sistemas módulo isomorfismos, en particular Sistema I.
+Luego, se realizó una formalización en Agda de dicho sistema, donde además se incorporó el tipo $\top$ y los tres isomorfismos correspondientes a este nuevo tipo.
+La formalización presenta algunas características interesantes, siendo una de ellas la representación de términos intrínsecamente tipados.
+En esta representación, la propiedad de preservación de tipos es inherente al sistema, y tiene como consecuencia que la aplicación de los isomorfismos de términos resulta dirigida por sintaxis.
+En cierta forma, la relación $\rightleftarrows$ elimina los isomorfismos de tipo del término, del mismo modo que la relación $\hookrightarrow$ elimina las aplicaciones y proyecciones, este punto es fundamental para la terminación del cálculo, ya que evita que algunos isomorfismos de término, como por ejemplo $\langle r,s \rangle\rightleftarrows\langle s,r \rangle$, sean aplicados un número indefinido de veces.
+
+Otra característica interesante es que la prueba de normalización fuerte utiliza una técnica distinta a la empleada en la clásica prueba de candidatos de reducibilidad.
+La formalización de esta prueba se presenta en primer lugar para el cálculo lambda simplemente tipado con pares, lo cual puede ser considerado como un aporte secundario.
+Además, es importante destacar que debido a que este trabajo posee el formato de una tesina de grado, la exposición es detallada, esto resulta un aporte a la comprensión de una prueba con una estructura compleja, como es el caso de la normalización fuerte.
+
+\section{Trabajo futuro}
+
+\subsection{Inferencia de tipos}
+
+La construcción de un término en Sistema I, no solo implica dar su derivación de tipo, sino también construir isomorfismos a través de las reglas de congruencia.
+Este proceso puede volverse engorroso cuando se trabaja con términos de tamaño considerable.
+
+En la práctica, por ejemplo cuando se programa en Haskell, solo se dan anotaciones de tipo a los términos de nivel superior y luego el \textit{type checker} del lenguaje puede inferir el resto de los tipos.
+
+En el libro \citetitle{plfa} \cite{plfa} se presenta una formalización de inferencia bidireccional de tipos, allí se implementa un algoritmo que a partir de simples anotaciones de tipo, retorna la derivación de tipos completa para un término dado, o un error en caso de que el término esté mal formado.
+Un trabajo futuro podría ser la definición de un algoritmo similar al presentado en este libro que permita inferir los tipos de los términos definidos en esta formalización.
+Debido al paradigma de Proposiciones como Tipos, la formalización de este algoritmo para Sistema I funcionaría también como una prueba de que el tipado de los términos de este cálculo es decidible.
+
+\subsection{Formalización SIP}
+
+Una posible línea de trabajo futuro derivado de la presente tesina sería extender la formalización a Sistema I Polimórfico.
+
+Esto implicaría, en primer lugar, añadir tipos polimórficos al cálculo de base, para ello se podría seguir una estrategia similar a la empleada en este trabajo, es decir, tomar como punto de partida una formalización de Sistema F preexistente, y luego añadir las construcciones particulares de SIP.
+
+En segundo lugar, implicaría extender la prueba de normalización fuerte a SIP, la técnica empleada en este trabajo fue presentada originalmente para Sistema F \cite{Schafer}, por lo que se espera que extenderla a SIP sea posible.

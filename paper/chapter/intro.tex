@@ -1,0 +1,56 @@
+\section{Motivación}
+
+Los sistemas de tipos permiten especificar el comportamiento de los programas.
+Estas especificaciones aseguran que los programas se comportarán de una forma esperada, pero al mismo tiempo imponen rigidez a la hora de escribirlos.
+Por ejemplo, el tipo $(A \times B) \rightarrow C$ representa los programas que permiten obtener un valor de tipo $C$ a partir de un par de valores de tipo $A$ y $B$.
+Mientas que, por otro lado, el tipo $A \rightarrow B \rightarrow C$ representa los programas que primero aceptan un valor de tipo $A$, luego uno de tipo $B$ y finalmente devuelven un valor de tipo $C$.
+A pesar de que estos dos tipos son distintos en su forma, representan la misma idea, es decir, poseen el mismo significado desde el punto de vista de la utilidad e información que aportan.
+
+Esto se puede demostrar usando las funciones \textit{curry} y \textit{uncurry}, que permiten transformar una función en su forma currificada y viceversa, sin perdida de información en el proceso.
+Cuando ambos tipos contienen la misma cantidad de información, se dice que son isomorfos, en este caso, los tipos $(A \times B) \rightarrow C$ y $A \rightarrow B \rightarrow C$ del primer ejemplo, están relacionados por el isomorfismo de Curry.
+
+Un caso más simple que ilustra este concepto es el de los pares $A \times B$ y $B \times A$, resulta fácil notar que es posible transformar uno en el otro y viceversa sin perder información, ya que desde el punto de vista de la utilidad, cada uno aporta un elemento de tipo $A$ y un elemento de tipo $B$, el orden no es relevante.
+
+Al mismo tiempo, la correspondencia de Curry-Howard \cite{sorensen2006lectures} define una estrecha relación entre la programación y la lógica, donde los tipos se corresponden con las fórmulas de la lógica.
+Debido a esto, se puede observar un comportamiento análogo cuando se trabaja con pruebas.
+Por ejemplo, una prueba de $(A \wedge B) \Rightarrow C$ no constituye una prueba de $A \Rightarrow B \Rightarrow C$, y viceversa, a pesar de que ambas tienen el mismo significado.
+
+Programas con tipos isomorfos representan el mismo tipo de problema, por lo que tratarlos como si fueran idénticos tiene aplicaciones interesantes.
+Desde el punto de vista de los programas, nos permite construir expresiones que antes no eran posibles, por ejemplo, una función $f : (A \times B) \rightarrow C$ puede ser aplicada como $f \langle a, b \rangle$ ó $f \: a \: b$, es decir, es posible evadir cierta rigidez impuesta por el sistema de tipos.
+Si $A$ y $B$ son tipos isomorfos, se puede emplear una expresión de tipo $A$ en cualquier lugar donde se espera una de tipo $B$.
+Mientras que desde el punto de vista de la lógica, los isomorfismos de fórmulas hacen que las pruebas sean más naturales, por ejemplo, para probar $(A \wedge (A \Rightarrow  B)) \Rightarrow B$ usando deducción natural, deberíamos primero introducir la hipótesis $A \wedge (A \Rightarrow B)$, y luego descomponerla en $A$ y $A \Rightarrow B$, en cambio, utilizando el isomorfismo de Curry, que también vale para la lógica, transformamos el objetivo en $A \Rightarrow (A \Rightarrow  B) \Rightarrow B$ y luego introducimos directamente las hipótesis $A$ y $A \Rightarrow B$.
+
+\section{Trabajo previo}
+
+Se han realizado múltiples aportes sobre los denominados sistemas módulo isomorfismos.
+Estos sistemas utilizan el cálculo lambda simplemente tipado con pares como marco de trabajo, y lo extienden de forma que los tipos isomorfos se consideran idénticos.
+El más relevante para este trabajo es Sistema I \cite{system-i}, que se corresponde con el fragmento de la lógica que incorpora las conectivas $\Rightarrow$ y $\wedge$.
+Este sistema ignora las formas de los tipos y se centra solo en su utilidad final, permitiendo así realizar aplicaciones de funciones y proyecciones que no son posibles en el cálculo tradicional.
+Además, se presentan propiedades interesantes como el no determinismo y otras que pueden utilizarse en la optimización de programas.
+Desde el punto de vista de la lógica, el no determinismo es interesante, ya que funciona como una surte de irrelevancia de pruebas.
+Sin embargo, desde el punto de vista de la programación es más útil que el comportamiento de los programas sea determinista.
+Afortunadamente, como se explicará en detalle más adelante, es posible recuperar el determinismo.
+
+También, es importante destacar que todos los isomorfismos de tipos que se presentan en estos sistemas, fueron caracterizados y agrupados en conjuntos axiomáticos por Di Cosmo \cite{MSCSSurvey05}.
+
+En términos de expresividad, un siguiente paso natural para un cálculo lambda simplemente tipado consiste en la adición de polimorfismo, esto es justamente lo que propone Sistema I Polimórfico \cite{sip, sip-paper}.
+Dicho trabajo incorpora el constructor $\forall$ a nivel de tipos, la abstracción y aplicación de tipos a nivel de términos, y algunos de los isomorfismos faltantes correspondientes al fragmento de la lógica con $\forall$, $\Rightarrow$ y $\wedge$.
+
+Desde el punto de vista práctico, existe una implementación de Sistema I desarrollada en Haskell, denominada $\lambda^+$ \cite{lambda-plus}.
+Este sistema posee un sistema de reescritura módulo isomorfimos, por lo que su implementación no es trivial.
+Además, añade números naturales y recursión general.
+En este trabajo se puede observar la complejidad que trae implementar un lenguaje de estas características.
+
+\section{Estructura del trabajo}
+
+En el capítulo 2 se presentan los fundamentos previos necesarios para comprender los aportes realizados en esta tesina.
+Por un lado, se introducen los isomorfismos de tipos y se explican en detalle la sintaxis y semántica de Sistema I.
+Por otro lado, se introducen una serie de conceptos que abarcan desde tipos dependientes hasta la Teoría de Tipos Intuicionista, y culminan en la presentación de Agda, que será el lenguaje elegido para la formalización realizada en este trabajo.
+Además, se explicará de forma sucinta la representación de términos con índices de De Brujin, y el funcionamiento de las substituciones explícitas, ambos conceptos no solo serán una pieza central de la formalización aquí presentada, sino que también son comúnmente empleados en el desarrollo de muchas implementaciones de cálculo lambda.
+
+Luego, en el capítulo 3 se presenta la formalización de Sistema I con tipo Top, que será el aporte principal de esta tesina.
+El orden de presentación del código y los fragmentos expuestos se escogieron con el objetivo de hacer la explicación más intuitiva y facilitar la comprensión de las pruebas.
+La propiedad de normalización fuerte se presenta en dos partes debido a su complejidad, donde primero se realiza la prueba para el cálculo lambda simplemente tipado con pares, y luego se extiende dicha prueba añadiendo isomorfismos de tipos.
+El código completo de toda la formalización puede obtenerse en \url{https://github.com/AgusSett/thesis}.
+
+Por último, en el capítulo 4 se presentan las conclusiones y trabajo futuro que se derivan del presente trabajo de tesina.
