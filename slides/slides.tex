@@ -1,6 +1,9 @@
-\documentclass{beamer}
+\documentclass[aspectratio=149]{beamer}
+\usepackage[utf8]{inputenc}
 \usepackage[spanish]{babel}
-\usetheme{Warsaw}
+\usepackage{ebproof}
+\usepackage[conor]{agda}
+\usetheme{Madrid}
 
 \title{Formalización de Sistema I con tipo Top}
 \author{Agustin Francisco Settimo}
@@ -11,8 +14,227 @@
     \maketitle
 \end{frame}
 
-\begin{frame}{Frame Title}
+\section{Introducción a STLC}
+
+\begin{frame}{Definición}
+	\begin{itemize}[<+->]
+		\item Términos
+			\[ t := x \mid \lambda x.t \mid t t \mid \langle t, t \rangle \mid \pi_1 t \mid \pi_2 t \]
+		
+		\item Computación
+			\[ (\lambda x.t) s \hookrightarrow t[s/x] \]
+
+			\[ \pi_1 \langle r, s \rangle \hookrightarrow r \quad \pi_2 \langle r, s \rangle \hookrightarrow s \]
+	\end{itemize}
+	
+	% Exlicar Church encodir para entender como algo tan simple es turing complete
+\end{frame}
+
+\begin{frame}{Ejemplos}
+	\begin{exampleblock}{Función identidad}
+		\[ \lambda x.x \]
+		\[ (\lambda x.x) y \hookrightarrow_\beta y \]
+	\end{exampleblock}
+	
+	\begin{exampleblock}{Dos argumentos}
+		\[ \lambda x. \lambda y.x \]
+		\[ (\lambda x. \lambda y.x) a b \hookrightarrow_\beta (\lambda y.a) b \hookrightarrow_\beta a \]
+	\end{exampleblock}
+
+	\begin{exampleblock}{Swap}
+		\[ \lambda p. \langle \pi_2 (p), \pi_1 (p) \rangle \]
+		\begin{align*}
+			&(\lambda p. \langle \pi_2 (p), \pi_1 (p) \rangle) \langle a,b \rangle \\
+			&\hookrightarrow_\beta \langle \pi_2 \langle a,b \rangle, \pi_1 \langle a,b \rangle \rangle \\
+			&\hookrightarrow_\pi \langle b, \pi_1 \langle a,b \rangle \rangle \\
+			&\hookrightarrow_\pi \langle b, a \rangle
+		\end{align*}
+	\end{exampleblock}
+\end{frame}
+
+\begin{frame}{Problemas}
+	Algunos términos no reducen (están atascados):
+	
+	Otros nunca terminan de reducir:
 	
 \end{frame}
+
+\begin{frame}{Sistema de tipos}
+	\begin{itemize}[<+->]
+		\item Tipos
+			\[ A := \top \mid A \rightarrow A \mid A \times A \]
+		
+		\item Contextos de tipado
+			\[ \Gamma := \emptyset \mid \Gamma, x:A \]
+		
+		\item Reglas de tipado
+		\begin{figure}[H]
+			\centering
+			\begin{prooftree}
+				\infer0[($ax$)]{ \Gamma, x:A \vdash x:A }
+			\end{prooftree}
+			\vspace{1em}
+			\\
+			\begin{prooftree}
+				\hypo{\Gamma, x:A \vdash r:B}
+				\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x.r : A \rightarrow B }
+			\end{prooftree}
+			\quad
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r : A \rightarrow B}
+				\hypo{\Gamma \vdash s:A}
+				\infer2[($\Rightarrow_e$)]{ \Gamma \vdash rs : B }
+			\end{prooftree}
+			\vspace{1em}
+			\\
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r:A}
+				\hypo{\Gamma \vdash s:B}
+				\infer2[($\times_i$)]{ \Gamma \vdash \langle r, s \rangle : A \times B }
+			\end{prooftree}
+			\quad
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r : A \times B}
+				\infer1[($\times_{e1}$)]{ \Gamma \vdash \pi_1(r) : A }
+			\end{prooftree}
+			\quad
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r : A \times B}
+				\infer1[($\times_{e2}$)]{ \Gamma \vdash \pi_2(r) : B }
+			\end{prooftree}
+		\end{figure}
+		
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Ejemplos}
+	\begin{prooftree}
+		\infer0[(ax)]{\emptyset, x:A \vdash x:A}
+		\infer1[($\Rightarrow_i$)]{ \emptyset \vdash \lambda x.x : A \rightarrow A }
+		\hypo{\emptyset \vdash y : A}
+		\infer2[($\Rightarrow_e$)]{ \emptyset \vdash (\lambda x.x) y : A }
+	\end{prooftree}
+\end{frame}
+
+\section{Introducción a Sistema I}
+
+\begin{frame}{Isomorfismos entre tipos}
+	Dos tipos A y B son \textit{isomorfos} si solo si existen:
+	\[ f: A \rightarrow B \quad g: B \rightarrow A \]
+	Tales que:
+	\[ f \circ g = id_A \quad g \circ f = id_B \]
+	
+	\begin{exampleblock}{Currificación}
+		\[ (A \times B) \rightarrow C \equiv A \rightarrow (B \rightarrow C) \]
+		
+		\[ curry = \lambda x^{(A \times B) \rightarrow C}. \lambda a^A . \lambda b^B . x\langle a,b \rangle \]
+		\[ uncurry = \lambda x^{A \rightarrow B \rightarrow C}. \lambda y^{A \times B} . x(\pi_1 y)(\pi_2 y) \]
+		
+		\[ curry \circ uncurry = id_{(A \times B) \rightarrow C} \quad
+		uncurry \circ curry = id_{A \rightarrow B \rightarrow C} \]
+	\end{exampleblock}
+\end{frame}
+
+\begin{frame}{Conjunto axiomático}
+	\begin{align*}
+		A \times B &\equiv B \times A \tag{\textsc{comm}} \\
+		A \times (B \times C) &\equiv (A \times B) \times C \tag{\textsc{asso}} \\
+		(A \times B) \rightarrow C &\equiv A \rightarrow (B \rightarrow C) \tag{\textsc{curry}} \\
+		A \rightarrow (B \times C) &\equiv (A \rightarrow B) \times (A \rightarrow C) \tag{\textsc{dist}} \\
+		A \times \top &\equiv A \tag{\textsc{id$_\times$}} \\
+		A \rightarrow \top &\equiv \top \tag{\textsc{ABS}} \\
+		\top \rightarrow A &\equiv \tag{\textsc{id$_\Rightarrow$}} A
+	\end{align*}
+\end{frame}
+
+\begin{frame}{Internalización de isomorfismos}
+	\begin{center}
+		\begin{prooftree}
+			\hypo{A \equiv B}
+			\hypo{\Gamma \vdash r:A}
+			\infer2[($\equiv$)]{ \Gamma \vdash r:B }
+		\end{prooftree}
+	\end{center}
+	
+\end{frame}
+
+\begin{frame}{Relación de equivalencia entre términos}
+	\begin{align}
+		\langle r,s \rangle &\rightleftarrows \langle s,r \rangle \tag{\textsc{comm}} \\
+		\langle r, \langle s,t \rangle \rangle &\rightleftarrows \langle \langle r, s \rangle, t \rangle \tag{\textsc{asso}} \\
+		\lambda x^A \langle r,s \rangle &\rightleftarrows \langle \lambda x^A.r, \lambda x^A.s \rangle \tag{$\textsc{dist}_{\lambda}$} \\
+		\langle r,s \rangle t &\rightleftarrows \langle r t, s t \rangle \tag{$\textsc{dist}_{app}$} \\
+		r \langle s, t \rangle &\rightleftarrows r s t \tag{\textsc{curry}}
+	\end{align}
+\end{frame}
+
+\section{Introducción a Agda}
+\section{Formalización}
+
+\AtBeginEnvironment{code}{\fontsize{10}{12}\selectfont}
+
+\begin{frame}{Tipos}
+	\input{code/type.tex}
+	\ExecuteMetaData[code/example.tex]{type}
+\end{frame}
+
+\begin{frame}{Contextos}
+	\ExecuteMetaData[code/context.tex]{ctx}
+	\ExecuteMetaData[code/context.tex]{example}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Términos}
+	\ExecuteMetaData[code/term.tex]{base}
+	\pagebreak
+	\ExecuteMetaData[code/term.tex]{abs}
+	\pagebreak
+	\ExecuteMetaData[code/term.tex]{prod}
+
+	\ExecuteMetaData[code/example.tex]{term}
+\end{frame}
+
+\begin{frame}{Reducción}
+	%\ExecuteMetaData[code/reduction.tex]{app}
+	%\ExecuteMetaData[code/reduction.tex]{pair}
+	\ExecuteMetaData[code/reduction.tex]{iso}
+	
+	\ExecuteMetaData[code/example.tex]{reduction}
+\end{frame}
+
+\begin{frame}{Isomorfismos de tipos}
+	\input{code/iso_type.tex}
+	
+	\ExecuteMetaData[code/example.tex]{iso-type}
+\end{frame}
+
+\begin{frame}{Equivalencias entre términos}
+	%\ExecuteMetaData[code/iso_term.tex]{comm}
+	%\ExecuteMetaData[code/iso_term.tex]{asso}
+	%\ExecuteMetaData[code/iso_term.tex]{dist}
+	%\ExecuteMetaData[code/iso_term.tex]{curry}
+	%\ExecuteMetaData[code/iso_term.tex]{id-pair}
+	%\ExecuteMetaData[code/iso_term.tex]{cong-abs}
+	%\ExecuteMetaData[code/iso_term.tex]{cong-pair}
+	%\ExecuteMetaData[code/iso_term.tex]{cong-app}
+	
+	\ExecuteMetaData[code/iso_term.tex]{cong-proj}
+	
+	%\ExecuteMetaData[code/example.tex]{iso-term-1}
+	
+	%\ExecuteMetaData[code/example.tex]{iso-term-2}
+\end{frame}
+
+\section{Normalización fuerte}
+
+\begin{frame}{Definición}
+	\ExecuteMetaData[code/SN1.tex]{sn-def}
+	
+	%\ExecuteMetaData[code/SN1.tex]{lemma-abs}
+	%\ExecuteMetaData[code/SN1.tex]{lemma-app}
+	\ExecuteMetaData[code/SN1.tex]{strong-type}
+	\ExecuteMetaData[code/SN3.tex]{adequacy-proof}
+\end{frame}
+
+\section{Evaluación}
 
 \end{document}
