@@ -3,11 +3,15 @@
 \usepackage[spanish]{babel}
 \usepackage{ebproof}
 \usepackage[conor]{agda}
-\usetheme{Madrid}
+\usetheme{Warsaw}
+\setbeamertemplate{headline}{}
 
 \title{Formalización de Sistema I con tipo Top}
 \author{Agustin Francisco Settimo}
 \date{}
+\titlegraphic{
+	\includegraphics[width=3cm]{logo.png}
+}
 \begin{document}
 	
 \begin{frame}[plain]
@@ -15,6 +19,22 @@
 \end{frame}
 
 \section{Introducción a STLC}
+
+\begin{frame}{$\lambda$-calculo}
+	\begin{itemize}[<+->]
+		\item Creado para investigar los fundamentos de la matemática
+		\item Es el lenguaje de programación funcional más simple que existe
+			\begin{itemize}[<+->]
+				\item Las funciones son anónimas:
+				\[ suma(x, y)= x + y \quad suma(2, 3) \]
+				\[ ((x, y) \mapsto x + y)(2, 3) \]
+				
+				\item Las funciones toman un solo argumento:
+				\[ x \mapsto (y \mapsto x + y) \]
+				\[ (x \mapsto (y \mapsto x + y))\; 2 \Rightarrow y \mapsto 2 + y \]
+			\end{itemize}
+	\end{itemize}
+\end{frame}
 
 \begin{frame}{Definición}
 	\begin{itemize}[<+->]
@@ -54,9 +74,15 @@
 
 \begin{frame}{Problemas}
 	Algunos términos no reducen (están atascados):
+	\[ \langle a, b \rangle c \]
+	\[ \pi_1(\lambda x.x) \]
+	
+	\pause
 	
 	Otros nunca terminan de reducir:
-	
+	\[ (\lambda x.xx) \pause (\lambda x.xx) \pause
+	\hookrightarrow (\lambda x.xx)(\lambda x.xx) \pause
+	\hookrightarrow (\lambda x.xx)(\lambda x.xx) \dots \]
 \end{frame}
 
 \begin{frame}{Sistema de tipos}
@@ -108,11 +134,12 @@
 \end{frame}
 
 \begin{frame}{Ejemplos}
+	\centering
 	\begin{prooftree}
-		\infer0[(ax)]{\emptyset, x:A \vdash x:A}
-		\infer1[($\Rightarrow_i$)]{ \emptyset \vdash \lambda x.x : A \rightarrow A }
-		\hypo{\emptyset \vdash y : A}
-		\infer2[($\Rightarrow_e$)]{ \emptyset \vdash (\lambda x.x) y : A }
+		\infer0[(ax)]{\emptyset, x:A, y:A \vdash x:A}
+		\infer1[($\Rightarrow_i$)]{ \emptyset, y:A \vdash \lambda x.x : A \rightarrow A }
+		\infer0[(ax)]{\emptyset, y:A \vdash y : A}
+		\infer2[($\Rightarrow_e$)]{ \emptyset, y:A \vdash (\lambda x.x) y : A }
 	\end{prooftree}
 \end{frame}
 
@@ -171,6 +198,20 @@
 \section{Introducción a Agda}
 \section{Formalización}
 
+\begin{frame}{Indices de De Bruijn}
+	\[ \lambda z. (\lambda y. y (\lambda x. x)) (\lambda x. z x) \]
+	
+	\[ \textcolor{red}{\lambda} (\textcolor{blue}{\lambda\; 0} \; (\textcolor{orange}{\lambda\; 0})) (\textcolor{green}{\lambda}\; \textcolor{red}{1} \; \textcolor{green}{0}) \]
+	
+	\[ (\lambda x. \lambda y. z x (\lambda z. z x)) (\lambda x. z x) \]
+	
+	\[
+	(\textcolor{red}{\lambda}\; \lambda\; \textcolor{magenta}{3}\; \textcolor{red}{1}\; (\textcolor{green}{\lambda\; 0}\; \textcolor{red}{2}))\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{4}\; \textcolor{blue}{0})
+	\hookrightarrow_\beta
+	\lambda \; \textcolor{magenta}{2} \; (\textcolor{blue}{\lambda}\; \textcolor{orange}{5}\; \textcolor{blue}{0})\; (\textcolor{green}{\lambda\; 0}\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{6}\; \textcolor{blue}{0}))\;
+	\]
+\end{frame}
+
 \AtBeginEnvironment{code}{\fontsize{10}{12}\selectfont}
 
 \begin{frame}{Tipos}
@@ -227,12 +268,21 @@
 \section{Normalización fuerte}
 
 \begin{frame}{Definición}
+	\begin{center}
+		\begin{prooftree}
+			\hypo{ \forall t. s \rightsquigarrow t \implies t \in SN }
+			\infer1{ s \in SN }
+		\end{prooftree}
+	\end{center}
+	
 	\ExecuteMetaData[code/SN1.tex]{sn-def}
+	
+	\ExecuteMetaData[code/example.tex]{sn}
 	
 	%\ExecuteMetaData[code/SN1.tex]{lemma-abs}
 	%\ExecuteMetaData[code/SN1.tex]{lemma-app}
-	\ExecuteMetaData[code/SN1.tex]{strong-type}
-	\ExecuteMetaData[code/SN3.tex]{adequacy-proof}
+	%\ExecuteMetaData[code/SN1.tex]{strong-type}
+	%\ExecuteMetaData[code/SN3.tex]{adequacy-proof}
 \end{frame}
 
 \section{Evaluación}
