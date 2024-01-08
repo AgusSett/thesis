@@ -1,0 +1,135 @@
+\begin{frame}{$\lambda$-calculo}
+	\begin{itemize}[<+->]
+		\item Creado para investigar los fundamentos de la matemática
+		\item Es el lenguaje de programación funcional más simple que existe
+		\begin{itemize}[<+->]
+			\item Las funciones son anónimas:
+			\[ suma(x, y)= x + y \quad\quad suma(2, 3) \]
+			\uncover<+->{
+				\[ ((x, y) \mapsto x + y)(2, 3) \]
+			}
+			
+			\item Las funciones toman un solo argumento:
+			\[ x \mapsto (y \mapsto x + y) \]
+			\uncover<+->{
+				\[ (x \mapsto (y \mapsto x + y))\; 2 \Rightarrow y \mapsto 2 + y \]
+			}
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Definición}
+	\begin{itemize}[<+->]
+		\item Gramática de términos
+		\[ t := x \mid \lambda x.t \mid t t \mid \langle t, t \rangle \mid \pi_1 t \mid \pi_2 t \]
+		
+		\item Computación (reglas de reescritura)
+			\begin{itemize}[<+->]
+				\item Reducción
+				\[ (\lambda x.t) s \hookrightarrow_\beta t[s/x] \]
+				
+				\item Proyección
+				\[ \pi_1 \langle r, s \rangle \hookrightarrow_\pi r \quad \pi_2 \langle r, s \rangle \hookrightarrow_\pi s \]
+			\end{itemize}
+	\end{itemize}
+	
+	% Exlicar Church encodir para entender como algo tan simple es turing complete
+\end{frame}
+
+\begin{frame}{Ejemplos}
+	\begin{exampleblock}{Función identidad}
+		\[ \lambda x.x \]
+		\[ (\lambda x.x) y \hookrightarrow_\beta y \]
+	\end{exampleblock}
+	\pause
+	\begin{exampleblock}{Dos argumentos}
+		\[ \lambda x. \lambda y.x \]
+		\[ (\lambda x. \lambda y.x) a b \hookrightarrow_\beta (\lambda y.a) b \hookrightarrow_\beta a \]
+	\end{exampleblock}
+\end{frame}
+
+\begin{frame}{Ejemplos}	
+	\begin{exampleblock}{Swap}
+		\[ \lambda p. \langle \pi_2 (p), \pi_1 (p) \rangle \]
+		\begin{align*}
+			&(\lambda p. \langle \pi_2 (p), \pi_1 (p) \rangle) \langle a,b \rangle \\
+			&\hookrightarrow_\beta \langle \pi_2 \langle a,b \rangle, \pi_1 \langle a,b \rangle \rangle \\
+			&\hookrightarrow_\pi \langle b, \pi_1 \langle a,b \rangle \rangle \\
+			&\hookrightarrow_\pi \langle b, a \rangle
+		\end{align*}
+	\end{exampleblock}
+\end{frame}
+
+\begin{frame}{Problemas}
+	Algunos términos no reducen (están atascados):
+	\[ \langle a, b \rangle c \]
+	\[ \pi_1(\lambda x.x) \]
+	
+	\pause
+	
+	Otros nunca terminan de reducir:
+	\[ (\lambda x.xx) \pause (\lambda x.xx) \pause
+	\hookrightarrow (\lambda x.xx)(\lambda x.xx) \pause
+	\hookrightarrow (\lambda x.xx)(\lambda x.xx) \dots \]
+\end{frame}
+
+\begin{frame}{Sistema de tipos}
+	\begin{itemize}[<+->]
+		\item Tipos
+		\[ A := \top \mid A \rightarrow A \mid A \times A \]
+		
+		\item Contextos de tipado
+		\[ \Gamma := \emptyset \mid \Gamma, x:A \]
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Sistema de tipos}
+	Reglas de tipado
+		\begin{figure}[H]
+			\centering
+			\begin{prooftree}
+				\infer0[($ax$)]{ \Gamma, x:A \vdash x:A }
+			\end{prooftree}
+			\pause
+			\vspace{1em}
+			\\
+			\begin{prooftree}
+				\hypo{\Gamma, x:A \vdash r:B}
+				\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x.r : A \rightarrow B }
+			\end{prooftree}
+			\quad
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r : A \rightarrow B}
+				\hypo{\Gamma \vdash s:A}
+				\infer2[($\Rightarrow_e$)]{ \Gamma \vdash rs : B }
+			\end{prooftree}
+			\pause
+			\vspace{1em}
+			\\
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r:A}
+				\hypo{\Gamma \vdash s:B}
+				\infer2[($\times_i$)]{ \Gamma \vdash \langle r, s \rangle : A \times B }
+			\end{prooftree}
+			\quad
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r : A \times B}
+				\infer1[($\times_{e1}$)]{ \Gamma \vdash \pi_1(r) : A }
+			\end{prooftree}
+			\quad
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r : A \times B}
+				\infer1[($\times_{e2}$)]{ \Gamma \vdash \pi_2(r) : B }
+			\end{prooftree}
+		\end{figure}
+\end{frame}
+
+\begin{frame}{Ejemplos}
+	\centering
+	\begin{prooftree}
+		\infer0[(ax)]{\emptyset, x:A, y:A \vdash x:A}
+		\infer1[($\Rightarrow_i$)]{ \emptyset, y:A \vdash \lambda x.x : A \rightarrow A }
+		\infer0[(ax)]{\emptyset, y:A \vdash y : A}
+		\infer2[($\Rightarrow_e$)]{ \emptyset, y:A \vdash (\lambda x.x) y : A }
+	\end{prooftree}
+\end{frame}

@@ -1,5 +1,5 @@
 %<*subs>
-\begin{code}%
+\begin{code}
 	\\
 	\>[0]\AgdaFunction{σ-cong⇒₁}\AgdaSpace{}%
 	\AgdaSymbol{:}\AgdaSpace{}%
@@ -35,8 +35,9 @@
 	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{S\AgdaUnderscore{}}}\AgdaSymbol{)}\<%
 	\\
-	
-	\\[\AgdaEmptyExtraSkip]%
+\end{code}
+%<*subs-uncurry>
+\begin{code}
 	\>[0]\AgdaFunction{σ-uncurry}\AgdaSpace{}%
 	\AgdaSymbol{:}\AgdaSpace{}%
 	\AgdaSymbol{∀}\AgdaSpace{}%
@@ -75,8 +76,10 @@
 	\AgdaSymbol{(}\AgdaOperator{\AgdaInductiveConstructor{S}}\AgdaSpace{}%
 	\AgdaBound{x}\AgdaSymbol{))}\<%
 	\\
-	
-	\\[\AgdaEmptyExtraSkip]%
+\end{code}
+%</subs-uncurry>
+%<*subs-curry>
+\begin{code}
 	\>[0]\AgdaFunction{σ-curry}\AgdaSpace{}%
 	\AgdaSymbol{:}\AgdaSpace{}%
 	\AgdaSymbol{∀}\AgdaSpace{}%
@@ -116,6 +119,7 @@
 	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{S\AgdaUnderscore{}}}\<%
 \end{code}
+%</subs-curry>
 %</subs>
 
 %<*comm>
@@ -201,10 +205,12 @@
 	\AgdaBound{r}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{⟩}}\<%
 	\\
+	\>[2]\vdots\< \\
 \end{code}
 %</comm>
 %<*asso>
 \begin{code}
+	\>[2]\vdots\< \\
 	\>[2]\AgdaInductiveConstructor{asso}\AgdaSpace{}%
 	\AgdaSymbol{:}\AgdaSpace{}%
 	\AgdaSymbol{∀}\AgdaSpace{}%
@@ -394,11 +400,13 @@
 	\AgdaOperator{\AgdaInductiveConstructor{⟩}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{⟩}}\<%
 	\\
+	\>[2]\vdots\< \\
 \end{code}
 %</asso>
 
 %<*dist>
 \begin{code}
+	\>[2]\vdots\< \\
 	\>[2]\AgdaInductiveConstructor{dist-ƛ}\AgdaSpace{}%
 	\AgdaSymbol{:}\AgdaSpace{}%
 	\AgdaSymbol{∀}\AgdaSpace{}%
@@ -653,6 +661,8 @@
 	\AgdaInductiveConstructor{refl}\AgdaSymbol{\}}\AgdaSpace{}%
 	\AgdaBound{r}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{⟩}}\<%
+	\\
+	\>[2]\vdots\< \\
 \end{code}
 %</dist>
 
@@ -1362,6 +1372,7 @@
 
 %<*cong-proj>
 \begin{code}
+	\>[2]\vdots\< \\
 	\>[2]\AgdaInductiveConstructor{ξ-⟨,⟩₁}\AgdaSpace{}%
 	\AgdaSymbol{:}\AgdaSpace{}%
 	\AgdaSymbol{∀}\AgdaSpace{}%

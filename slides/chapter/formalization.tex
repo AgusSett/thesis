@@ -1,0 +1,113 @@
+
+\begin{frame}{Indices de De Bruijn}
+	\[ \lambda z. (\lambda y. y (\lambda x. x)) (\lambda x. z x) \]
+	
+	\pause
+	\[ \textcolor{red}{\lambda} (\textcolor{blue}{\lambda\; 0} \; (\textcolor{orange}{\lambda\; 0})) (\textcolor{green}{\lambda}\; \textcolor{red}{1} \; \textcolor{green}{0}) \]
+	
+	\pause
+	\[ (\lambda x. \lambda y. z x (\lambda z. z x)) (\lambda x. z x) \]
+	
+	\pause
+	\[
+	(\textcolor{red}{\lambda}\; \lambda\; \textcolor{magenta}{3}\; \textcolor{red}{1}\; (\textcolor{green}{\lambda\; 0}\; \textcolor{red}{2}))\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{4}\; \textcolor{blue}{0})
+	\pause
+	\hookrightarrow_\beta
+	\lambda \; \textcolor{magenta}{2} \; (\textcolor{blue}{\lambda}\; \textcolor{orange}{5}\; \textcolor{blue}{0})\; (\textcolor{green}{\lambda\; 0}\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{6}\; \textcolor{blue}{0}))\;
+	\]
+\end{frame}
+
+\begin{frame}{Substituciones explícitas}
+\end{frame}
+
+\begin{frame}{Tipos}
+	\input{code/type.tex}
+	\ExecuteMetaData[code/example.tex]{type}
+\end{frame}
+
+\begin{frame}{Contextos}
+	\ExecuteMetaData[code/context.tex]{ctx}
+	\pause
+	\ExecuteMetaData[code/context.tex]{example}
+\end{frame}
+
+\begin{frame}{Indices intrínsecamente tipados}
+	\ExecuteMetaData[code/context.tex]{index}
+	\pause
+	\ExecuteMetaData[code/context.tex]{example}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Términos}
+	\ExecuteMetaData[code/term.tex]{base}
+	\pagebreak
+	\ExecuteMetaData[code/term.tex]{abs}
+	\pagebreak
+	\ExecuteMetaData[code/term.tex]{prod}
+\end{frame}
+
+\begin{frame}{Ejemplo}
+	\ExecuteMetaData[code/example.tex]{term}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Reducción}
+	\ExecuteMetaData[code/reduction.tex]{app}
+	\pagebreak
+	\ExecuteMetaData[code/reduction.tex]{app2}
+	
+	\pagebreak
+	\ExecuteMetaData[code/reduction.tex]{pair}
+	\pagebreak
+	\ExecuteMetaData[code/reduction.tex]{pair2}
+	
+	\pagebreak
+	\ExecuteMetaData[code/reduction.tex]{iso}
+\end{frame}
+
+\begin{frame}{Ejemplo}
+	\ExecuteMetaData[code/example.tex]{reduction}
+\end{frame}
+
+\begin{frame}{Isomorfismos de tipos}
+	\input{code/iso_type.tex}
+\end{frame}
+
+\begin{frame}{Ejemplo}
+	\ExecuteMetaData[code/example.tex]{iso-type}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Equivalencias entre términos}
+	\ExecuteMetaData[code/iso_term.tex]{comm}
+	\pagebreak
+	\ExecuteMetaData[code/iso_term.tex]{asso}
+	\pagebreak
+	\ExecuteMetaData[code/iso_term.tex]{dist}
+	\pagebreak
+	\ExecuteMetaData[code/iso_term.tex]{subs-curry}
+	\[ \lambda r[\pi_B(z)/x, \pi_A(z)/y] \]
+	\[ \lambda r[\pi_B(0), \pi_A(0)] \]
+	
+	\ExecuteMetaData[code/iso_term.tex]{subs-uncurry}
+	\[ \lambda \lambda r[\langle x,y \rangle/z] \]
+	\[ \lambda \lambda r[\langle 1,0 \rangle] \]
+	\ExecuteMetaData[code/iso_term.tex]{curry}
+	%\ExecuteMetaData[code/iso_term.tex]{id-pair}
+	%\ExecuteMetaData[code/iso_term.tex]{cong-abs}
+	%\ExecuteMetaData[code/iso_term.tex]{cong-pair}
+	%\ExecuteMetaData[code/iso_term.tex]{cong-app}
+	\pagebreak
+	\ExecuteMetaData[code/iso_term.tex]{cong-proj}
+\end{frame}
+
+\begin{frame}{Ejemplo}
+	\ExecuteMetaData[code/example.tex]{iso-term-1}
+	\pause
+	\ExecuteMetaData[code/example.tex]{iso-term-2}
+\end{frame}
+
+\begin{frame}{Evaluación}
+	\ExecuteMetaData[code/eval.tex]{relation}
+\end{frame}
+
+\begin{frame}{Evaluación}
+	\ExecuteMetaData[code/eval.tex]{eval}
+\end{frame}

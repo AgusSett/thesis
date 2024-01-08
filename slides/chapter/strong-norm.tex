@@ -1,0 +1,113 @@
+
+\begin{frame}{Definición}
+	\begin{center}
+		\begin{prooftree}
+			\hypo{ \forall t. s \hookrightarrow t \implies t \in SN }
+			\infer1{ s \in SN }
+		\end{prooftree}
+	\end{center}
+	
+	\pause
+	
+	\ExecuteMetaData[code/SN1.tex]{sn-def}
+	
+	%\ExecuteMetaData[code/SN3.tex]{adequacy-proof}
+\end{frame}
+
+\begin{frame}{Ejemplos}
+	\ExecuteMetaData[code/example.tex]{sn}
+\end{frame}
+
+\begin{frame}{Approach 1}
+	\begin{AgdaSuppressSpace}
+		\ExecuteMetaData[code/SN1.tex]{strong-type}
+		
+		\pause
+		
+		\ExecuteMetaData[code/SN1.tex]{strong-proof}
+	\end{AgdaSuppressSpace}
+\end{frame}
+
+\begin{frame}{Approach 1}
+	\ExecuteMetaData[code/SN1.tex]{lemma-abs}
+\end{frame}
+
+\begin{frame}{Approach 1}
+	\ExecuteMetaData[code/SN1.tex]{lemma-app}
+\end{frame}
+
+\begin{frame}{Approach 2}
+	\ExecuteMetaData[code/SN2.tex]{sn-star}
+	\pause
+	\ExecuteMetaData[code/SN2.tex]{sn-star-sn}
+	\pause
+	\ExecuteMetaData[code/SN2.tex]{inter}
+\end{frame}
+
+\begin{frame}{Approach 2}
+	\ExecuteMetaData[code/SN2.tex]{adequacy-type}
+	
+	\ExecuteMetaData[code/SN2.tex]{strong-proof}
+	
+	\ExecuteMetaData[code/SN2.tex]{lemma-app}
+	\ExecuteMetaData[code/SN2.tex]{adequacy-proof}
+\end{frame}
+
+\begin{frame}{Approach 3}
+	\ExecuteMetaData[code/SN3.tex]{adequacy-type}
+	
+	\ExecuteMetaData[code/SN3.tex]{strong-proof}
+\end{frame}
+
+
+\begin{frame}{Approach 3}
+	\ExecuteMetaData[code/SN3.tex]{subst-split}
+	\ExecuteMetaData[code/SN3.tex]{adequacy-proof}
+\end{frame}
+
+\begin{frame}{Approach 4}
+	\ExecuteMetaData[code/SN4.tex]{adequacy-subst}
+	\pause
+	\ExecuteMetaData[code/SN4.tex]{adequacy-ids}
+	\pause
+	\ExecuteMetaData[code/SN4.tex]{adequacy-cons}
+	\pause
+	\ExecuteMetaData[code/SN4.tex]{adequacy-type}
+\end{frame}
+
+\begin{frame}{Approach 4}
+	\ExecuteMetaData[code/SN4.tex]{adequacy-proof}
+	\ExecuteMetaData[code/SN4.tex]{strong-proof}
+\end{frame}
+
+\begin{frame}{Approach 4}
+	\ExecuteMetaData[code/SN4.tex]{adequacy-exts}
+	\ExecuteMetaData[code/SN4.tex]{sn-rename}
+	\ExecuteMetaData[code/SN4.tex]{inter-rename}
+\end{frame}
+
+\begin{frame}{Approach 5}
+	\ExecuteMetaData[code/SN5.tex]{inter}
+	\ExecuteMetaData[code/SN5.tex]{inter-rename}
+	\ExecuteMetaData[code/SN5.tex]{adequacy-rename}
+\end{frame}
+
+\begin{frame}{Approach 5}
+	\ExecuteMetaData[code/SN5.tex]{subst-split}
+	\ExecuteMetaData[code/SN5.tex]{adequacy-proof}
+\end{frame}
+
+\begin{frame}{Prueba para Sistema I}
+	\ExecuteMetaData[code/strong_norm.tex]{SN}
+	\ExecuteMetaData[code/strong_norm.tex]{sn-star}
+\end{frame}
+
+\begin{frame}{Prueba para Sistema I}
+	\ExecuteMetaData[code/strong_norm.tex]{lemma-iso-type}
+\end{frame}
+
+\begin{frame}{Caso \textsc{comm}}
+	\ExecuteMetaData[code/strong_norm.tex]{iso-comm}
+\end{frame}
+
+\section{Evaluación}

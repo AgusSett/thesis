@@ -1,0 +1,145 @@
+
+\begin{frame}{Isomorfismos entre tipos}
+	Dos tipos A y B son \textit{isomorfos} si solo si existen:
+	\[ f: A \rightarrow B \quad g: B \rightarrow A \]
+	
+	\pause
+	
+	Tales que:
+	\[ f \circ g = id_A \quad g \circ f = id_B \]
+\end{frame}
+
+\begin{frame}{Ejemplo}
+	\begin{exampleblock}{Currificación}
+		\[ (A \times B) \rightarrow C \equiv A \rightarrow (B \rightarrow C) \]
+		
+		\pause
+		\[ curry = \lambda x^{(A \times B) \rightarrow C}. \lambda a^A . \lambda b^B . x\langle a,b \rangle \]
+		\[ uncurry = \lambda x^{A \rightarrow B \rightarrow C}. \lambda y^{A \times B} . x(\pi_1 y)(\pi_2 y) \]
+		
+		\pause
+		\[ curry \circ uncurry = id_{(A \times B) \rightarrow C} \quad
+		uncurry \circ curry = id_{A \rightarrow B \rightarrow C} \]
+	\end{exampleblock}
+\end{frame}
+
+\begin{frame}{Conjunto axiomático}
+	\begin{align*}
+		A \times B &\equiv B \times A \tag{\textsc{comm}} \\
+		A \times (B \times C) &\equiv (A \times B) \times C \tag{\textsc{asso}} \\
+		(A \times B) \rightarrow C &\equiv A \rightarrow (B \rightarrow C) \tag{\textsc{curry}} \\
+		A \rightarrow (B \times C) &\equiv (A \rightarrow B) \times (A \rightarrow C) \tag{\textsc{dist}} \\
+		A \times \top &\equiv A \tag{\textsc{id$_\times$}} \\
+		A \rightarrow \top &\equiv \top \tag{\textsc{ABS}} \\
+		\top \rightarrow A &\equiv \tag{\textsc{id$_\Rightarrow$}} A
+	\end{align*}
+\end{frame}
+
+\begin{frame}{Internalización de isomorfismos}
+	Se añade la regla $\equiv$
+	\begin{center}
+		\begin{prooftree}
+			\hypo{A \equiv B}
+			\hypo{\Gamma \vdash r:A}
+			\infer2[($\equiv$)]{ \Gamma \vdash r:B }
+		\end{prooftree}
+	\end{center}
+	
+	\pause
+	Esto permite usar $a: A$ en lugar de $b : B$, siempre y cuando $A \equiv B$
+	
+	\begin{prooftree*}
+		\hypo{ \Gamma\vdash r: A }
+		\infer1[($\Rightarrow_i$)]{ \Gamma\vdash \lambda x.r: C \rightarrow A }
+		\hypo{ \Gamma\vdash s: B }
+		\infer1[($\Rightarrow_i$)]{ \Gamma\vdash \lambda x.s: C \rightarrow B }
+		\infer2[($\times_i$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle : (C \rightarrow A) \times (C \rightarrow B) }
+		\infer1[($\equiv$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle : C \rightarrow (A \times B) }
+		\hypo{ \Gamma\vdash t: C }
+		\infer2[($\Rightarrow_e$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle \; t : A \times B }
+	\end{prooftree*}
+\end{frame}
+
+\begin{frame}{Relación de equivalencia entre términos}
+	\begin{align}
+		\langle r,s \rangle &\rightleftarrows \langle s,r \rangle \tag{\textsc{comm}} \\
+		\langle r, \langle s,t \rangle \rangle &\rightleftarrows \langle \langle r, s \rangle, t \rangle \tag{\textsc{asso}} \\
+		\lambda x^A \langle r,s \rangle &\rightleftarrows \langle \lambda x^A.r, \lambda x^A.s \rangle \tag{$\textsc{dist}_{\lambda}$} \\
+		\langle r,s \rangle t &\rightleftarrows \langle r t, s t \rangle \tag{$\textsc{dist}_{app}$} \\
+		r \langle s, t \rangle &\rightleftarrows r s t \tag{\textsc{curry}}
+	\end{align}
+	\pause
+	\begin{align*}
+		& \langle \lambda x.r, \lambda x.s \rangle \; t \\
+		\rightleftarrows& \\
+		& (\lambda x. \langle r, s \rangle)\; t \\
+		\hookrightarrow& \\
+		& \langle r[t/x], s[t/x] \rangle
+	\end{align*}
+\end{frame}
+
+\begin{frame}{Problema}
+	Las reglas de proyección $\pi_1$ y $\pi_2$ acceden al par a través de la posición de los elementos, pero el isomorfismo $\textsc{comm}$ permite cambiar el orden de un par:
+	\begin{align*}
+		\pi_1 \langle r, s \rangle& \hookrightarrow_{\pi_1} r \\
+		\pi_1 \langle r, s \rangle& \rightleftarrows_{\textsc{comm}} \pi_1 \langle s, r \rangle \hookrightarrow_{\pi_1} s
+	\end{align*}
+	\pause
+	
+	\[ \text{si} \; r:A \quad \pi_A \langle r, s \rangle \hookrightarrow_{\pi} r \]
+	
+\end{frame}
+
+\begin{frame}{Ejemplo: proyección de funciones}
+	\begin{prooftree*}
+		\hypo{ \Gamma\vdash r: B }
+		\hypo{ \Gamma\vdash s: C }
+		\infer2[($\times_i$)]{ \Gamma\vdash \langle r,s \rangle: B \times C }
+		\infer1[($\Rightarrow_i$)]{ \Gamma\vdash \lambda x. \langle r,s \rangle: A \rightarrow (B \times C) }
+		\infer1[($\equiv$)]{ \Gamma\vdash \lambda x. \langle r,s \rangle: (A \rightarrow B) \times (A \rightarrow C) }
+		\infer1[($\times_e$)]{ \Gamma\vdash \pi_{A \rightarrow B} (\lambda x. \langle r,s \rangle) : A \rightarrow B }
+	\end{prooftree*}
+\end{frame}
+
+\begin{frame}{Ejemplo: proyección de funciones}
+	\begin{align*}
+		&\pi_{A \rightarrow B}(\lambda x^A . \langle r,s \rangle)\, a \\
+		\rightleftarrows&_{\textsc{dist}_\lambda} \\
+		&\pi_{A \rightarrow B}(\langle \lambda x^A.r, \lambda x^A.s \rangle)\, a \\
+		\hookrightarrow&_\pi \\
+		&(\lambda x^A. r)\, a \\
+		\hookrightarrow&_\beta \\
+		&r[a/x]
+	\end{align*}
+\end{frame}
+
+\begin{frame}{Ejemplo: aplicación de argumentos en cualquier orden}
+	\[ \lambda x^A. \lambda y^B. r : A \rightarrow B \rightarrow C \]
+	\pause
+	
+	\begin{align*}
+		&A \rightarrow B \rightarrow C \\
+		\equiv&_{\textsc{curry}} \\
+		&(A \times B) \rightarrow C \\
+		\equiv&_{\textsc{comm}} \\
+		&(B \times A) \rightarrow C \\
+		\equiv&_{\textsc{curry}} \\
+		&B \rightarrow A \rightarrow C
+	\end{align*}	
+\end{frame}
+
+\begin{frame}{Ejemplo: aplicación de argumentos en cualquier orden}
+	\begin{align*}
+		&(\lambda x^A. \lambda y^B. r)\, b\, a \\
+		\rightleftarrows&_{\textsc{curry}} \\
+		&(\lambda x^A. \lambda y^B. r)\, \langle b,a \rangle \\
+		\rightleftarrows&_{\textsc{comm}} \\
+		&(\lambda x^A. \lambda y^B. r)\, \langle a,b \rangle \\
+		\rightleftarrows&_{\textsc{curry}} \\
+		&(\lambda x^A. \lambda y^B. r)\, a\, b \\
+		\hookrightarrow&_\beta \\
+		&(\lambda y^B. r[a/x])\, b \\
+		\hookrightarrow&_\beta \\
+		&r[a/x, b/y]
+	\end{align*}
+\end{frame}
