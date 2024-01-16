@@ -15,7 +15,11 @@
 \end{frame}
 
 \begin{frame}{Ejemplos}
-	\ExecuteMetaData[code/example.tex]{sn}
+	\ExecuteMetaData[code/example.tex]{sn-1}
+	\pause
+	\ExecuteMetaData[code/example.tex]{sn-2}
+	\pause
+	\ExecuteMetaData[code/example.tex]{sn-3}
 \end{frame}
 
 \begin{frame}{Approach 1}
@@ -36,6 +40,14 @@
 	\ExecuteMetaData[code/SN1.tex]{lemma-app}
 \end{frame}
 
+\begin{frame}{Approach 1}
+	\ExecuteMetaData[code/SN1.tex]{lemma-prod}
+\end{frame}
+
+\begin{frame}{Approach 1}
+	\ExecuteMetaData[code/SN1.tex]{lemma-proj}
+\end{frame}
+
 \begin{frame}{Approach 2}
 	\ExecuteMetaData[code/SN2.tex]{sn-star}
 	\pause
@@ -46,16 +58,26 @@
 
 \begin{frame}{Approach 2}
 	\ExecuteMetaData[code/SN2.tex]{adequacy-type}
-	
 	\ExecuteMetaData[code/SN2.tex]{strong-proof}
-	
+\end{frame}
+
+\begin{frame}{Approach 2}
 	\ExecuteMetaData[code/SN2.tex]{lemma-app}
+	\pause
+	\ExecuteMetaData[code/SN2.tex]{lemma-proj}
+\end{frame}
+
+\begin{frame}{Approach 2}
 	\ExecuteMetaData[code/SN2.tex]{adequacy-proof}
 \end{frame}
 
 \begin{frame}{Approach 3}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<1>{\draw[red,thick,rounded corners] (7.44361, 6.4) rectangle (10.16, 5.9);}
+		\only<2>{\draw[red,thick,rounded corners] (11.9592, 6.4) rectangle (12.8411, 5.9);}
+	\end{tikzpicture}
 	\ExecuteMetaData[code/SN3.tex]{adequacy-type}
-	
+	\pause[3]
 	\ExecuteMetaData[code/SN3.tex]{strong-proof}
 \end{frame}
 
@@ -76,19 +98,31 @@
 \end{frame}
 
 \begin{frame}{Approach 4}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<3>{\draw[red,thick,rounded corners] (3.77472, 4.72) rectangle (5.60917, 4.35);}
+	\end{tikzpicture}
+	
 	\ExecuteMetaData[code/SN4.tex]{adequacy-proof}
+	\pause
 	\ExecuteMetaData[code/SN4.tex]{strong-proof}
 \end{frame}
 
 \begin{frame}{Approach 4}
 	\ExecuteMetaData[code/SN4.tex]{adequacy-exts}
+	\pause
 	\ExecuteMetaData[code/SN4.tex]{sn-rename}
+	\pause
 	\ExecuteMetaData[code/SN4.tex]{inter-rename}
 \end{frame}
 
 \begin{frame}{Approach 5}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<1>{\draw[red,thick,rounded corners] (8.64306, 6.92168) rectangle (11.5711, 6.39251);}
+	\end{tikzpicture}
 	\ExecuteMetaData[code/SN5.tex]{inter}
+	\pause
 	\ExecuteMetaData[code/SN5.tex]{inter-rename}
+	\pause
 	\ExecuteMetaData[code/SN5.tex]{adequacy-rename}
 \end{frame}
 
@@ -99,6 +133,7 @@
 
 \begin{frame}{Prueba para Sistema I}
 	\ExecuteMetaData[code/strong_norm.tex]{SN}
+	\pause
 	\ExecuteMetaData[code/strong_norm.tex]{sn-star}
 \end{frame}
 
@@ -108,6 +143,30 @@
 
 \begin{frame}{Caso \textsc{comm}}
 	\ExecuteMetaData[code/strong_norm.tex]{iso-comm}
+\end{frame}
+
+\begin{frame}{Caso \textsc{curry}}
+	\[ \lambda x^A. \lambda y^B. t \rightleftarrows \lambda z^{A \times B}. t[\pi_A(z)/x, \pi_B(z)/y] \]
+	\[ \forall u_1, u_2 \in SN \Longrightarrow t[u_1/x, u_2/y] \in SN \]
+	
+	\[ \lambda z. t[\pi_A(z)/x, \pi_B(z)/y]\]
+	\[ \forall u \in SN \Longrightarrow (t[\pi_A(z)/x, \pi_B(z)/y])[u/z] = t[\pi_A(u)/x, \pi_B(u)/y] \in SN \]
+	 
+	\[ u_1 = \pi_A(u) \quad u_2 = \pi_B(u) \]
+\end{frame}
+
+\begin{frame}{Caso \textsc{curry}}
+	\[ \lambda x^{A \times B}. t \rightleftarrows \lambda y^A. \lambda z^B. t[\langle y, z \rangle/x] \]
+	\[ \forall u \in SN \Longrightarrow t[u/x] \in SN \]
+	
+	\[ \lambda y. \lambda z. t[\langle y, z \rangle/x]\]
+	
+	\[ \forall u_1,u_2 \in SN \Longrightarrow ((t[\langle y, z \rangle/x])[u_1/y])[u_2/z] = t[\langle u_1, u_2 \rangle/x] \in SN \]
+	
+	\[ (\lambda z. t[\langle y, z \rangle/x])[u_1/y] = \lambda z. t[\langle u_1, z \rangle/x] \]
+	\[ (t[\langle u_1, z \rangle/x])[u_2/z] = t[\langle u_1, u_2 \rangle/x] \]
+	
+	\[ u = \langle u_1, u_2 \rangle \]
 \end{frame}
 
 \section{Evaluación}

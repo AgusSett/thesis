@@ -410,9 +410,10 @@
 \AgdaSymbol{=}\AgdaSpace{}%
 \AgdaSymbol{λ}\AgdaSpace{}%
 \AgdaBound{SNu}\AgdaSpace{}%
-\AgdaSymbol{→}\AgdaSpace{}%
+\AgdaSymbol{→}\AgdaSpace{}\>[1]
 \AgdaHole{\{!\ \ \ !\}}\AgdaSpace{}%
-\AgdaComment{--\ SN*\ ⟦\AgdaUnderscore{}⟧\ ((rename\ (ext\ ρ)\ n)\ [\ u\ ])}\<%
+\\
+\>[1]\AgdaComment{--\ SN*\ ⟦\AgdaUnderscore{}⟧\ ((rename\ (ext\ ρ)\ n)\ [\ u\ ])}\<%
 \\
 \end{code}
 %</inter-rename>
@@ -1134,9 +1135,9 @@
 \>[0]\AgdaFunction{strong-norm}\AgdaSpace{}%
 \AgdaBound{t}\AgdaSpace{}%
 \AgdaSymbol{=}\AgdaSpace{}%
-\AgdaFunction{transport}\AgdaSpace{}%
-\AgdaDatatype{SN}\AgdaSpace{}%
-\AgdaFunction{sub-id}\AgdaSpace{}%
+%\AgdaFunction{transport}\AgdaSpace{}%
+%\AgdaDatatype{SN}\AgdaSpace{}%
+%\AgdaFunction{sub-id}\AgdaSpace{}%
 \AgdaSymbol{(}\AgdaFunction{SN*-SN}\AgdaSpace{}%
 \AgdaSymbol{(}\AgdaFunction{adequacy}\AgdaSpace{}%
 \AgdaBound{t}\AgdaSpace{}%

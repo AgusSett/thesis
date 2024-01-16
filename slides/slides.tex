@@ -3,13 +3,23 @@
 \usepackage[spanish]{babel}
 \usepackage{ebproof}
 \usepackage[conor]{agda}
+\usepackage{tikz}
 \usetheme{Warsaw}
 \setbeamertemplate{headline}{}
 
 \title{Formalización de Sistema I con tipo Top}
-\author{Agustin Francisco Settimo}
+\author{
+	{\large Agustin Francisco Settimo} \\ ~\\
+	\textbf{Directora:} Cecilia Manzino \\
+	\textbf{Co-Director:} Cristian Sottile
+}
+\institute{
+	Facultad de Ciencias Exactas, Ingeniería y Agrimensura \\
+	Departamento de Ciencias de la Computación
+}
 \date{}
 \titlegraphic{
+	\vspace{-2.5em}
 	\includegraphics[width=3cm]{logo.png}
 }
 \begin{document}
@@ -17,6 +27,8 @@
 \begin{frame}[plain]
     \maketitle
 \end{frame}
+
+\author{Agustin Francisco Settimo}
 
 \begin{frame}{Outline}
 	\tableofcontents
@@ -28,17 +40,29 @@
 
 \section{Introducción a Sistema I}
 
+\begin{frame}{Outline}
+	\tableofcontents[currentsection]
+\end{frame}
+
 %\input{chapter/system-i}
 
 \section{Introducción a Agda}
 
 \section{Formalización}
 
-%\AtBeginEnvironment{code}{\fontsize{10}{12}\selectfont}
+\begin{frame}{Outline}
+	\tableofcontents[currentsection]
+\end{frame}
+
+\AtBeginEnvironment{code}{\fontsize{10}{12}\selectfont}
 %\input{chapter/formalization}
 
 \section{Normalización fuerte}
 
-\input{chapter/strong-norm}
+\begin{frame}{Outline}
+	\tableofcontents[currentsection]
+\end{frame}
+
+%\input{chapter/strong-norm}
 
 \end{document}
