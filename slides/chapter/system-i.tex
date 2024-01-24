@@ -1,3 +1,20 @@
+\begin{frame}{Motivación}
+	Los tipos indican la \textbf{forma} y la \textbf{clase de problema} de un programa:
+	\pause
+	\[ suma : (int \times int) \rightarrow int \]
+	
+	\pause
+	Existen programas con tipos distintos, pero la misma clase de problema:
+	\[ suma' : int \rightarrow int \rightarrow int \]
+	
+	\pause
+	Los programas se combinan según su forma:
+	\[ suma \;\langle2,\; 3\rangle \quad suma'\; 2\; 3 \]
+	
+	\pause
+	Sería interesante poder combinarlos según su significado:
+	\[ suma\; 2\; 3 \quad suma' \;\langle2,\; 3\rangle \]
+\end{frame}
 
 \begin{frame}{Isomorfismos entre tipos}
 	Dos tipos A y B son \textit{isomorfos} si solo si existen:

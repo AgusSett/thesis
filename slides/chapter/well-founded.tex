@@ -1,0 +1,26 @@
+\begin{frame}{Relación bien fundada}
+	\begin{block}{Definición (Relación bien fundada)}
+		Una relación está bien fundada cuando todas sus cadenas descendentes
+		\[ x_1 < x_2 < \dots < x_n \]
+		tienen un largo acotado.
+	\end{block}
+	
+	\pause
+	\begin{block}{Definición (Accesibilidad)}
+		Un elemento $x: A$ es accesible, si todo elemento $y < x$ es también accesible.
+		\ExecuteMetaData[code/eval.tex]{acc}
+	\end{block}
+\end{frame}
+
+\begin{frame}{Relación bien fundada}
+	Una relación está bien fundada si todo elemento es accesible:
+	\ExecuteMetaData[code/eval.tex]{wf}
+	\pause
+	\ExecuteMetaData[code/eval.tex]{wf-reduction}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<3>{
+			\draw[red,thick,rounded corners] (3.91583, 3.37231) rectangle (6.6675, 2.99953);
+			\draw[red,thick,rounded corners] (8.39611, 2.18814) rectangle (10.1247, 1.69425);
+		}
+	\end{tikzpicture}
+\end{frame}

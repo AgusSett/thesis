@@ -39,12 +39,15 @@
 \begin{frame}{Ejemplos}
 	\begin{exampleblock}{Función identidad}
 		\[ \lambda x.x \]
+		\pause
 		\[ (\lambda x.x) y \hookrightarrow_\beta y \]
 	\end{exampleblock}
 	\pause
 	\begin{exampleblock}{Dos argumentos}
 		\[ \lambda x. \lambda y.x \]
-		\[ (\lambda x. \lambda y.x) a b \hookrightarrow_\beta (\lambda y.a) b \hookrightarrow_\beta a \]
+		\[ (\lambda x. \lambda y.x) a b
+		\pause \hookrightarrow_\beta (\lambda y.a) b
+		\pause \hookrightarrow_\beta a \]
 	\end{exampleblock}
 \end{frame}
 
@@ -132,4 +135,21 @@
 		\infer0[(ax)]{\emptyset, y:A \vdash y : A}
 		\infer2[($\Rightarrow_e$)]{ \emptyset, y:A \vdash (\lambda x.x) y : A }
 	\end{prooftree}
+\end{frame}
+
+\begin{frame}{Propiedades}
+	\begin{block}{Definición (Forma normal)}
+		$t$ es normal si no puede reducirse. $t \not\hookrightarrow$
+	\end{block}
+	
+	\pause
+	\begin{block}{Progreso}
+		Si $\Gamma \vdash t : A$ entonces $t$ es normal o $t \hookrightarrow t'$.
+	\end{block}
+	
+	\pause
+	\begin{block}{Normalización Fuerte}
+		Si $\Gamma \vdash t : A$ entonces no existe ninguna secuencia de reducción infinita.
+		$t \hookrightarrow t_1 \hookrightarrow t_2 \hookrightarrow t_3 \hookrightarrow \dots$
+	\end{block}
 \end{frame}

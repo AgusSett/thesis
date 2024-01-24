@@ -6,34 +6,81 @@
 	\[ \textcolor{red}{\lambda} (\textcolor{blue}{\lambda\; 0} \; (\textcolor{orange}{\lambda\; 0})) (\textcolor{green}{\lambda}\; \textcolor{red}{1} \; \textcolor{green}{0}) \]
 	
 	\pause
-	\[ (\lambda x. \lambda y. z x (\lambda z. z x)) (\lambda x. z x) \]
+	\[ (\lambda x. \lambda y. z x (\lambda z. z x)) (\lambda x. w x) \]
 	
 	\pause
 	\[
-	(\textcolor{red}{\lambda}\; \lambda\; \textcolor{magenta}{3}\; \textcolor{red}{1}\; (\textcolor{green}{\lambda\; 0}\; \textcolor{red}{2}))\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{4}\; \textcolor{blue}{0})
+	(\textcolor{red}{\lambda}\; \lambda\; \textcolor{magenta}{2}\; \textcolor{red}{1}\; (\textcolor{green}{\lambda\; 0}\; \textcolor{red}{2}))\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{2}\; \textcolor{blue}{0})
 	\pause
 	\hookrightarrow_\beta
-	\lambda \; \textcolor{magenta}{2} \; (\textcolor{blue}{\lambda}\; \textcolor{orange}{5}\; \textcolor{blue}{0})\; (\textcolor{green}{\lambda\; 0}\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{6}\; \textcolor{blue}{0}))\;
+	\lambda \; \textcolor{magenta}{1} \; (\textcolor{blue}{\lambda}\; \textcolor{orange}{3}\; \textcolor{blue}{0})\; (\textcolor{green}{\lambda\; 0}\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{4}\; \textcolor{blue}{0}))\;
 	\]
 \end{frame}
 
 \begin{frame}{Substituciones explícitas}
+	\[ (0\; 1\; 3)\{0\mapsto a, 1\mapsto b, 2\mapsto 0, 3\mapsto 1, \dots \} \rightarrow a\; b\; 1 \]
+	
+	\pause
+	\begin{itemize}[<+->]
+		\item $id$ (substitución identidad) $\{i \mapsto i\}$.
+		\item $\uparrow$ (shift) $\{i \mapsto i+1\}$.
+		\item $a \bullet s$ (cons) $\{0 \mapsto a, i+1 \mapsto s(i)\}$. \\ Por ejemplo $a \bullet id = \{ 0 \mapsto a, 1 \mapsto 0, 2 \mapsto 1, 3 \mapsto 2, \dots \} = \{ 0 \mapsto a, i+1 \mapsto i \} $
+		\item $s \circ t$ (composición) $t$ $\{ i \mapsto \llangle t \rrangle (s(i)) \}$.
+	\end{itemize}
+	
+	\pause
+	\begin{align*}
+		\llangle s \rrangle n &= s(n) \\
+		\llangle s \rrangle (a\; b) &= \llangle s \rrangle a\; \llangle s \rrangle b \\
+		\llangle s \rrangle (\lambda a) &= \lambda \llangle 0 \bullet (s \; \circ \uparrow) \rrangle a
+	\end{align*}
+\end{frame}
+
+\begin{frame}{Substituciones explícitas}
+	\ExecuteMetaData[code/subs.tex]{subs-type}
+	\pause
+	\ExecuteMetaData[code/subs.tex]{ids}
+	\pause
+	\ExecuteMetaData[code/subs.tex]{cons}
+	\pause
+	\ExecuteMetaData[code/subs.tex]{subs}
+\end{frame}
+
+\begin{frame}{Substituciones explícitas}
+	\ExecuteMetaData[code/subs.tex]{single}
+
+	\pause
+	\ExecuteMetaData[code/example.tex]{subst1}
+	%\ExecuteMetaData[code/example.tex]{subst2}
+\end{frame}
+
+\begin{frame}{Substituciones explícitas}
+	\ExecuteMetaData[code/subs.tex]{ren-type}
+	\ExecuteMetaData[code/subs.tex]{rename}
+	
+	\pause
+	\ExecuteMetaData[code/example.tex]{rename}
 \end{frame}
 
 \begin{frame}{Tipos}
-	\input{code/type.tex}
-	\ExecuteMetaData[code/example.tex]{type}
-\end{frame}
-
-\begin{frame}{Contextos}
-	\ExecuteMetaData[code/context.tex]{ctx}
-	\pause
-	\ExecuteMetaData[code/context.tex]{example}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\input{code/type.tex}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\pause
+			\ExecuteMetaData[code/example.tex]{types}
+		\end{column}
+	\end{columns}
 \end{frame}
 
 \begin{frame}{Indices intrínsecamente tipados}
-	\ExecuteMetaData[code/context.tex]{index}
+	\ExecuteMetaData[code/context.tex]{ctx}
 	\pause
+	\ExecuteMetaData[code/context.tex]{index}
+\end{frame}
+
+\begin{frame}{Ejemplo}
 	\ExecuteMetaData[code/context.tex]{example}
 \end{frame}
 
@@ -78,41 +125,57 @@
 	\ExecuteMetaData[code/example.tex]{iso-type}
 \end{frame}
 
-\begin{frame}[allowframebreaks]{Equivalencias entre términos}
+\begin{frame}{Equivalencias entre términos}
 	\ExecuteMetaData[code/iso_term.tex]{comm}
-	\pagebreak
+\end{frame}
+
+\begin{frame}{Equivalencias entre términos}
 	\ExecuteMetaData[code/iso_term.tex]{asso}
-	\pagebreak
-	
-	\[ \langle r,s \rangle \rightleftarrows_{\textsc{split}} \langle r, \langle \pi_B(s),\pi_C(s) \rangle \rangle \rightleftarrows_{\textsc{asso}} \langle \langle r, \pi_B(s) \rangle, \pi_C(s) \rangle \]
-	
+\end{frame}
+
+\begin{frame}{Equivalencias entre términos}	
+	\[ \langle r,s \rangle \rightleftarrows_{\textsc{split}} \pause \textcolor{blue}{\langle} r, \textcolor{red}{\langle} \pi_B(s),\pi_C(s) \textcolor{red}{\rangle} \textcolor{blue}{\rangle} \pause \rightleftarrows_{\textsc{asso}} \textcolor{blue}{\langle} \textcolor{red}{\langle} r, \pi_B(s) \textcolor{red}{\rangle}, \pi_C(s) \textcolor{blue}{\rangle} \]
+	\pause
 	\ExecuteMetaData[code/iso_term.tex]{asso-split}
 	%\ExecuteMetaData[code/iso_term.tex]{dist}
+\end{frame}
+
+\begin{frame}{Equivalencias entre términos}	
+	\[ \lambda \textcolor{red}{x^A}. \lambda \textcolor{blue}{y^B}. r \rightleftarrows \lambda z^{A \times B}. r[\textcolor{red}{\pi_B(z)/y}, \textcolor{blue}{\pi_A(z)/x}] \]
+
+	\pause
+	\[ \lambda r[\textcolor{red}{\pi_B(z)/y}, \textcolor{blue}{\pi_A(z)/x}] \]
+	\pause
+	\[ \lambda r[\textcolor{red}{\pi_B(0)}, \textcolor{blue}{\pi_A(0)}] \]
 	
-	
-	\pagebreak
-	\[ \lambda x^A. \lambda y^B. t \rightleftarrows \lambda z^{A \times B}. t[\pi_A(z)/x, \pi_B(z)/y] \]
-	
+	\pause
 	\ExecuteMetaData[code/iso_term.tex]{subs-curry}
-	\[ \lambda r[\pi_B(z)/x, \pi_A(z)/y] \]
-	\[ \lambda r[\pi_B(0), \pi_A(0)] \]
 	
+	\pause
 	\ExecuteMetaData[code/iso_term.tex]{curry}
+\end{frame}
+
+\begin{frame}{Equivalencias entre términos}	
+	\[ \lambda x^{A \times B}. r \rightleftarrows \lambda y^A. \lambda z^B. r[\langle y, z \rangle/x] \]
 	
-	\pagebreak
-	\[ \lambda x^{A \times B}. t \rightleftarrows \lambda y^A. \lambda z^B. t[\langle y, z \rangle/x] \]
-	
-	\ExecuteMetaData[code/iso_term.tex]{subs-uncurry}
-	\[ \lambda \lambda r[\langle x,y \rangle/z] \]
+	\pause
+	\[ \lambda \lambda r[\langle y,z \rangle/x] \]
+	\pause
 	\[ \lambda \lambda r[\langle 1,0 \rangle] \]
 	
+	\pause
+	\ExecuteMetaData[code/iso_term.tex]{subs-uncurry}
+	
+	\pause
 	\ExecuteMetaData[code/iso_term.tex]{uncurry}
 	
 	%\ExecuteMetaData[code/iso_term.tex]{id-pair}
 	%\ExecuteMetaData[code/iso_term.tex]{cong-abs}
 	%\ExecuteMetaData[code/iso_term.tex]{cong-pair}
 	%\ExecuteMetaData[code/iso_term.tex]{cong-app}
-	\pagebreak
+\end{frame}
+
+\begin{frame}{Equivalencias entre términos}	
 	\ExecuteMetaData[code/iso_term.tex]{cong-proj}
 \end{frame}
 
@@ -127,5 +190,6 @@
 \end{frame}
 
 \begin{frame}{Evaluación}
-	\ExecuteMetaData[code/eval.tex]{eval}
+	\ExecuteMetaData[code/example.tex]{eval1}
+	%\ExecuteMetaData[code/eval.tex]{eval}
 \end{frame}
