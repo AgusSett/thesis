@@ -70,8 +70,8 @@
 		\infer1[($\Rightarrow_i$)]{ \Gamma\vdash \lambda x.r: C \rightarrow A }
 		\hypo{ \Gamma\vdash s: B }
 		\infer1[($\Rightarrow_i$)]{ \Gamma\vdash \lambda x.s: C \rightarrow B }
-		\infer2[($\times_i$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle : (C \rightarrow A) \times (C \rightarrow B) }
-		\infer1[($\equiv$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle : C \rightarrow (A \times B) }
+		\infer2[($\times_i$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle : \textcolor{red}{(C \rightarrow A) \times (C \rightarrow B)} }
+		\infer1[\textcolor{red}{($\equiv$)}]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle : \textcolor{red}{C \rightarrow (A \times B)} }
 		\hypo{ \Gamma\vdash t: C }
 		\infer2[($\Rightarrow_e$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle \; t : A \times B }
 	\end{prooftree*}
@@ -81,28 +81,34 @@
 	\begin{align}
 		\langle r,s \rangle &\rightleftarrows \langle s,r \rangle \tag{\textsc{comm}} \\
 		\langle r, \langle s,t \rangle \rangle &\rightleftarrows \langle \langle r, s \rangle, t \rangle \tag{\textsc{asso}} \\
-		\lambda x^A \langle r,s \rangle &\rightleftarrows \langle \lambda x^A.r, \lambda x^A.s \rangle \tag{$\textsc{dist}_{\lambda}$} \\
-		\langle r,s \rangle t &\rightleftarrows \langle r t, s t \rangle \tag{$\textsc{dist}_{app}$} \\
-		r \langle s, t \rangle &\rightleftarrows r s t \tag{\textsc{curry}}
+		\lambda x^A. \langle r,s \rangle &\rightleftarrows \langle \lambda x^A.r, \lambda x^A.s \rangle \tag{$\textsc{dist}_{\lambda}$} \\
+		\langle r,s \rangle\, t &\rightleftarrows \langle r\, t, s\, t \rangle \tag{$\textsc{dist}_{app}$} \\
+		r\, \langle s, t \rangle &\rightleftarrows r\, s\, t \tag{\textsc{curry}}
 	\end{align}
 	\pause
 	\begin{align*}
 		& \langle \lambda x.r, \lambda x.s \rangle \; t \\
+	\onslide<3->{
 		\rightleftarrows& \\
 		& (\lambda x. \langle r, s \rangle)\; t \\
+	}
+	\onslide<4->{
 		\hookrightarrow& \\
 		& \langle r[t/x], s[t/x] \rangle
+	}
 	\end{align*}
 \end{frame}
 
 \begin{frame}{Problema}
 	Las reglas de proyección $\pi_1$ y $\pi_2$ acceden al par a través de la posición de los elementos, pero el isomorfismo $\textsc{comm}$ permite cambiar el orden de un par:
+	\pause
 	\begin{align*}
 		\pi_1 \langle r, s \rangle& \hookrightarrow_{\pi_1} r \\
 		\pi_1 \langle r, s \rangle& \rightleftarrows_{\textsc{comm}} \pi_1 \langle s, r \rangle \hookrightarrow_{\pi_1} s
 	\end{align*}
 	\pause
 	
+	La solución es acceder al elemento usando los tipos:
 	\[ \text{si} \; r:A \quad \pi_A \langle r, s \rangle \hookrightarrow_{\pi} r \]
 	
 \end{frame}
@@ -112,8 +118,8 @@
 		\hypo{ \Gamma\vdash r: B }
 		\hypo{ \Gamma\vdash s: C }
 		\infer2[($\times_i$)]{ \Gamma\vdash \langle r,s \rangle: B \times C }
-		\infer1[($\Rightarrow_i$)]{ \Gamma\vdash \lambda x. \langle r,s \rangle: A \rightarrow (B \times C) }
-		\infer1[($\equiv$)]{ \Gamma\vdash \lambda x. \langle r,s \rangle: (A \rightarrow B) \times (A \rightarrow C) }
+		\infer1[($\Rightarrow_i$)]{ \Gamma\vdash \lambda x. \langle r,s \rangle: \textcolor{red}{A \rightarrow (B \times C)} }
+		\infer1[\textcolor{red}{($\equiv$)}]{ \Gamma\vdash \lambda x. \langle r,s \rangle: \textcolor{red}{(A \rightarrow B) \times (A \rightarrow C)} }
 		\infer1[($\times_e$)]{ \Gamma\vdash \pi_{A \rightarrow B} (\lambda x. \langle r,s \rangle) : A \rightarrow B }
 	\end{prooftree*}
 \end{frame}
@@ -121,12 +127,18 @@
 \begin{frame}{Ejemplo: proyección de funciones}
 	\begin{align*}
 		&\pi_{A \rightarrow B}(\lambda x^A . \langle r,s \rangle)\, a \\
+	\uncover<2->{
 		\rightleftarrows&_{\textsc{dist}_\lambda} \\
 		&\pi_{A \rightarrow B}(\langle \lambda x^A.r, \lambda x^A.s \rangle)\, a \\
+	}
+	\uncover<3->{
 		\hookrightarrow&_\pi \\
 		&(\lambda x^A. r)\, a \\
+	}
+	\uncover<4->{
 		\hookrightarrow&_\beta \\
 		&r[a/x]
+	}
 	\end{align*}
 \end{frame}
 
@@ -148,15 +160,23 @@
 \begin{frame}{Ejemplo: aplicación de argumentos en cualquier orden}
 	\begin{align*}
 		&(\lambda x^A. \lambda y^B. r)\, b\, a \\
+	\uncover<2->{
 		\rightleftarrows&_{\textsc{curry}} \\
 		&(\lambda x^A. \lambda y^B. r)\, \langle b,a \rangle \\
+	}
+	\uncover<3->{
 		\rightleftarrows&_{\textsc{comm}} \\
 		&(\lambda x^A. \lambda y^B. r)\, \langle a,b \rangle \\
+	}
+	\uncover<4->{
 		\rightleftarrows&_{\textsc{curry}} \\
 		&(\lambda x^A. \lambda y^B. r)\, a\, b \\
+	}
+	\uncover<5->{
 		\hookrightarrow&_\beta \\
 		&(\lambda y^B. r[a/x])\, b \\
 		\hookrightarrow&_\beta \\
 		&r[a/x, b/y]
+	}
 	\end{align*}
 \end{frame}

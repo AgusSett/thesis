@@ -21,12 +21,15 @@
 \begin{frame}{Definición}
 	\begin{itemize}[<+->]
 		\item Gramática de términos
-		\[ t := x \mid \lambda x.t \mid t t \mid \langle t, t \rangle \mid \pi_1 t \mid \pi_2 t \]
+		\[ t := x \mid \lambda x.t \mid t t \mid \langle t, t \rangle \mid \pi_1 t \mid \pi_2 t \mid \star \]
 		
 		\item Computación (reglas de reescritura)
 			\begin{itemize}[<+->]
 				\item Reducción
 				\[ (\lambda x.t) s \hookrightarrow_\beta t[s/x] \]
+				\uncover<+->{
+					$t[s/x]$ reemplaza todas las variables $x$ que aparecen en $t$ por $s$.
+				}
 				
 				\item Proyección
 				\[ \pi_1 \langle r, s \rangle \hookrightarrow_\pi r \quad \pi_2 \langle r, s \rangle \hookrightarrow_\pi s \]
@@ -54,11 +57,18 @@
 \begin{frame}{Ejemplos}	
 	\begin{exampleblock}{Swap}
 		\[ \lambda p. \langle \pi_2 (p), \pi_1 (p) \rangle \]
-		\begin{align*}
-			&(\lambda p. \langle \pi_2 (p), \pi_1 (p) \rangle) \langle a,b \rangle \\
+		\pause
+		\begin{align*}	
+			&(\lambda p. \langle \pi_2 (p), \pi_1 (p) \rangle)\; \langle a,b \rangle \\
+		\onslide<3->{
 			&\hookrightarrow_\beta \langle \pi_2 \langle a,b \rangle, \pi_1 \langle a,b \rangle \rangle \\
+		}
+		\onslide<4->{
 			&\hookrightarrow_\pi \langle b, \pi_1 \langle a,b \rangle \rangle \\
+		}
+		\onslide<5->{
 			&\hookrightarrow_\pi \langle b, a \rangle
+		}
 		\end{align*}
 	\end{exampleblock}
 \end{frame}
@@ -92,6 +102,11 @@
 			\centering
 			\begin{prooftree}
 				\infer0[($ax$)]{ \Gamma, x:A \vdash x:A }
+			\end{prooftree}
+			\pause
+			\quad
+			\begin{prooftree}
+				\infer0[($\top_i$)]{ \Gamma \vdash \star:\top }
 			\end{prooftree}
 			\pause
 			\vspace{1em}

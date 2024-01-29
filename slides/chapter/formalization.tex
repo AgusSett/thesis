@@ -6,18 +6,23 @@
 	\[ \textcolor{red}{\lambda} (\textcolor{blue}{\lambda\; 0} \; (\textcolor{orange}{\lambda\; 0})) (\textcolor{green}{\lambda}\; \textcolor{red}{1} \; \textcolor{green}{0}) \]
 	
 	\pause
-	\[ (\lambda x. \lambda y. z x (\lambda z. z x)) (\lambda x. w x) \]
+	\[ (\lambda x. \lambda y. z x (\lambda z. z x)) \; (\lambda x. w x) \]
 	
 	\pause
 	\[
 	(\textcolor{red}{\lambda}\; \lambda\; \textcolor{magenta}{2}\; \textcolor{red}{1}\; (\textcolor{green}{\lambda\; 0}\; \textcolor{red}{2}))\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{2}\; \textcolor{blue}{0})
 	\pause
 	\hookrightarrow_\beta
-	\lambda \; \textcolor{magenta}{1} \; (\textcolor{blue}{\lambda}\; \textcolor{orange}{3}\; \textcolor{blue}{0})\; (\textcolor{green}{\lambda\; 0}\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{4}\; \textcolor{blue}{0}))\;
+	\alt{
+		\lambda \; \textcolor{magenta}{1} \; (\textcolor{blue}{\lambda}\; \textcolor{orange}{3}\; \textcolor{blue}{0})\; (\textcolor{green}{\lambda\; 0}\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{4}\; \textcolor{blue}{0}))\;
+	}{
+		\lambda \; \textcolor{magenta}{1} \; \textcolor{red}{\square} \; (\textcolor{green}{\lambda\; 0}\; \textcolor{red}{\square})\;
+	}<6>
 	\]
 \end{frame}
 
 \begin{frame}{Substituciones explícitas}
+	Usando índices, las substituciones son secuencias de términos:
 	\[ (0\; 1\; 3)\{0\mapsto a, 1\mapsto b, 2\mapsto 0, 3\mapsto 1, \dots \} \rightarrow a\; b\; 1 \]
 	
 	\pause
@@ -25,41 +30,18 @@
 		\item $id$ (substitución identidad) $\{i \mapsto i\}$.
 		\item $\uparrow$ (shift) $\{i \mapsto i+1\}$.
 		\item $a \bullet s$ (cons) $\{0 \mapsto a, i+1 \mapsto s(i)\}$. \\ Por ejemplo $a \bullet id = \{ 0 \mapsto a, 1 \mapsto 0, 2 \mapsto 1, 3 \mapsto 2, \dots \} = \{ 0 \mapsto a, i+1 \mapsto i \} $
-		\item $s \circ t$ (composición) $t$ $\{ i \mapsto \llangle t \rrangle (s(i)) \}$.
+		%\item $s \circ t$ (composición) $t$ $\{ i \mapsto \llangle t \rrangle (s(i)) \}$.
 	\end{itemize}
 	
 	\pause
 	\begin{align*}
 		\llangle s \rrangle n &= s(n) \\
 		\llangle s \rrangle (a\; b) &= \llangle s \rrangle a\; \llangle s \rrangle b \\
-		\llangle s \rrangle (\lambda a) &= \lambda \llangle 0 \bullet (s \; \circ \uparrow) \rrangle a
+		\llangle s \rrangle (\lambda a) &= \lambda \llangle 0 \bullet (\uparrow \circ\; s) \rrangle a
 	\end{align*}
-\end{frame}
-
-\begin{frame}{Substituciones explícitas}
-	\ExecuteMetaData[code/subs.tex]{subs-type}
-	\pause
-	\ExecuteMetaData[code/subs.tex]{ids}
-	\pause
-	\ExecuteMetaData[code/subs.tex]{cons}
-	\pause
-	\ExecuteMetaData[code/subs.tex]{subs}
-\end{frame}
-
-\begin{frame}{Substituciones explícitas}
-	\ExecuteMetaData[code/subs.tex]{single}
-
-	\pause
-	\ExecuteMetaData[code/example.tex]{subst1}
-	%\ExecuteMetaData[code/example.tex]{subst2}
-\end{frame}
-
-\begin{frame}{Substituciones explícitas}
-	\ExecuteMetaData[code/subs.tex]{ren-type}
-	\ExecuteMetaData[code/subs.tex]{rename}
 	
 	\pause
-	\ExecuteMetaData[code/example.tex]{rename}
+	\[ (\lambda t)\; a \hookrightarrow_\beta \llangle a \bullet id \rrangle t \]
 \end{frame}
 
 \begin{frame}{Tipos}
@@ -97,6 +79,32 @@
 
 \begin{frame}{Ejemplo}
 	\ExecuteMetaData[code/example.tex]{term}
+\end{frame}
+
+\begin{frame}{Substituciones explícitas}
+	\ExecuteMetaData[code/subs.tex]{subs-type}
+	\pause
+	\ExecuteMetaData[code/subs.tex]{ids}
+	\pause
+	\ExecuteMetaData[code/subs.tex]{cons}
+	\pause
+	\ExecuteMetaData[code/subs.tex]{subs}
+\end{frame}
+
+\begin{frame}{Substituciones explícitas}
+	\ExecuteMetaData[code/subs.tex]{single}
+	
+	\pause
+	\ExecuteMetaData[code/example.tex]{subst1}
+	%\ExecuteMetaData[code/example.tex]{subst2}
+\end{frame}
+
+\begin{frame}{Substituciones explícitas}
+	\ExecuteMetaData[code/subs.tex]{ren-type}
+	\ExecuteMetaData[code/subs.tex]{rename}
+	
+	\pause
+	\ExecuteMetaData[code/example.tex]{rename}
 \end{frame}
 
 \begin{frame}[allowframebreaks]{Reducción}
@@ -141,12 +149,10 @@
 \end{frame}
 
 \begin{frame}{Equivalencias entre términos}	
-	\[ \lambda \textcolor{red}{x^A}. \lambda \textcolor{blue}{y^B}. r \rightleftarrows \lambda z^{A \times B}. r[\textcolor{red}{\pi_B(z)/y}, \textcolor{blue}{\pi_A(z)/x}] \]
+	\[ \lambda \textcolor{red}{x^A}. \lambda \textcolor{blue}{y^B}. r \rightleftarrows \lambda z^{A \times B}. r[\textcolor{blue}{\pi_B(z)/y}, \textcolor{red}{\pi_A(z)/x}] \]
 
 	\pause
-	\[ \lambda r[\textcolor{red}{\pi_B(z)/y}, \textcolor{blue}{\pi_A(z)/x}] \]
-	\pause
-	\[ \lambda r[\textcolor{red}{\pi_B(0)}, \textcolor{blue}{\pi_A(0)}] \]
+	\[ \lambda r[\textcolor{blue}{\pi_B(0)}, \textcolor{red}{\pi_A(0)}] \]
 	
 	\pause
 	\ExecuteMetaData[code/iso_term.tex]{subs-curry}
@@ -157,9 +163,7 @@
 
 \begin{frame}{Equivalencias entre términos}	
 	\[ \lambda x^{A \times B}. r \rightleftarrows \lambda y^A. \lambda z^B. r[\langle y, z \rangle/x] \]
-	
-	\pause
-	\[ \lambda \lambda r[\langle y,z \rangle/x] \]
+
 	\pause
 	\[ \lambda \lambda r[\langle 1,0 \rangle] \]
 	
@@ -190,6 +194,30 @@
 \end{frame}
 
 \begin{frame}{Evaluación}
-	\ExecuteMetaData[code/example.tex]{eval1}
+	\AtBeginEnvironment{code}{\fontsize{7}{11}\selectfont}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/example.tex]{eval1}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\fontsize{7}{8}\selectfont
+			\vspace{4.5em}
+			\begin{align*}
+				&\pi_{(\top \times (A \rightarrow A) ) \rightarrow \top} (\lambda \lambda \langle 1, 0 \rangle) \; \langle \star , \lambda 0 \rangle \\
+				&\rightleftarrows_{\textsc{curry}} \\
+				&\pi_{(\top \times (A \rightarrow A) ) \rightarrow \top} (\lambda \langle \pi_\top 0 , \pi_{A \rightarrow A} 0 \rangle) \; \langle \star , \lambda 0 \rangle \\
+				\\
+				&\rightleftarrows_{\textsc{dist}} \\
+				&\pi_{(\top \times (A \rightarrow A) ) \rightarrow \top} (\langle \lambda \pi_\top 0 , \lambda \pi_{A \rightarrow A} 0 \rangle) \; \langle \star , \lambda 0 \rangle \\
+				&\hookrightarrow_\pi \\
+				&(\pi_\top 0) \langle \star , \lambda 0 \rangle \\
+				&\hookrightarrow_\beta \\
+				&\pi_\top \langle \star , \lambda 0 \rangle \\
+				&\hookrightarrow_\pi \\
+				&\star
+			\end{align*}
+		\end{column}
+	\end{columns}
+	\AtBeginEnvironment{code}{\fontsize{10}{12}\selectfont}
 	%\ExecuteMetaData[code/eval.tex]{eval}
 \end{frame}
