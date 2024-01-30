@@ -34,6 +34,8 @@
 	\end{itemize}
 	
 	\pause
+	Usamos $\llangle s \rrangle t$ para denotar la aplicación de la subst $s$ sobre $t$.
+	\pause
 	\begin{align*}
 		\llangle s \rrangle n &= s(n) \\
 		\llangle s \rrangle (a\; b) &= \llangle s \rrangle a\; \llangle s \rrangle b \\
@@ -47,6 +49,8 @@
 \begin{frame}{Tipos}
 	\begin{columns}
 		\begin{column}{0.5\textwidth}
+			\[ A := \top \mid A \rightarrow A \mid A \times A \]
+			
 			\input{code/type.tex}
 		\end{column}
 		\begin{column}{0.5\textwidth}
@@ -67,18 +71,86 @@
 \end{frame}
 
 \begin{frame}[allowframebreaks]{Términos}
-	\ExecuteMetaData[code/term.tex]{base}
-	\pagebreak
-	\ExecuteMetaData[code/term.tex]{abs}
-	\pagebreak
-	\ExecuteMetaData[code/term.tex]{prod}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/term.tex]{base}		
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{prooftree}
+				\infer0[($ax$)]{ \Gamma, x:A \vdash x:A }
+			\end{prooftree}
+			
+			\vspace{1em}
+			\begin{prooftree}
+				\infer0[($\top_i$)]{ \Gamma \vdash \star:\top }
+			\end{prooftree}
+		\end{column}
+	\end{columns}
 	
 	\pagebreak
-	\ExecuteMetaData[code/term.tex]{equiv}
+	
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/term.tex]{abs}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{prooftree}
+				\hypo{\Gamma, x:A \vdash r:B}
+				\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x.r : A \rightarrow B }
+			\end{prooftree}
+			
+			\vspace{1em}
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r : A \rightarrow B}
+				\hypo{\Gamma \vdash s:A}
+				\infer2[($\Rightarrow_e$)]{ \Gamma \vdash rs : B }
+			\end{prooftree}
+		\end{column}
+	\end{columns}
+	
+	\pagebreak
+		
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/term.tex]{prod}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r:A}
+				\hypo{\Gamma \vdash s:B}
+				\infer2[($\times_i$)]{ \Gamma \vdash \langle r, s \rangle : A \times B }
+			\end{prooftree}
+			
+			\vspace{1em}
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r : A \times B}
+				\infer1[($\times_e$)]{ \Gamma \vdash \pi_A(r) : A }
+			\end{prooftree}
+		\end{column}
+	\end{columns}
+	
+	\pagebreak
+	
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/term.tex]{equiv}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{prooftree}
+				\hypo{A \equiv B}
+				\hypo{\Gamma \vdash r:A}
+				\infer2[($\equiv$)]{ \Gamma \vdash r:B }
+			\end{prooftree}
+		\end{column}
+	\end{columns}
 \end{frame}
 
 \begin{frame}{Ejemplo}
-	\ExecuteMetaData[code/example.tex]{term}
+	\ExecuteMetaData[code/example.tex]{term1}
+	\pause
+	\ExecuteMetaData[code/example.tex]{term2}
+	\pause
+	\ExecuteMetaData[code/example.tex]{term3}
 \end{frame}
 
 \begin{frame}{Substituciones explícitas}
@@ -108,17 +180,94 @@
 \end{frame}
 
 \begin{frame}[allowframebreaks]{Reducción}
-	\ExecuteMetaData[code/reduction.tex]{app}
-	\pagebreak
-	\ExecuteMetaData[code/reduction.tex]{app2}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/reduction.tex]{app}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\centering
+			\begin{prooftree}
+				\hypo{t \hookrightarrow t'}
+				\infer1{ t\;s \hookrightarrow t'\;s }
+			\end{prooftree}
+			
+			\vspace{1em}
+			\begin{prooftree}
+				\hypo{s \hookrightarrow s'}
+				\infer1{ t\;s \hookrightarrow t\;s' }
+			\end{prooftree}
+			
+			\vspace{1em}
+			\begin{prooftree}
+				\hypo{t \hookrightarrow t'}
+				\infer1{ \lambda t \hookrightarrow \lambda t' }
+			\end{prooftree}
+		\end{column}
+	\end{columns}
 	
 	\pagebreak
-	\ExecuteMetaData[code/reduction.tex]{pair}
-	\pagebreak
-	\ExecuteMetaData[code/reduction.tex]{pair2}
+	
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/reduction.tex]{app2}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\[ (\lambda t)\; s \hookrightarrow t[s] \]
+		\end{column}
+	\end{columns}
 	
 	\pagebreak
-	\ExecuteMetaData[code/reduction.tex]{iso}
+	
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/reduction.tex]{pair}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\centering
+			\begin{prooftree}
+				\hypo{r \hookrightarrow r'}
+				\infer1{ \langle r,s \rangle \hookrightarrow \langle r',s \rangle }
+			\end{prooftree}
+			
+			\vspace{1em}
+			\begin{prooftree}
+				\hypo{s \hookrightarrow s'}
+				\infer1{ \langle r,s \rangle \hookrightarrow \langle r,s' \rangle }
+			\end{prooftree}
+			
+			\vspace{1em}
+			\begin{prooftree}
+				\hypo{t \hookrightarrow t'}
+				\infer1{ \pi_C t \hookrightarrow \pi_C t' }
+			\end{prooftree}
+		\end{column}
+	\end{columns}
+	
+	\pagebreak
+	
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/reduction.tex]{pair2}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\[ \text{Si } r: A \quad \pi_A \langle r,s \rangle \hookrightarrow r \]
+		\end{column}
+	\end{columns}
+	
+	\pagebreak
+
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/reduction.tex]{iso}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\centering
+			\begin{prooftree}
+				\hypo{t \hookrightarrow t'}
+				\infer1{ [iso]\!\!\equiv t \hookrightarrow [iso]\!\!\equiv t' }
+			\end{prooftree}
+		\end{column}
+	\end{columns}
 \end{frame}
 
 \begin{frame}{Ejemplo}
@@ -134,10 +283,12 @@
 \end{frame}
 
 \begin{frame}{Equivalencias entre términos}
+	\[ \langle r,s \rangle \rightleftarrows \langle s,r \rangle \]
 	\ExecuteMetaData[code/iso_term.tex]{comm}
 \end{frame}
 
 \begin{frame}{Equivalencias entre términos}
+	\[ \langle r,\langle s,t \rangle \rangle \rightleftarrows \langle \langle r,s \rangle,t \rangle \]
 	\ExecuteMetaData[code/iso_term.tex]{asso}
 \end{frame}
 
@@ -145,7 +296,12 @@
 	\[ \langle r,s \rangle \rightleftarrows_{\textsc{split}} \pause \textcolor{blue}{\langle} r, \textcolor{red}{\langle} \pi_B(s),\pi_C(s) \textcolor{red}{\rangle} \textcolor{blue}{\rangle} \pause \rightleftarrows_{\textsc{asso}} \textcolor{blue}{\langle} \textcolor{red}{\langle} r, \pi_B(s) \textcolor{red}{\rangle}, \pi_C(s) \textcolor{blue}{\rangle} \]
 	\pause
 	\ExecuteMetaData[code/iso_term.tex]{asso-split}
-	%\ExecuteMetaData[code/iso_term.tex]{dist}
+\end{frame}
+
+\begin{frame}{Equivalencias entre términos}	
+	\[ \lambda \langle r, s \rangle \rightleftarrows \langle \lambda r, \lambda s \rangle \]
+	\ExecuteMetaData[code/iso_term.tex]{dist}
+	\ExecuteMetaData[code/iso_term.tex]{sym-dist}
 \end{frame}
 
 \begin{frame}{Equivalencias entre términos}	
@@ -203,16 +359,16 @@
 			\fontsize{7}{8}\selectfont
 			\vspace{4.5em}
 			\begin{align*}
-				&\pi_{(\top \times (A \rightarrow A) ) \rightarrow \top} (\lambda \lambda \langle 1, 0 \rangle) \; \langle \star , \lambda 0 \rangle \\
+				&\pi_{(\top \times (A \rightarrow A) ) \rightarrow \top} (\lambda x. \lambda y. \langle x, y \rangle) \; \langle \star , \lambda z.z \rangle \\
 				&\rightleftarrows_{\textsc{curry}} \\
-				&\pi_{(\top \times (A \rightarrow A) ) \rightarrow \top} (\lambda \langle \pi_\top 0 , \pi_{A \rightarrow A} 0 \rangle) \; \langle \star , \lambda 0 \rangle \\
+				&\pi_{(\top \times (A \rightarrow A) ) \rightarrow \top} (\lambda x. \langle \pi_\top x , \pi_{A \rightarrow A} x \rangle) \; \langle \star , \lambda z.z \rangle \\
 				\\
 				&\rightleftarrows_{\textsc{dist}} \\
-				&\pi_{(\top \times (A \rightarrow A) ) \rightarrow \top} (\langle \lambda \pi_\top 0 , \lambda \pi_{A \rightarrow A} 0 \rangle) \; \langle \star , \lambda 0 \rangle \\
+				&\pi_{(\top \times (A \rightarrow A) ) \rightarrow \top} (\langle \lambda x. \pi_\top x , \lambda x. \pi_{A \rightarrow A} x \rangle) \; \langle \star , \lambda x.x \rangle \\
 				&\hookrightarrow_\pi \\
-				&(\pi_\top 0) \langle \star , \lambda 0 \rangle \\
+				&(\lambda x. \pi_\top x)\; \langle \star , \lambda z.z \rangle \\
 				&\hookrightarrow_\beta \\
-				&\pi_\top \langle \star , \lambda 0 \rangle \\
+				&\pi_\top \langle \star , \lambda z.z \rangle \\
 				&\hookrightarrow_\pi \\
 				&\star
 			\end{align*}
