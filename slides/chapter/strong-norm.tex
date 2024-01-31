@@ -1,11 +1,14 @@
 
-\begin{frame}{Definición}
-	\begin{center}
+\begin{frame}{Normalización Fuerte}
+	\begin{block}{Definición (SN)}
+		Un término $s$ es fuertemente normalizante si todos sus reductos también lo son:
+
+		\centering
 		\begin{prooftree}
 			\hypo{ \forall t. s \hookrightarrow t \implies t \in SN }
 			\infer1{ s \in SN }
 		\end{prooftree}
-	\end{center}
+	\end{block}
 	
 	\pause
 	
@@ -23,6 +26,7 @@
 \end{frame}
 
 \begin{frame}{Approach 1}
+	Realizamos inducción directa sobre los términos:
 	\begin{AgdaSuppressSpace}
 		\ExecuteMetaData[code/SN1.tex]{strong-type}
 		
@@ -30,40 +34,64 @@
 		
 		\ExecuteMetaData[code/SN1.tex]{strong-proof}
 	\end{AgdaSuppressSpace}
+	
+	Por H.I. sabemos que $SN$ vale para los subterminos...
+	\pause
+	
+	Definimos algunos lemas para construir $SN$ para todo el término.
 \end{frame}
 
 \begin{frame}{Approach 1}
+	Definimos una función auxiliar para realizar \textit{pattern matching} sobre el paso de reducción:
+	
 	\ExecuteMetaData[code/SN1.tex]{lemma-abs}
 \end{frame}
 
 \begin{frame}{Approach 1}
 	\ExecuteMetaData[code/SN1.tex]{lemma-app}
+	\pause
+	No podemos concluir nada sobre $t[b]$, de hecho la substitución podría crear nuevos redexes dentro de $t$.
 \end{frame}
 
 \begin{frame}{Approach 1}
+	El lema de introducción del par es simple...
 	\ExecuteMetaData[code/SN1.tex]{lemma-prod}
 \end{frame}
 
 \begin{frame}{Approach 1}
+	Pero la eliminación también da problemas:
 	\ExecuteMetaData[code/SN1.tex]{lemma-proj}
 \end{frame}
 
 \begin{frame}{Approach 2}
+	Definimos un $SN$ más general que añade un predicado sobre el término:
 	\ExecuteMetaData[code/SN2.tex]{sn-star}
 	\pause
+	Es fácil ver que $SN^*$ implica $SN$:
 	\ExecuteMetaData[code/SN2.tex]{sn-star-sn}
 	\pause
+	Luego definimos la \textbf{interpretación del término}:
 	\ExecuteMetaData[code/SN2.tex]{inter}
+	
+	% La definición de la interpretacíon en un ttérmino particular refleja la estructura lógica de ese término de forma apropiada.
 \end{frame}
 
 \begin{frame}{Approach 2}
+	La prueba queda divida en dos pasos.
+	\pause
+	Primero se prueba el teorema fundamental:
 	\ExecuteMetaData[code/SN2.tex]{adequacy-type}
+	
+	\pause
+	Luego es fácil probar $SN$:
 	\ExecuteMetaData[code/SN2.tex]{strong-proof}
 \end{frame}
 
 \begin{frame}{Approach 2}
 	\ExecuteMetaData[code/SN2.tex]{lemma-app}
+	La interpretación de la abstracción es precisamente lo que permite probar el caso de la aplicación.
 	\pause
+	Del mismo modo, la interpretación del par resuelve el caso de la proyección.
 	\ExecuteMetaData[code/SN2.tex]{lemma-proj}
 \end{frame}
 
@@ -76,6 +104,8 @@
 		\only<1>{\draw[red,thick,rounded corners] (7.44361, 6.4) rectangle (10.16, 5.9);}
 		\only<2>{\draw[red,thick,rounded corners] (11.9592, 6.4) rectangle (12.8411, 5.9);}
 	\end{tikzpicture}
+
+	Generalizamos el teorema fundamental, vamos a probar que vale para cualquier $t$ con cualquier substitución aplicada:
 	\ExecuteMetaData[code/SN3.tex]{adequacy-type}
 	\pause[3]
 	\ExecuteMetaData[code/SN3.tex]{strong-proof}
@@ -84,16 +114,23 @@
 
 \begin{frame}{Approach 3}
 	\ExecuteMetaData[code/SN3.tex]{subst-split}
+	
 	\ExecuteMetaData[code/SN3.tex]{adequacy-proof}
+	\pause
+	Ahora el problema está en el caso de las variables, una substitución arbitraria podría ``romper'' el término.
 \end{frame}
 
 \begin{frame}{Approach 4}
+	Definimos las \textbf{substituciones adecuadas}:
 	\ExecuteMetaData[code/SN4.tex]{adequacy-subst}
 	\pause
+	En particular $ids$ es adecuada:
 	\ExecuteMetaData[code/SN4.tex]{adequacy-ids}
 	\pause
+	El cons entre un término $SN$ y una subst. adecuada, también es adecuada:
 	\ExecuteMetaData[code/SN4.tex]{adequacy-cons}
 	\pause
+	Nuevamente fortalecemos el teorema:
 	\ExecuteMetaData[code/SN4.tex]{adequacy-type}
 \end{frame}
 
