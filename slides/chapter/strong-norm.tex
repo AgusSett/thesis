@@ -44,13 +44,19 @@
 \begin{frame}{Approach 1}
 	Definimos una función auxiliar para realizar \textit{pattern matching} sobre el paso de reducción:
 	
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<2>{\draw[red,thick,rounded corners] (4.40972, 4.41488) rectangle (5.29167, 4.02683);
+		\draw[red,thick,rounded corners] (4.23333, 3.66981) rectangle (5.715, 3.17592);}
+		\only<3>{
+		\draw[red,thick,rounded corners] (7.54944, 3.66981) rectangle (9.13694, 3.17592);}
+	\end{tikzpicture}
 	\ExecuteMetaData[code/SN1.tex]{lemma-abs}
 \end{frame}
 
 \begin{frame}{Approach 1}
 	\ExecuteMetaData[code/SN1.tex]{lemma-app}
 	\pause
-	No podemos concluir nada sobre $t[b]$, de hecho la substitución podría crear nuevos redexes dentro de $t$.
+	No podemos concluir nada sobre $t[b]$, de hecho, la substitución podría crear nuevos redexes dentro de $t$.
 \end{frame}
 
 \begin{frame}{Approach 1}
@@ -64,6 +70,9 @@
 \end{frame}
 
 \begin{frame}{Approach 2}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\draw[red,thick,rounded corners] (2.2225, 6.63447) rectangle (2.92806, 6.24642);
+	\end{tikzpicture}
 	Definimos un $SN$ más general que añade un predicado sobre el término:
 	\ExecuteMetaData[code/SN2.tex]{sn-star}
 	\pause
@@ -96,13 +105,30 @@
 \end{frame}
 
 \begin{frame}{Approach 2}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<2>{\draw[red,thick,rounded corners] (5.18583, 5.11881) rectangle (7.47889, 4.6602);}
+		\only<3>{\draw[red,thick,rounded corners] (7.79639, 3.14325) rectangle (9.03111, 2.57881);}
+	\end{tikzpicture}
+	Por otro lado, las introducciones ahora deben construir las interpretaciones.
+	
+	\pause
+	El caso del par es simple:
+	\ExecuteMetaData[code/SN2.tex]{lemma-prod}
+	
+	\pause
+	Sin embargo, construir la interpretación de la abstracción resulta particularmente complejo:
+	\ExecuteMetaData[code/SN2.tex]{lemma-abs}
+
+\end{frame}
+
+\begin{frame}{Approach 2}
 	\ExecuteMetaData[code/SN2.tex]{adequacy-proof}
 \end{frame}
 
 \begin{frame}{Approach 3}
 	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
-		\only<1>{\draw[red,thick,rounded corners] (7.44361, 6.4) rectangle (10.16, 5.9);}
-		\only<2>{\draw[red,thick,rounded corners] (11.9592, 6.4) rectangle (12.8411, 5.9);}
+		\only<1>{\draw[red,thick,rounded corners] (7.44361, 5.22336) rectangle (10.16, 4.80003);}
+		\only<2>{\draw[red,thick,rounded corners] (11.9592, 5.22336) rectangle (12.8411, 4.80003);}
 	\end{tikzpicture}
 
 	Generalizamos el teorema fundamental, vamos a probar que vale para cualquier $t$ con cualquier substitución aplicada:
@@ -113,7 +139,10 @@
 
 
 \begin{frame}{Approach 3}
-	\ExecuteMetaData[code/SN3.tex]{subst-split}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<1>{\draw[red,thick,rounded corners] (6.70278, 4.83659) rectangle (7.90222, 4.37797);}
+	\end{tikzpicture}
+	%\ExecuteMetaData[code/SN3.tex]{subst-split}
 	
 	\ExecuteMetaData[code/SN3.tex]{adequacy-proof}
 	\pause
@@ -145,63 +174,85 @@
 \end{frame}
 
 \begin{frame}{Approach 4}
+	La extensión de una subst. adecuada es también es adecuada:
 	\ExecuteMetaData[code/SN4.tex]{adequacy-exts}
 	\pause
+	Los renombres preservan la propiedad $SN^*$:
 	\ExecuteMetaData[code/SN4.tex]{sn-rename}
 	\pause
+	Los renombres preservan la interpretación:
 	\ExecuteMetaData[code/SN4.tex]{inter-rename}
 \end{frame}
 
 \begin{frame}{Approach 5}
 	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
-		\only<1>{\draw[red,thick,rounded corners] (8.64306, 6.92168) rectangle (11.5711, 6.39251);}
+		\only<1>{\draw[red,thick,rounded corners] (8.64306, 6.63447) rectangle (11.5711, 6.14059);}
 	\end{tikzpicture}
+
+	Generalizamos la interpretación de la abstracción:
 	\ExecuteMetaData[code/SN5.tex]{inter}
 	\pause
 	\ExecuteMetaData[code/SN5.tex]{inter-rename}
 	\pause
+	La composición entre un renombre y una subst. adecuada, también es adecuada::
 	\ExecuteMetaData[code/SN5.tex]{adequacy-rename}
 \end{frame}
 
 \begin{frame}{Approach 5}
-	\ExecuteMetaData[code/SN5.tex]{subst-split}
+	%\ExecuteMetaData[code/SN5.tex]{subst-split}
 	\ExecuteMetaData[code/SN5.tex]{adequacy-proof}
 \end{frame}
 
 \begin{frame}{Prueba para Sistema I}
+	Definimos la $SN$ para la unión entre $\hookrightarrow$ y $\rightleftarrows$:
 	\ExecuteMetaData[code/strong_norm.tex]{SN}
 	\pause
 	\ExecuteMetaData[code/strong_norm.tex]{sn-star}
 \end{frame}
 
 \begin{frame}{Prueba para Sistema I}
+	El caso de la congruencia es simple:
 	\ExecuteMetaData[code/strong_norm.tex]{lemma-iso-type}
 \end{frame}
 
 \begin{frame}{Caso \textsc{comm}}
+	Para las equivalencias, la idea es ``desarmar'' las hipótesis del lado izquierdo, y reconstruir $SN$ del lado derecho usando los lemas anteriores:
 	\ExecuteMetaData[code/strong_norm.tex]{iso-comm}
 \end{frame}
 
 \begin{frame}{Caso \textsc{curry}}
 	\[ \lambda x^A. \lambda y^B. t \rightleftarrows \lambda z^{A \times B}. t[\pi_A(z)/x, \pi_B(z)/y] \]
-	\[ \forall u_1, u_2 \in SN \Longrightarrow t[u_1/x, u_2/y] \in SN \]
+	\pause
 	
-	\[ \lambda z. t[\pi_A(z)/x, \pi_B(z)/y]\]
-	\[ \forall u \in SN \Longrightarrow (t[\pi_A(z)/x, \pi_B(z)/y])[u/z] = t[\pi_A(u)/x, \pi_B(u)/y] \in SN \]
+	Por hipótesis sabemos:
+	\[ \forall u_1, u_2 \in SN \Longrightarrow t[u_1/x, u_2/y] \in SN \]
+	\pause
+	
+	Debemos probar:
+	\[ \lambda z. t[\pi_A(z)/x, \pi_B(z)/y] \in SN \]
+	\pause
+	\[ \forall u \in SN \Longrightarrow (t[\pi_A(\textcolor{red}{z})/x, \pi_B(\textcolor{red}{z})/y])[u/\textcolor{red}{z}] \pause = t[\pi_A(u)/x, \pi_B(u)/y] \in SN \]
 	 
+	\pause
+	Basta con instanciar la hipótesis usando:
 	\[ u_1 = \pi_A(u) \quad u_2 = \pi_B(u) \]
 \end{frame}
 
 \begin{frame}{Caso \textsc{curry}}
 	\[ \lambda x^{A \times B}. t \rightleftarrows \lambda y^A. \lambda z^B. t[\langle y, z \rangle/x] \]
+	\pause
+	
+	Por hipótesis sabemos:
 	\[ \forall u \in SN \Longrightarrow t[u/x] \in SN \]
+	\pause
 	
-	\[ \lambda y. \lambda z. t[\langle y, z \rangle/x]\]
+	Debemos probar:
+	\[ \lambda y. \lambda z. t[\langle y, z \rangle/x] \in SN \]
 	
-	\[ \forall u_1,u_2 \in SN \Longrightarrow ((t[\langle y, z \rangle/x])[u_1/y])[u_2/z] = t[\langle u_1, u_2 \rangle/x] \in SN \]
-	
-	\[ (\lambda z. t[\langle y, z \rangle/x])[u_1/y] = \lambda z. t[\langle u_1, z \rangle/x] \]
-	\[ (t[\langle u_1, z \rangle/x])[u_2/z] = t[\langle u_1, u_2 \rangle/x] \]
-	
+	\pause
+	\[ \forall u_1,u_2 \in SN \Longrightarrow ((t[\langle \textcolor{blue}{y}, \textcolor{red}{z} \rangle/x])[u_1/\textcolor{blue}{y}])[u_2/\textcolor{red}{z}] \pause = t[\langle u_1, u_2 \rangle/x] \in SN \]
+
+	\pause
+	Basta con instanciar la hipótesis usando:
 	\[ u = \langle u_1, u_2 \rangle \]
 \end{frame}
