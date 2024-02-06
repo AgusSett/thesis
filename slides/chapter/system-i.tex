@@ -1,3 +1,42 @@
+\begin{frame}{Correspondencia de Curry-Howard}
+	\begin{itemize}[<+->]
+		\item Tipos $\Leftrightarrow$ Proposiciones
+			\begin{itemize}[<+->]
+				\item $A \times B \Leftrightarrow A \wedge B$
+				\item $A \rightarrow B \Leftrightarrow A \Rightarrow B$
+				\item $\top \Leftrightarrow true$
+			\end{itemize}
+		\item Programas $\Leftrightarrow$ Pruebas
+		
+		\centering
+		\begin{prooftree}
+			\hypo{\Gamma \ni x:A}
+			\infer1[($ax$)]{ \Gamma \vdash x:A }
+			\hypo{\Gamma \ni x:A}
+			\infer1[($ax$)]{ \Gamma \vdash y:B }
+			\infer2[($\times_i$)]{ \Gamma \vdash \langle x, y \rangle : A \times B }
+		\end{prooftree}
+		\quad
+		\begin{prooftree}
+			\infer0{\Gamma, A \vdash A}
+			\infer0{\Gamma, B \vdash B}
+			\infer2[$\wedge_i$]{ \Gamma \vdash A \wedge B }
+		\end{prooftree}
+		
+		\item Evaluación $\Leftrightarrow$ Simplificación
+		
+		\begin{center}
+			\begin{prooftree}
+				\infer0{\Gamma, A \vdash A}
+				\infer0{\Gamma, B \vdash B}
+				\infer2[$\wedge_i$]{ \Gamma \vdash A \wedge B }
+				\infer1[$\wedge_e$]{ \Gamma \vdash A }
+			\end{prooftree}
+			$\quad\Rightarrow\quad A$ 
+		\end{center}
+	\end{itemize}
+\end{frame}
+
 \begin{frame}{Motivación}
 	Los tipos indican la \textbf{forma} y la \textbf{clase de problema} de un programa:
 	\pause

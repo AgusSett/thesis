@@ -43,14 +43,23 @@
 
 \begin{frame}{Approach 1}
 	Definimos una función auxiliar para realizar \textit{pattern matching} sobre el paso de reducción:
-	
+
 	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
-		\only<2>{\draw[red,thick,rounded corners] (4.40972, 4.41488) rectangle (5.29167, 4.02683);
-		\draw[red,thick,rounded corners] (4.23333, 3.66981) rectangle (5.715, 3.17592);}
+		\only<2>{\draw[red,thick,rounded corners] (4.40972, 5.01036) rectangle (5.29167, 4.58964);
+		\draw[red,thick,rounded corners] (4.23333, 4.20031) rectangle (5.715, 3.7417);}
 		\only<3>{
-		\draw[red,thick,rounded corners] (7.54944, 3.66981) rectangle (9.13694, 3.17592);}
+		\draw[red,thick,rounded corners] (7.54944, 4.20031) rectangle (9.13694, 3.7417);}
 	\end{tikzpicture}
 	\ExecuteMetaData[code/SN1.tex]{lemma-abs}
+	
+	\pause
+	$ step : t \hookrightarrow t' $
+	
+	\pause
+	$ f\; step : SN\; t' $
+	
+	\pause
+	$ \text{lemma-ƛ } (f\; step) : SN\; (ƛ\; t') $
 \end{frame}
 
 \begin{frame}{Approach 1}
