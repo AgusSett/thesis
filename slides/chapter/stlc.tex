@@ -1,12 +1,12 @@
 \begin{frame}{$\lambda$-calculo}
 	\begin{itemize}[<+->]
-		\item Creado para investigar los fundamentos de la matemática
-		\item Es el lenguaje de programación funcional más simple que existe
+		\item Creado para investigar los fundamentos de la matemática. (principalmente, el concepto de recursión).
+		\item Es el lenguaje de programación funcional más simple que existe.
 		\begin{itemize}[<+->]
 			\item Las funciones son anónimas:
 			\[ suma(x, y)= x + y \quad\quad suma(2, 3) \]
 			\uncover<+->{
-				\[ ((x, y) \mapsto x + y)(2, 3) \]
+				\[ ((x, y) \mapsto x + y)\; (2, 3) \]
 			}
 			
 			\item Las funciones toman un solo argumento:
@@ -21,11 +21,13 @@
 \begin{frame}{Definición}
 	\begin{itemize}[<+->]
 		\item Gramática de términos
-		\[ t := x \mid \lambda x.t \mid t t \mid \langle t, t \rangle \mid \pi_1 t \mid \pi_2 t \mid \star \]
+		\[ t := x \mid \lambda x.t \mid t\; t
+		\pause \mid \langle t, t \rangle \mid \pi_1 t \mid \pi_2 t
+		\pause \mid \star \]
 		
 		\item Computación (reglas de reescritura)
 			\begin{itemize}[<+->]
-				\item Reducción
+				\item Aplicación ($\beta$-reducción)
 				\[ (\lambda x.t) s \hookrightarrow_\beta t[s/x] \]
 				\uncover<+->{
 					$t[s/x]$ reemplaza todas las variables $x$ que aparecen en $t$ por $s$.
@@ -43,7 +45,7 @@
 	\begin{exampleblock}{Función identidad}
 		\[ \lambda x.x \]
 		\pause
-		\[ (\lambda x.x) y \hookrightarrow_\beta y \]
+		\[ (\lambda x.x) y \pause \hookrightarrow_\beta x[y/x] \pause = y \]
 	\end{exampleblock}
 	\pause
 	\begin{exampleblock}{Dos argumentos}
@@ -59,12 +61,12 @@
 		\[ \lambda p. \langle \pi_2 (p), \pi_1 (p) \rangle \]
 		\pause
 		\begin{align*}	
-			&(\lambda p. \langle \pi_2 (p), \pi_1 (p) \rangle)\; \langle a,b \rangle \\
+			&(\lambda \textcolor{red}{p}. \langle \pi_2 (\textcolor{red}{p}), \pi_1 (\textcolor{red}{p}) \rangle)\; \langle a,b \rangle \\
 		\onslide<3->{
-			&\hookrightarrow_\beta \langle \pi_2 \langle a,b \rangle, \pi_1 \langle a,b \rangle \rangle \\
+			&\hookrightarrow_\beta \langle \pi_{\textcolor{red}{2}} \langle a,\textcolor{red}{b} \rangle, \pi_1 \langle a,b \rangle \rangle \\
 		}
 		\onslide<4->{
-			&\hookrightarrow_\pi \langle b, \pi_1 \langle a,b \rangle \rangle \\
+			&\hookrightarrow_\pi \langle b, \pi_{\textcolor{red}{1}} \langle \textcolor{red}{a},b \rangle \rangle \\
 		}
 		\onslide<5->{
 			&\hookrightarrow_\pi \langle b, a \rangle
@@ -75,7 +77,7 @@
 
 \begin{frame}{Problemas}
 	Algunos términos no reducen (están atascados):
-	\[ \langle a, b \rangle c \]
+	\[ \langle a, b \rangle \; c \]
 	\[ \pi_1(\lambda x.x) \]
 	
 	\pause
@@ -89,7 +91,7 @@
 \begin{frame}{Sistema de tipos}
 	\begin{itemize}[<+->]
 		\item Tipos
-		\[ A := \top \mid A \rightarrow A \mid A \times A \]
+		\[ A := A \rightarrow A \mid A \times A \mid \top \]
 		
 		\item Contextos de tipado
 		\[ \Gamma := \emptyset \mid \Gamma, x:A \]
@@ -101,7 +103,8 @@
 		\begin{figure}[H]
 			\centering
 			\begin{prooftree}
-				\infer0[($ax$)]{ \Gamma, x:A \vdash x:A }
+				\hypo{\Gamma \ni x:A}
+				\infer1[($ax$)]{ \Gamma \vdash x:A }
 			\end{prooftree}
 			\pause
 			\quad
@@ -145,10 +148,12 @@
 \begin{frame}{Ejemplos}
 	\centering
 	\begin{prooftree}
-		\infer0[(ax)]{\emptyset, x:A, y:A \vdash x:A}
-		\infer1[($\Rightarrow_i$)]{ \emptyset, y:A \vdash \lambda x.x : A \rightarrow A }
-		\infer0[(ax)]{\emptyset, y:A \vdash y : A}
-		\infer2[($\Rightarrow_e$)]{ \emptyset, y:A \vdash (\lambda x.x) y : A }
+		\hypo{\emptyset,\; x:A,\; y:A \ni x:A}
+		\infer1[(ax)]{\emptyset,\; x:A,\; y:A \vdash x:A}
+		\infer1[($\Rightarrow_i$)]{ \emptyset,\; y:A \vdash \lambda x.x : A \rightarrow A }
+		\hypo{\emptyset,\; y:A \ni y:A}
+		\infer1[(ax)]{\emptyset,\; y:A \vdash y : A}
+		\infer2[($\Rightarrow_e$)]{ \emptyset,\; y:A \vdash (\lambda x.x) y : A }
 	\end{prooftree}
 \end{frame}
 

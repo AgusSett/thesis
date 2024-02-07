@@ -63,6 +63,9 @@
 	
 	Tales que:
 	\[ f \circ g = id_A \quad g \circ f = id_B \]
+	
+	\pause
+	Y lo notamos $A \equiv B$.
 \end{frame}
 
 \begin{frame}{Ejemplo}
@@ -70,8 +73,9 @@
 		\[ (A \times B) \rightarrow C \equiv A \rightarrow (B \rightarrow C) \]
 		
 		\pause
-		\[ curry = \lambda x^{(A \times B) \rightarrow C}. \lambda a^A . \lambda b^B . x\langle a,b \rangle \]
-		\[ uncurry = \lambda x^{A \rightarrow B \rightarrow C}. \lambda y^{A \times B} . x(\pi_1 y)(\pi_2 y) \]
+		\[ curry = \lambda f^{(A \times B) \rightarrow C}. \lambda a^A . \lambda b^B . f\langle a,b \rangle \]
+		\pause
+		\[ uncurry = \lambda f^{A \rightarrow B \rightarrow C}. \lambda y^{A \times B} . f(\pi_1 y)(\pi_2 y) \]
 		
 		\pause
 		\[ curry \circ uncurry = id_{(A \times B) \rightarrow C} \quad
@@ -128,11 +132,11 @@
 	\begin{align*}
 		& \langle \lambda x.r, \lambda x.s \rangle \; t \\
 	\onslide<3->{
-		\rightleftarrows& \\
+		\rightleftarrows&_{\textsc{dist}_\lambda} \\
 		& (\lambda x. \langle r, s \rangle)\; t \\
 	}
 	\onslide<4->{
-		\hookrightarrow& \\
+		\hookrightarrow&_\beta \\
 		& \langle r[t/x], s[t/x] \rangle
 	}
 	\end{align*}
@@ -190,6 +194,7 @@
 	\end{align*}
 \end{frame}
 
+\iffalse
 \begin{frame}{Ejemplo: aplicación de argumentos en cualquier orden}
 	\[ \lambda x^A. \lambda y^B. r : A \rightarrow B \rightarrow C \]
 	\pause
@@ -228,3 +233,4 @@
 	}
 	\end{align*}
 \end{frame}
+\fi

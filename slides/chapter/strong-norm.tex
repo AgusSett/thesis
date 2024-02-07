@@ -91,7 +91,7 @@
 	Luego definimos la \textbf{interpretación del término}:
 	\ExecuteMetaData[code/SN2.tex]{inter}
 	
-	% La definición de la interpretacíon en un ttérmino particular refleja la estructura lógica de ese término de forma apropiada.
+	% La definición de la interpretacíon en un término particular refleja la estructura lógica de ese término de forma apropiada.
 \end{frame}
 
 \begin{frame}{Approach 2}
@@ -106,6 +106,16 @@
 \end{frame}
 
 \begin{frame}{Approach 2}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<1>{
+			\draw[red,thick,rounded corners] (3.81, 5.43369) rectangle (4.33917, 5.04988);
+			\draw[red,thick,rounded corners] (7.72583, 5.43369) rectangle (8.96056, 5.04988);
+		}
+		\only<2>{
+			\draw[red,thick,rounded corners] (6.77333, 1.59266) rectangle (7.47889, 1.2017);
+			\draw[red,thick,rounded corners] (10.0894, 1.55447) rectangle (10.795, 1.16642);
+		}
+	\end{tikzpicture}
 	\ExecuteMetaData[code/SN2.tex]{lemma-app}
 	La interpretación de la abstracción es precisamente lo que permite probar el caso de la aplicación.
 	\pause

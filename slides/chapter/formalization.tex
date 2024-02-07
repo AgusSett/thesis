@@ -23,13 +23,13 @@
 
 \begin{frame}{Substituciones explícitas}
 	Usando índices, las substituciones son secuencias de términos:
-	\[ (0\; 1\; 3)\{0\mapsto a, 1\mapsto b, 2\mapsto 0, 3\mapsto 1, \dots \} \rightarrow a\; b\; 1 \]
+	\[ \{0\mapsto a, 1\mapsto b, 2\mapsto 0, 3\mapsto 1, \dots \} = \{a, b, 0, 1, \dots\} \]
 	
 	\pause
 	\begin{itemize}[<+->]
 		\item $id$ (substitución identidad) $\{i \mapsto i\} = \{0, 1, 2, \dots \}$.
 		\item $\uparrow$ (shift) $\{i \mapsto i+1\} = \{1, 2, 3, \dots \}$.
-		\item $a \bullet s$ (cons) $\{0 \mapsto a, i+1 \mapsto s(i)\}$. \\ Por ejemplo $a \bullet id = \{ 0 \mapsto a, i+1 \mapsto i \} = \{ a, 0, 1, 2, \dots \}$
+		\item $a \bullet s$ (cons) $\{0 \mapsto a, i+1 \mapsto s(i)\}$. \pause \\ Por ejemplo $a \bullet id = \{ 0 \mapsto a, i+1 \mapsto i \} = \{ a, 0, 1, 2, \dots \}$
 		%\item $s \circ t$ (composición) $t$ $\{ i \mapsto \llangle t \rrangle (s(i)) \}$.
 	\end{itemize}
 \end{frame}
@@ -40,11 +40,15 @@
 	\pause
 	\begin{align*}
 		\llangle s \rrangle n &= s(n) \\
+		\uncover<3->{
 		\llangle s \rrangle (a\; b) &= \llangle s \rrangle a\; \llangle s \rrangle b \\
+		}
+		\uncover<4->{
 		\llangle s \rrangle (\lambda a) &= \lambda \llangle 0 \bullet (\uparrow \circ\; s) \rrangle a
+		}
 	\end{align*}
 	
-	\pause
+	\pause[5]
 	Implementación de la $\beta$-reducción usando esta notación:
 	\[ (\lambda t)\; a \hookrightarrow_\beta t[a] = \llangle a \bullet id \rrangle t \]
 \end{frame}
@@ -170,18 +174,18 @@
 \begin{frame}{Substituciones explícitas}
 	\ExecuteMetaData[code/subs.tex]{single}
 	
-	\pause
-	\ExecuteMetaData[code/example.tex]{subst1}
+	%\pause
+	%\ExecuteMetaData[code/example.tex]{subst1}
 	%\ExecuteMetaData[code/example.tex]{subst2}
-	$ (\lambda x. y\; (y \; x)) [ \lambda z.z ] \cong \lambda x. (\lambda z.z)\; ((\lambda z.z) \; x) $
+	%$ (\lambda x. y\; (y \; x)) [ \lambda z.z ] \cong \lambda x. (\lambda z.z)\; ((\lambda z.z) \; x) $
 \end{frame}
 
 \begin{frame}{Substituciones explícitas}
 	\ExecuteMetaData[code/subs.tex]{ren-type}
 	\ExecuteMetaData[code/subs.tex]{rename}
 	
-	\pause
-	\ExecuteMetaData[code/example.tex]{rename}
+	%\pause
+	%\ExecuteMetaData[code/example.tex]{rename}
 \end{frame}
 
 \begin{frame}{Substituciones explícitas}
@@ -365,6 +369,7 @@
 	$ \lambda x. \lambda y. \langle x, y \rangle \rightleftarrows \lambda x. \langle \lambda y.x, \lambda y.y \rangle $
 \end{frame}
 
+\iffalse
 \begin{frame}{Evaluación}
 	\ExecuteMetaData[code/eval.tex]{relation}
 \end{frame}
@@ -397,3 +402,4 @@
 	\AtBeginEnvironment{code}{\fontsize{10}{12}\selectfont}
 	%\ExecuteMetaData[code/eval.tex]{eval}
 \end{frame}
+\fi
