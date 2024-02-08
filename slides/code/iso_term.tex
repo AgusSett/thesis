@@ -68,13 +68,11 @@
 	\AgdaInductiveConstructor{Z}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{⟩}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaFunction{•}}\AgdaSpace{}%
-	\AgdaSymbol{λ}\AgdaSpace{}%
-	\AgdaBound{x}\AgdaSpace{}%
-	\AgdaSymbol{→}\AgdaSpace{}%
-	\AgdaOperator{\AgdaInductiveConstructor{`}}\AgdaSpace{}%
-	\AgdaSymbol{(}\AgdaOperator{\AgdaInductiveConstructor{S}}\AgdaSpace{}%
-	\AgdaSymbol{(}\AgdaOperator{\AgdaInductiveConstructor{S}}\AgdaSpace{}%
-	\AgdaBound{x}\AgdaSymbol{))}\<%
+	\AgdaFunction{ids}\AgdaSpace{}%
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{S\AgdaUnderscore{}}}\AgdaSpace{}
+	\AgdaOperator{\AgdaFunction{∘}}\AgdaSpace{}%
+	\AgdaOperator{\AgdaInductiveConstructor{S\AgdaUnderscore{}}}\<%
 	\\
 \end{code}
 %</subs-uncurry>
@@ -689,8 +687,9 @@
 	\AgdaBound{r}\AgdaSymbol{)}\AgdaSpace{}%
 	\AgdaOperator{\AgdaDatatype{⇄}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{ƛ}}\AgdaSpace{}%
-	\AgdaFunction{subst}\AgdaSpace{}%
+	\AgdaFunction{⟪}\AgdaSpace{}%
 	\AgdaFunction{σ-curry}\AgdaSpace{}%
+	\AgdaFunction{⟫}\AgdaSpace{}
 	\AgdaBound{r}\<%
 	\\
 	\>[2]\vdots\< \\
@@ -754,8 +753,9 @@
 	\AgdaOperator{\AgdaDatatype{⇄}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{ƛ}}\AgdaSpace{}%
 	\AgdaOperator{\AgdaInductiveConstructor{ƛ}}\AgdaSpace{}%
-	\AgdaFunction{subst}\AgdaSpace{}%
+	\AgdaFunction{⟪}\AgdaSpace{}%
 	\AgdaFunction{σ-uncurry}\AgdaSpace{}%
+	\AgdaFunction{⟫}\AgdaSpace{}%
 	\AgdaBound{r}\<%
 	\\
 	\>[2]\vdots\< \\

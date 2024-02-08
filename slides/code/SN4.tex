@@ -482,23 +482,23 @@
 \AgdaBound{σ}\AgdaSymbol{)}\<%
 \\
 \>[0]\AgdaFunction{⊨exts}\AgdaSpace{}%
-\AgdaBound{σ}\AgdaSpace{}%
+\AgdaBound{⊨σ}\AgdaSpace{}%
 \AgdaInductiveConstructor{Z}%
 \>[15]\AgdaSymbol{=}\AgdaSpace{}%
 \AgdaInductiveConstructor{sn*}\AgdaSpace{}%
 \AgdaInductiveConstructor{tt}\AgdaSpace{}%
 \AgdaSymbol{(λ}\AgdaSpace{}%
-\AgdaSymbol{())}\<%
+\AgdaSymbol{())}\>[16]\AgdaComment{ -- SN* ⟦\_⟧ (` Z)}\<%
 \\
 \>[0]\AgdaFunction{⊨exts}\AgdaSpace{}%
-\AgdaBound{σ}\AgdaSpace{}%
+\AgdaBound{⊨σ}\AgdaSpace{}%
 \AgdaSymbol{(}\AgdaOperator{\AgdaInductiveConstructor{S}}\AgdaSpace{}%
 \AgdaBound{v}\AgdaSymbol{)}%
 \>[15]\AgdaSymbol{=}\AgdaSpace{}%
 \AgdaFunction{SN*-rename}\AgdaSpace{}%
 \AgdaOperator{\AgdaInductiveConstructor{S\AgdaUnderscore{}}}\AgdaSpace{}%
-\AgdaSymbol{(}\AgdaBound{σ}\AgdaSpace{}%
-\AgdaBound{v}\AgdaSymbol{)}\<%
+\AgdaSymbol{(}\AgdaBound{⊨σ}\AgdaSpace{}%
+\AgdaBound{v}\AgdaSymbol{)}\>[16]\AgdaComment{ -- SN* ⟦\_⟧ (rename S\_ (σ v))}\<%
 \end{code}
 %</adequacy-exts>
 

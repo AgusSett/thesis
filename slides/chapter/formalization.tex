@@ -363,10 +363,10 @@
 
 \begin{frame}{Ejemplo}
 	\ExecuteMetaData[code/example.tex]{iso-term-1}
-	$ \langle \star, \langle \lambda x.x, \star \rangle \rangle \rightleftarrows \langle \star, \langle \star, \lambda x.x \rangle \rangle $
+	$ \langle \star, \textcolor{red}{\langle \lambda x.x, \star \rangle} \rangle \rightleftarrows \langle \star, \textcolor{red}{\langle \star, \lambda x.x \rangle} \rangle $
 	\pause
 	\ExecuteMetaData[code/example.tex]{iso-term-2}
-	$ \lambda x. \lambda y. \langle x, y \rangle \rightleftarrows \lambda x. \langle \lambda y.x, \lambda y.y \rangle $
+	$ \lambda x. \textcolor{red}{\lambda y. \langle x, y \rangle} \rightleftarrows \lambda x. \textcolor{red}{\langle \lambda y.x, \lambda y.y \rangle} $
 \end{frame}
 
 \iffalse
