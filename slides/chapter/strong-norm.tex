@@ -63,6 +63,13 @@
 \end{frame}
 
 \begin{frame}{Approach 1}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<1>{
+			\draw[red,thick,rounded corners] (5.04472, 4.93981) rectangle (6.91444, 4.05786);
+			\draw[red,thick,rounded corners] (8.78417, 4.93981) rectangle (10.3011, 4.48119);
+			\draw[red,thick,rounded corners] (9.525, 4.51647) rectangle (11.0067, 4.09314);
+		}
+	\end{tikzpicture}
 	\ExecuteMetaData[code/SN1.tex]{lemma-app}
 	\pause
 	No podemos concluir nada sobre $t[b]$, de hecho, la substitución podría crear nuevos redexes dentro de $t$.
@@ -125,8 +132,8 @@
 
 \begin{frame}{Approach 2}
 	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
-		\only<2>{\draw[red,thick,rounded corners] (5.18583, 5.11881) rectangle (7.47889, 4.6602);}
-		\only<3>{\draw[red,thick,rounded corners] (7.79639, 3.14325) rectangle (9.03111, 2.57881);}
+		\only<2>{\draw[red,thick,rounded corners] (5.18583, 4.93981) rectangle (7.44361, 4.55309);}
+		\only<3>{\draw[red,thick,rounded corners] (7.79639, 3.35364) rectangle (8.99583, 2.82575);}
 	\end{tikzpicture}
 	Por otro lado, las introducciones ahora deben construir las interpretaciones.
 	
@@ -148,6 +155,7 @@
 	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
 		\only<1>{\draw[red,thick,rounded corners] (7.44361, 5.22336) rectangle (10.16, 4.80003);}
 		\only<2>{\draw[red,thick,rounded corners] (11.9592, 5.22336) rectangle (12.8411, 4.80003);}
+		\only<3>{\draw[red,thick,rounded corners] (7.3025, 3.17725) rectangle (7.9375, 2.82447);}
 	\end{tikzpicture}
 
 	Generalizamos el teorema fundamental, vamos a probar que vale para cualquier $t$ con cualquier substitución aplicada:
@@ -159,7 +167,9 @@
 
 \begin{frame}{Approach 3}
 	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
-		\only<1>{\draw[red,thick,rounded corners] (6.70278, 4.83659) rectangle (7.90222, 4.37797);}
+		\only<1>{\draw[red,thick,rounded corners] (6.70278, 4.83659) rectangle (7.90222, 4.37797);
+			\draw[red,thick,rounded corners] (3.77472, 4.34142) rectangle (5.18583, 3.95336);
+		}
 	\end{tikzpicture}
 	%\ExecuteMetaData[code/SN3.tex]{subst-split}
 	
@@ -169,6 +179,14 @@
 \end{frame}
 
 \begin{frame}{Approach 4}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<1>{
+			\draw[red,thick,rounded corners] (5.04472, 7.05781) rectangle (7.26722, 6.56392);
+		}
+		\only<4>{
+			\draw[red,thick,rounded corners] (7.65528, 1.27225) rectangle (8.74889, 0.778363);
+		}
+	\end{tikzpicture}
 	Definimos las \textbf{substituciones adecuadas}:
 	\ExecuteMetaData[code/SN4.tex]{adequacy-subst}
 	\pause
@@ -218,18 +236,41 @@
 \end{frame}
 
 \begin{frame}{Approach 5}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<2>{\draw[red,thick,rounded corners] (7.83167, 4.6602) rectangle (10.3011, 4.16631);}
+	\end{tikzpicture}
 	%\ExecuteMetaData[code/SN5.tex]{subst-split}
 	\ExecuteMetaData[code/SN5.tex]{adequacy-proof}
 \end{frame}
 
 \begin{frame}{Prueba para Sistema I}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<1>{
+			\draw[red,thick,rounded corners] (2.92806, 6.66975) rectangle (3.4925, 6.35225);
+			\draw[red,thick,rounded corners] (4.72722, 6.66975) rectangle (5.25639, 6.35225);
+		}
+		\only<2>{
+			\draw[red,thick,rounded corners] (4.05694, 5.47031) rectangle (4.58611, 5.11753);
+		}
+	\end{tikzpicture}
 	Definimos la $SN$ para la unión entre $\hookrightarrow$ y $\rightleftarrows$:
 	\ExecuteMetaData[code/strong_norm.tex]{SN}
+	\pause
+	La suma $\biguplus$ funciona igual al \textbf{Either} de Haskell:
+	\[ \text{data } \textbf{Either } a\; b  = \textbf{Left } a \mid \textbf{Right } b \]
+	Donde \textbf{Left} y \textbf{Right} se llaman $inj_1$ y $inj_2$ resp.
+	
 	\pause
 	\ExecuteMetaData[code/strong_norm.tex]{sn-star}
 \end{frame}
 
 \begin{frame}{Prueba para Sistema I}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<2>{
+			\draw[red,thick,rounded corners] (4.33917, 2.64936) rectangle (7.47889, 1.76742);
+			\draw[red,thick,rounded corners] (9.34861, 2.64936) rectangle (12.1003, 1.8027);
+		}
+	\end{tikzpicture}
 	Se agrega el caso en adequacy:
 	\ExecuteMetaData[code/strong_norm.tex]{adecuacy-iso}
 	\pause

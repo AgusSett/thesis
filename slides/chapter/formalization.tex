@@ -167,8 +167,6 @@
 	\ExecuteMetaData[code/subs.tex]{ids}
 	\pause
 	\ExecuteMetaData[code/subs.tex]{cons}
-	\pause
-	\ExecuteMetaData[code/subs.tex]{subs}
 \end{frame}
 
 \begin{frame}{Substituciones explícitas}
@@ -323,6 +321,10 @@
 \end{frame}
 
 \begin{frame}{Equivalencias entre términos}	
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<2>{\draw[red,thick,rounded corners] (1.76389, 4.94405) rectangle (3.73944, 4.59127);}
+		\only<2>{\draw[red,thick,rounded corners] (7.44361, 5.0146) rectangle (9.38389, 4.55599);}
+	\end{tikzpicture}
 	\ExecuteMetaData[code/iso_term.tex]{cong-pair}
 \end{frame}
 
