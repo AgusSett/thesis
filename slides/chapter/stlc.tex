@@ -21,6 +21,7 @@
 \begin{frame}{Definición}
 	\begin{itemize}[<+->]
 		\item Gramática de términos
+		\pause
 		\[ t := x \mid \lambda x.t \mid t\; t
 		\pause \mid \langle t, t \rangle \mid \pi_1 t \mid \pi_2 t
 		\pause \mid \star \]
@@ -103,8 +104,8 @@
 		\begin{figure}[H]
 			\centering
 			\begin{prooftree}
-				\hypo{\Gamma \ni x:A}
-				\infer1[($ax$)]{ \Gamma \vdash x:A }
+				\hypo{\Gamma \ni x:\textcolor{red}{A}}
+				\infer1[($ax$)]{ \Gamma \vdash x:\textcolor{red}{A} }
 			\end{prooftree}
 			\pause
 			\quad
@@ -115,32 +116,32 @@
 			\vspace{1em}
 			\\
 			\begin{prooftree}
-				\hypo{\Gamma, x:A \vdash r:B}
-				\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x.r : A \rightarrow B }
+				\hypo{\Gamma, x:\textcolor{red}{A} \vdash r:\textcolor{blue}{B} }
+				\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x.r : \textcolor{red}{A} \rightarrow \textcolor{blue}{B} }
 			\end{prooftree}
 			\quad
 			\begin{prooftree}
-				\hypo{\Gamma \vdash r : A \rightarrow B}
-				\hypo{\Gamma \vdash s:A}
-				\infer2[($\Rightarrow_e$)]{ \Gamma \vdash r\; s : B }
+				\hypo{\Gamma \vdash r : \textcolor{red}{A} \rightarrow \textcolor{blue}{B} }
+				\hypo{\Gamma \vdash s:\textcolor{red}{A}}
+				\infer2[($\Rightarrow_e$)]{ \Gamma \vdash r\; s : \textcolor{blue}{B} }
 			\end{prooftree}
 			\pause
 			\vspace{1em}
 			\\
 			\begin{prooftree}
-				\hypo{\Gamma \vdash r:A}
-				\hypo{\Gamma \vdash s:B}
-				\infer2[($\times_i$)]{ \Gamma \vdash \langle r, s \rangle : A \times B }
+				\hypo{\Gamma \vdash r:\textcolor{red}{A}}
+				\hypo{\Gamma \vdash s:\textcolor{blue}{B}}
+				\infer2[($\times_i$)]{ \Gamma \vdash \langle r, s \rangle : \textcolor{red}{A} \times \textcolor{blue}{B} }
 			\end{prooftree}
 			\quad
 			\begin{prooftree}
-				\hypo{\Gamma \vdash r : A \times B}
-				\infer1[($\times_{e1}$)]{ \Gamma \vdash \pi_1(r) : A }
+				\hypo{\Gamma \vdash r : \textcolor{red}{A} \times \textcolor{blue}{B} }
+				\infer1[($\times_{e1}$)]{ \Gamma \vdash \pi_1(r) : \textcolor{red}{A} }
 			\end{prooftree}
 			\quad
 			\begin{prooftree}
-				\hypo{\Gamma \vdash r : A \times B}
-				\infer1[($\times_{e2}$)]{ \Gamma \vdash \pi_2(r) : B }
+				\hypo{\Gamma \vdash r : \textcolor{red}{A} \times \textcolor{blue}{B} }
+				\infer1[($\times_{e2}$)]{ \Gamma \vdash \pi_2(r) : \textcolor{blue}{B} }
 			\end{prooftree}
 		\end{figure}
 \end{frame}

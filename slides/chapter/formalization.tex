@@ -60,10 +60,10 @@
 			
 			\input{code/type.tex}
 		\end{column}
-		\begin{column}{0.5\textwidth}
-			\pause
-			\ExecuteMetaData[code/example.tex]{types}
-		\end{column}
+		%\begin{column}{0.5\textwidth}
+		%	\pause
+		%	\ExecuteMetaData[code/example.tex]{types}
+		%%\end{column}
 	\end{columns}
 \end{frame}
 
@@ -187,6 +187,11 @@
 \end{frame}
 
 \begin{frame}{Substituciones explícitas}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<4>{
+			\draw[red,thick,rounded corners] (4.37444, 2.65099) rectangle (7.23194, 1.8396);
+		}
+	\end{tikzpicture}
 	\ExecuteMetaData[code/subs.tex]{exts}
 	\pause
 	\ExecuteMetaData[code/subs.tex]{shift}
@@ -286,8 +291,9 @@
 \end{frame}
 
 \begin{frame}{Ejemplo}
-	\ExecuteMetaData[code/example.tex]{reduction}
 	$ (\pi_{A \rightarrow A} \langle \lambda x.x, \star \rangle)\; y \hookrightarrow_\pi (\lambda x.x)\; y $
+	\pause
+	\ExecuteMetaData[code/example.tex]{reduction}
 \end{frame}
 
 \begin{frame}{Isomorfismos de tipos}

@@ -56,20 +56,20 @@
 \end{frame}
 
 \begin{frame}{Isomorfismos entre tipos}
-	Dos tipos A y B son \textit{isomorfos} si solo si existen:
-	\[ f: A \rightarrow B \quad g: B \rightarrow A \]
+	Dos tipos \textcolor{red}{A} y \textcolor{blue}{B} son \textit{isomorfos} si solo si existen:
+	\[ f: \textcolor{red}{A} \rightarrow \textcolor{blue}{B} \quad g: \textcolor{blue}{B} \rightarrow \textcolor{red}{A} \]
 	
 	\pause
 	
 	Tales que:
-	\[ f \circ g = id_A \quad g \circ f = id_B \]
+	\[ f \circ g = id_{\textcolor{red}{A}} \quad g \circ f = id_{\textcolor{blue}{B}} \]
 	
 	\pause
-	Y lo notamos $A \equiv B$.
+	Y lo notamos $\textcolor{red}{A} \equiv \textcolor{blue}{B}$.
 \end{frame}
 
 \begin{frame}{Ejemplo}
-	\begin{exampleblock}{Currificación}
+	\begin{exampleblock}{Isomorfismo de Curry}
 		\[ (A \times B) \rightarrow C \equiv A \rightarrow (B \rightarrow C) \]
 		
 		\pause
@@ -86,17 +86,29 @@
 \begin{frame}{Conjunto axiomático}
 	\begin{align*}
 		A \times B &\equiv B \times A \tag{\textsc{comm}} \\
+		\uncover<2->{
 		A \times (B \times C) &\equiv (A \times B) \times C \tag{\textsc{asso}} \\
+		}
+		\uncover<3->{
 		(A \times B) \rightarrow C &\equiv A \rightarrow (B \rightarrow C) \tag{\textsc{curry}} \\
+		}
+		\uncover<4->{
 		A \rightarrow (B \times C) &\equiv (A \rightarrow B) \times (A \rightarrow C) \tag{\textsc{dist}} \\
+		}
+		\uncover<5->{
 		A \times \top &\equiv A \tag{\textsc{id$_\times$}} \\
+		}
+		\uncover<6->{
 		A \rightarrow \top &\equiv \top \tag{\textsc{ABS}} \\
-		\top \rightarrow A &\equiv \tag{\textsc{id$_\Rightarrow$}} A
+		}
+		\uncover<7->{
+		\top \rightarrow A &\equiv \tag{\textsc{id$_\Rightarrow$}} A \\
+		}
 	\end{align*}
 \end{frame}
 
 \begin{frame}{Internalización de isomorfismos}
-	Se añade la regla $\equiv$
+	Se añade la regla $\equiv$ (eqiv)
 	\begin{center}
 		\begin{prooftree}
 			\hypo{A \equiv B}
@@ -121,21 +133,29 @@
 \end{frame}
 
 \begin{frame}{Relación de equivalencia entre términos}
-	\begin{align}
+	\begin{align*}
 		\langle r,s \rangle &\rightleftarrows \langle s,r \rangle \tag{\textsc{comm}} \\
+		\uncover<2->{
 		\langle r, \langle s,t \rangle \rangle &\rightleftarrows \langle \langle r, s \rangle, t \rangle \tag{\textsc{asso}} \\
+		}
+		\uncover<3->{
 		\lambda x^A. \langle r,s \rangle &\rightleftarrows \langle \lambda x^A.r, \lambda x^A.s \rangle \tag{$\textsc{dist}_{\lambda}$} \\
+		}
+		\uncover<4->{
 		\langle r,s \rangle\, t &\rightleftarrows \langle r\, t, s\, t \rangle \tag{$\textsc{dist}_{app}$} \\
-		r\, \langle s, t \rangle &\rightleftarrows r\, s\, t \tag{\textsc{curry}}
-	\end{align}
-	\pause
+		}
+		\uncover<5->{
+		r\, \langle s, t \rangle &\rightleftarrows r\, s\, t \tag{\textsc{curry}} \\
+		}
+	\end{align*}
+	\pause[6]
 	\begin{align*}
 		& \langle \lambda x.r, \lambda x.s \rangle \; t \\
-	\onslide<3->{
+	\onslide<7->{
 		\rightleftarrows&_{\textsc{dist}_\lambda} \\
 		& (\lambda x. \langle r, s \rangle)\; t \\
 	}
-	\onslide<4->{
+	\onslide<8->{
 		\hookrightarrow&_\beta \\
 		& \langle r[t/x], s[t/x] \rangle
 	}
@@ -143,12 +163,15 @@
 \end{frame}
 
 \begin{frame}{Problema}
-	Las reglas de proyección $\pi_1$ y $\pi_2$ acceden al par a través de la posición de los elementos, pero el isomorfismo $\textsc{comm}$ permite cambiar el orden de un par:
+	$\textsc{comm}$ permite cambiar el elemento de una proyección:
 	\pause
 	\begin{align*}
 		\pi_1 \langle r, s \rangle& \hookrightarrow_{\pi_1} r \\
 		\pi_1 \langle r, s \rangle& \rightleftarrows_{\textsc{comm}} \pi_1 \langle s, r \rangle \hookrightarrow_{\pi_1} s
 	\end{align*}
+	\pause
+	Si $r: A$ y $s: B$ esto puede ser un problema.
+	
 	\pause
 	
 	La solución es acceder al elemento usando los tipos:
