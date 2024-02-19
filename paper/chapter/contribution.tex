@@ -24,14 +24,14 @@ De hecho, para un término dado pueden existir más de un tipo posible, por ejem
 Desde este punto de vista, los juicios de tipado aseguran que los términos poseen ciertas propiedades.
 Este estilo es llamado ``tipos a la Curry''.
 
-Por otro lado, es posible definir los tipos en primer lugar y luego los términos.
+Por otro lado, es posible definir los tipos en primer lugar y luego los términos sobre esos tipos.
 Aquí no tiene sentido hablar de términos ``bien tipados'', ya que no pueden existir los términos ``mal tipados''.
 Por lo tanto, todo el significado recae sobre los juicios de tipado, en lugar de los términos.
 En cierta forma, los términos y las reglas de tipado están entrelazados.
 Aquí, las derivaciones de tipos son únicas, puesto que los términos $\lambda x^\tau.x$ y $\lambda x^{\tau \rightarrow \tau}.x$ se consideran distintos.
 A este enfoque se lo denomina ``tipos a la Church''.
 
-Reynolds \cite{reynolds_1998} acuñó las expresiones \textit{tipos intrínsecos} y \textit{tipos extrínsecos} para referirse a cada uno de estos dos enfoques.
+Reynolds \cite{reynolds_1998} acuñó las expresiones \textit{tipos extrínsecos} y \textit{tipos intrínsecos} para referirse a cada uno de estos dos enfoques.
 
 \subsection{Cálculo lambda con pares y tipo Top}
 
@@ -63,7 +63,7 @@ Luego se formalizan las variables intrínsecamente tipadas, que son representada
 	\ExecuteMetaData[code/context.tex]{ctx}
 \end{codigo}
 
-La proposición \bound{$\Gamma$} \const{$\ni$} \bound{A} indica que existe un tipo \bound{A} dentro del entorno \bound{$\Gamma$}, es decir que este es el tipo de las variables que tienen tipo \bound{A} en el entorno \bound{$\Gamma$}.
+La proposición \bound{$\Gamma$} \const{$\ni$} \bound{A} indica que existe una variable de tipo \bound{A} dentro del entorno \bound{$\Gamma$}, es decir que este es el tipo de las variables que tienen tipo \bound{A} en el entorno \bound{$\Gamma$}.
 Los términos construidos con \const{Z} y \const{S} corresponden a los índices de De Bruijn, los cuales constituyen pruebas para dichas proposiciones.
 
 \begin{example}
@@ -108,7 +108,7 @@ La implementación de las substituciones explícitas se divide en dos partes.
 Primero se implementa la operación \func{rename} que dada una función de renombrado $\rho$ y un término, aplica el renombre de variables $\rho$ a dicho término.
 Se debe tener cuidado de no capturar el índice 0 cuando se empuja el renombre debajo de una abstracción.
 Por este motivo, se define la función \func{ext} que toma un renombre y retorna uno nuevo con los entornos extendidos.
-Notar que esta definición sigue la forma propuesta por Abadi: $Z \bullet (\rho \; \circ S\_)$
+Notar que esta definición sigue la forma propuesta por Abadi et al.: $Z \bullet (\rho \; \circ S\_)$
 
 \begin{codigo}
 	Aplicación de renombres sobre términos
@@ -162,7 +162,7 @@ El constructor \const{β-ƛ} corresponde a la beta reducción y los constructore
 
 Es importante destacar que el tipo de \type{$\_\hookrightarrow\_$}, está indexado por dos términos del mismo tipo.
 Por lo tanto, no es necesario demostrar que la reducción preserva tipos, ya que es imposible construir una reducción que arribe a un término de distinto tipo.
-Esta es una de las ventajas más importante de utilizar tipos intrínsecos.
+Esta es una de las ventajas más importantes de utilizar tipos intrínsecos.
 
 \begin{example}
 	En el siguiente ejemplo se construye una reducción del término \func{T$_3$} al término \func{T$_1$}~\const{·~‘~Z} usando los constructores de la relación \type{$\_\hookrightarrow\_$}.
@@ -277,10 +277,10 @@ La mayoría de estas reglas tiene una definición intuitiva, sin embargo, alguna
 	La regla \const{asso-split} combina esto dos pasos en uno solo.
 	Las demás reglas con el sufijo \const{split} tienen un comportamiento análogo.
 	
-	\item El constructor \const{dist-ƛηₗᵣ} se aplica cuando se quiere mover las abstracciones fuera del producto, pero los elementos del par no tienen forma de lambda.
+	\item El constructor \const{dist-ƛηₗᵣ} se aplica cuando se quiere mover las abstracciones fuera del producto, pero los elementos del par no tienen forma de abstracción.
 	Por lo tanto, primero se debe $\eta$-expandir ambos lados del par y luego se extraen las abstracciones
 	$\langle r, s \rangle \rightleftarrows \langle \lambda x^A.r\, x, \lambda x^A.s\, x \rangle \rightleftarrows \lambda x^A. \langle r\, x, s\, x \rangle$.
-	Cabe destacar que a nivel implementación, la $\eta$-expansión del término \bound{t} se escribe \const{ƛ}~\func{rename}~\const{S\_}~\bound{t}~\const{· ` Z}, donde el renombre suma uno a todas las variables libres, por lo que el índice 0 pasa a estar fresco en $t$.
+	Cabe destacar que a nivel de la implementación, la $\eta$-expansión del término \bound{t} se escribe \const{ƛ}~\func{rename}~\const{S\_}~\bound{t}~\const{· ` Z}, donde el renombre suma uno a todas las variables libres, por lo que el índice 0 pasa a estar fresco en $t$.
 	La regla \const{dist-ƛηₗᵣ} combina esto dos pasos en uno solo.
 	Las demás reglas con el sufijo \const{η} tienen un comportamiento análogo.
 	
@@ -300,7 +300,7 @@ Por ejemplo, el constructor \const{comm} elimina la regla \const{[ comm ]$\equiv
 Por lo tanto, las equivalencias solo pueden aplicarse para eliminar o simplificar un constructor ($\equiv$) del término.
 
 \begin{example}
-	El siguiente ejemplo muestra como la regla \const{cong$\times_2$} se aplica para simplificar el isomorfismo de tipo, esto hace que luego sea posible aplica la regla \const{comm}.
+	El siguiente ejemplo muestra como la regla \const{cong$\times_2$} se aplica para simplificar el isomorfismo de tipo, esto hace que luego sea posible aplicar la regla \const{comm}.
 	Las congruencias funcionan de forma análoga a las de la relación \type{$\_\hookrightarrow\_$}
 	\ExecuteMetaData[code/example.tex]{iso-term-1}
 \end{example}
@@ -506,7 +506,7 @@ Notar que es trivial construir un término de tipo \type{SN} para un valor, ya q
 Estos representan los casos base del tipo \type{SN}.
 
 \begin{example}
-	Cuando se construye un término de tipo \type{SN} \bound{t}, para cierto término \bound{t}, se deben tener en cuenta todos los pasos de reducción posible a partir de \bound{t}.
+	Cuando se construye un término de tipo \type{SN} \bound{t}, para cierto término \bound{t}, se deben tener en cuenta todos los pasos de reducción posibles a partir de \bound{t}.
 	Para términos normales, todos los pasos concluyen en un patrón absurdo.
 	En los casos que si es posible aplicar una eliminación, se debe construir recursivamente \type{SN} para el término resultante.
 	
@@ -616,7 +616,7 @@ En este caso, para el paso de reducción \bound{step} existen dos posibilidades,
 	\item El caso de la congruencia a derecha es análogo al primero, la diferencia es que se usa la hipótesis \bound{SNb} para obtener \snstar \bound{b'}.
 \end{itemize}
 
-Luego, se utiliza la hipótesis inductiva en \func{adecuacy} sobre $a$ y $b$ para instanciar el lema
+Luego, se utiliza la hipótesis inductiva en \func{adequacy} sobre $a$ y $b$ para instanciar el lema
 
 \ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-pair}
 
@@ -662,7 +662,7 @@ El paso de reducción tiene tres posibles constructores, congruencia a izquierda
 \ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-app}
 
 Notar cómo las interpretaciones de los términos permiten resolver los casos de eliminación (proyección y aplicación), pero, por otro lado, los casos de introducción (producto y abstracción) se vuelven más complejos, ya que son estos donde se construyen dichas interpretaciones.
-Esta construcción es simple para los productos, puesto que se puede deducir de forma directa aplicando la hipótesis inductiva en \func{adecuacy}.	
+Esta construcción es simple para los productos, puesto que se puede deducir de forma directa aplicando la hipótesis inductiva en \func{adequacy}.	
 Sin embargo, como se verá más adelante, obtener la interpretación correspondiente al caso de las abstracciones, resulta particularmente complejo.
 
 \subsubsection{Caso abstracción}
@@ -681,7 +681,7 @@ Luego se utiliza la función \func{↪[]} para definir el lema correspondiente a
 
 \ExecuteMetaData[code/strong_norm_base.tex]{lemma-abs}
 
-La instanciación de las hipótesis necesarias para utilizar el lema de la abstracción en la prueba de \func{adecuacy} requiere especial atención.
+La instanciación de las hipótesis necesarias para utilizar el lema de la abstracción en la prueba de \func{adequacy} requiere especial atención.
 
 Por un lado, para obtener la hipótesis \snstar \bound{t}, primero se debe probar que la extensión de una substitución adecuada sigue siendo adecuada.
 
@@ -695,7 +695,7 @@ Lógicamente, la prueba de dicho lema requiere probar que dados un renombre de v
 
 \ExecuteMetaData[code/strong_norm_base.tex]{adec-rename}
 
-Aquí se deben realizar una observación importante.
+Aquí se debe realizar una observación importante.
 El caso de la abstracción en la prueba de \func{⟦⟧-rename} es el único lugar donde es necesario usar el argumento $\rho$ de la interpretación.
 De hecho, este es precisamente el motivo por el cual es necesario generalizar la interpretación de las lambdas añadiendo un renombre en su definición.
 
@@ -720,7 +720,7 @@ La otra propiedad, dice que el cons entre un término \snstar y una substitució
 
 \ExecuteMetaData[code/strong_norm_base.tex]{adecuacy-cons}
 
-Un último detalle a destacar es que \func{adecuacy} toma como argumento solo una substitución, por lo que se debe combinar \bound{$\sigma$} y
+Un último detalle a destacar es que \func{adequacy} toma como argumento solo una substitución, por lo que se debe combinar \bound{$\sigma$} y
 \cons{\bound{u}}{\parens{\comp{\ids}{\bound{$\rho$}}}}
 en una sola substitución y demostrar que aplicar dicha combinación es equivalente a aplicarlas por separado.
 
@@ -741,7 +741,7 @@ Esta función está definida en el módulo \AgdaModule{Relation.Binary.Propositi
 
 \subsubsection{Cierre de la prueba}
 
-Finalmente, se prueba la propiedad de normalización fuerte instanciando \func{adecuacy} con la substitución identidad.
+Finalmente, se prueba la propiedad de normalización fuerte instanciando \func{adequacy} con la substitución identidad.
 
 Como detalle adicional, se elimina la substitución identidad aplicada al término utilizando el lema
 \func{sub-id}

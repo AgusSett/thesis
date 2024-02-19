@@ -157,9 +157,9 @@ A continuación se presentan los cuatro isomorfismos que pertenecen a dicho conj
 La regla $(\equiv)$ permite cambiar el tipo de un término por otro isomorfo a este. Por ejemplo:
 
 \begin{prooftree*}
-	\hypo{ \Gamma\vdash r: A }
+	\hypo{ \Gamma , x:C \vdash r: A }
 	\infer1[($\Rightarrow_i$)]{ \Gamma\vdash \lambda x.r: C \rightarrow A }
-	\hypo{ \Gamma\vdash s: B }
+	\hypo{ \Gamma , x:C \vdash s: B }
 	\infer1[($\Rightarrow_i$)]{ \Gamma\vdash \lambda x.s: C \rightarrow B }
 	\infer2[($\times_i$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle : (C \rightarrow A) \times (C \rightarrow B) }
 	\infer1[($\equiv$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle : C \rightarrow (A \times B) }
@@ -188,34 +188,38 @@ A continuación, se presentan las reglas propuestas por Sistema I, las cuales fu
 	\begin{align}
 		\langle r,s \rangle &\rightleftarrows \langle s,r \rangle \tag{\textsc{comm}} \\
 		\langle r, \langle s,t \rangle \rangle &\rightleftarrows \langle \langle r, s \rangle, t \rangle \tag{\textsc{asso}} \\
-		\lambda x^A \langle r,s \rangle &\rightleftarrows \langle \lambda x^A.r, \lambda x^A.s \rangle \tag{$\textsc{dist}_{\lambda}$} \\
+		\lambda x^A. \langle r,s \rangle &\rightleftarrows \langle \lambda x^A.r, \lambda x^A.s \rangle \tag{$\textsc{dist}_{\lambda}$} \\
 		\langle r,s \rangle t &\rightleftarrows \langle r t, s t \rangle \tag{$\textsc{dist}_{app}$} \\
 		r \langle s, t \rangle &\rightleftarrows r s t \tag{\textsc{curry}}
 	\end{align}
 	
 	\begin{prooftree}
-		\hypo{\lambda x.t \rightleftarrows \lambda x.r}
-		\infer1{ t \rightleftarrows r }
+		\hypo{ t \rightleftarrows r }
+		\infer1{s \rightleftarrows t}
 	\end{prooftree} \quad
 	\begin{prooftree}
-		\hypo{ts \rightleftarrows rs}
-		\infer1{ t \rightleftarrows r }
+		\hypo{ t \rightleftarrows r }
+		\infer1{\lambda x.t \rightleftarrows \lambda x.r}
 	\end{prooftree} \quad
 	\begin{prooftree}
-		\hypo{st \rightleftarrows sr}
-		\infer1{ t \rightleftarrows r }
+		\hypo{ t \rightleftarrows r }
+		\infer1{ts \rightleftarrows rs}
+	\end{prooftree} \quad
+	\begin{prooftree}
+		\hypo{ t \rightleftarrows r }
+		\infer1{st \rightleftarrows sr}
 	\end{prooftree} \\ \vspace{1em}
 	\begin{prooftree}
-		\hypo{\langle t, s \rangle \rightleftarrows \langle r, s \rangle}
-		\infer1{ t \rightleftarrows r }
+		\hypo{ t \rightleftarrows r }
+		\infer1{\langle t, s \rangle \rightleftarrows \langle r, s \rangle}
 	\end{prooftree} \quad
 	\begin{prooftree}
-		\hypo{\langle s, t \rangle \rightleftarrows \langle s, r \rangle}
-		\infer1{ t \rightleftarrows r }
+		\hypo{ t \rightleftarrows r }
+		\infer1{\langle s, t \rangle \rightleftarrows \langle s, r \rangle}
 	\end{prooftree} \quad
 	\begin{prooftree}
-		\hypo{\pi_A t \rightleftarrows \pi_A r}
-		\infer1{ t \rightleftarrows r }
+		\hypo{ t \rightleftarrows r }
+		\infer1{\pi_A t \rightleftarrows \pi_A r}
 	\end{prooftree}
 	
 	\caption{Reglas de equivalencia entre términos}
@@ -264,7 +268,7 @@ se codifica como:
 Y la proyección $\pi_1 \langle r, s \rangle$ se codifica como:
 \[ (\pi_{\mathbb{X} \rightarrow A} \langle \lambda x^\mathbb{X}.r, \lambda x^\mathbb{Y}.s \rangle)\; y^\mathbb{X} \]
 
-Donde $\mathbb{X}$ y $\mathbb{Y}$ son dos tipos distintos, y $y^\mathbb{X}$ es cualquier elemento de tipo $\mathbb{X}$.
+Donde $\mathbb{X}$ y $\mathbb{Y}$ son dos tipos distintos, e $y^\mathbb{X}$ es cualquier elemento de tipo $\mathbb{X}$.
 De forma análoga se puede codificar $\pi_2$.
 
 
@@ -280,7 +284,7 @@ Por último se define la relación de reducción módulo isomorfismos:
 
 \[ \rightsquigarrow \; := \; \rightleftarrows^* \circ \hookrightarrow \circ \rightleftarrows^* \]
 
-Donde $r \rightsquigarrow s \iff r \rightleftarrows^* r' \hookrightarrow s' \rightleftarrows^* s$ para cierto $r'$ y $s'$. Es decir, que primero los términos son transformados a una forma equivalente donde sea posible aplicar las eliminaciones, y luego se aplican las $\beta$-reducciones y proyecciones.
+Por lo tanto, $r \rightsquigarrow s \iff r \rightleftarrows^* r' \hookrightarrow s' \rightleftarrows^* s$ para cierto $r'$ y $s'$. Es decir, que primero los términos son transformados a una forma equivalente donde sea posible aplicar las eliminaciones, y luego se aplican las $\beta$-reducciones y proyecciones.
 
 \subsubsection{Ejemplos}
 El término $\lambda x^A. \langle r,s \rangle$ tiene tipo $A \rightarrow (B \times C)$ aplicando el isomorfismo \textsc{dist} se obtiene el tipo $(A \rightarrow B) \times (A \rightarrow C)$.
@@ -310,7 +314,7 @@ El término $\lambda x^A. \lambda y^B. r$ tiene tipo $A \rightarrow B \rightarro
 	&B \rightarrow A \rightarrow C
 \end{align*}
 Es decir que, dada una función con múltiples argumentos es posible aplicarlos en cualquier orden.
-Dados $a: A$ y $b : B$ se puede aplicar la función $(\lambda x^A. \lambda y^B. r)\, b\, a$.
+Dados $a: A$ y $b : B$ la aplicación $(\lambda x^A. \lambda y^B. r)\, b\, a$ es válida.
 
 A continuación se detalla la forma de reducir dicho término:
 
@@ -460,7 +464,7 @@ La idea es convertir todos los argumentos en forma de pares utilizando \textsc{c
 	S \rightarrow R \rightarrow T& 
 \end{align*}
 
-Un detalle interesante de este sistema, es que a nivel implementación, se añade una nueva regla de reescritura llamada $dist_e$ que no surge de ningún isomorfismo, sino que es necesaria para reducir términos que de otra forma quedarían atascados.
+Un detalle interesante de este sistema, es que a nivel de la implementación, se añade una nueva regla de reescritura llamada $dist_e$ que no surge de ningún isomorfismo, sino que es necesaria para reducir términos que de otra forma quedarían atascados.
 Esta regla reescribe términos de la forma
 $\pi_{R \times S}(\langle r,s \rangle) \hookrightarrow \langle \pi_R(r), \pi_S(s) \rangle$
 y permite desatascar proyecciones donde el argumento es una abstracción más algún otro término.
@@ -663,7 +667,7 @@ Vistas como programas, las pruebas son procedimientos que al ejecutarlos permite
 
 Esto tiene algunas consecuencias interesantes, por ejemplo, en la lógica clásica, a las proposiciones se les asigna valores de verdad sin importar si existe evidencia directa de que sea verdadera o falsa.
 Esto es lo que comúnmente se denomina ``principio del tercero excluido'', ya que excluye la posibilidad de un tercer valor distinto de verdadero o falso.
-Sin embargo, puede que no siempre sea posible construir una prueba de dicha proposición para cualquier tipo $A$, por lo tanto, no es posible probar $A \vee \neg A$ en la lógica intuicionista.
+Sin embargo, puede que no siempre sea posible obtener una prueba constructiva de dicha proposición para cualquier tipo $A$, por lo tanto, no es posible probar $A \vee \neg A$ en la lógica intuicionista.
 
 
 Se puede pensar a la teoría de tipos intuicionista como un lenguaje de programación funcional donde el sistema de tipos es tan rico que prácticamente cualquier propiedad concebible de un programa puede expresarse como un tipo.
@@ -673,8 +677,7 @@ Filosófica y prácticamente, la Teoría de Tipos de Martin-Löf es un marco fun
 
 
 \section{Agda}
-Agda es un lenguaje de programación con tipos dependientes, desarrollado por la Universidad de
-Chalmers (Suiza).
+Agda es un lenguaje de programación con tipos dependientes, desarrollado originalmente por la Universidad de Chalmers (Suecia).
 Debido al paradigma de las proposiciones como tipos, Agda también funciona como un asistente de pruebas.
 A diferencia de otros asistentes, como Coq, carece de un sistema de tácticas, por lo que las pruebas son escritas en un estilo de programación funcional, de hecho su sintaxis es similar a la de Haskell.
 
@@ -687,7 +690,7 @@ Por este motivo, no todas las funciones recursivas están permitidas, Agda posee
 Generalmente, los términos en cálculo lambda se presentan utilizando letras para nombrar las variables, por ejemplo:
 \[ \lambda z. (\lambda y. y (\lambda x. x)) (\lambda x. z x) \]
 Esta forma de representación permite ver a simple vista cuáles variables están ligadas y a qué abstracción pertenecen, también suelen utilizarse palabras para dar nombres más descriptivos a las variables.
-Se puede notar que la forma de escribir un término no es única, ya que es posible cambiar los nombres de algunas variables sin alterar su significado, por ejemplo, el término $\lambda c. (\lambda b. b (\lambda d. d)) (\lambda a. c a)$ es equivalente al del ejemplo anterior.
+Se puede notar que la forma de escribir un término no es única, ya que es posible cambiar los nombres de algunas variables sin alterar su significado, por ejemplo, el término $\lambda c. (\lambda b. b (\lambda d. d)) (\lambda a. c a)$ es equivalente al término anterior.
 Cuando esto ocurre se dice que los términos son $\alpha$-equivalentes.
 
 El principal problema de esta representación es que para implementar la $\beta$-reducción, se debe tener cuidado de no capturar una variable libre cuando se substituye un término en el cuerpo de una abstracción, en caso de que eso ocurra, se renombra la variable capturada con un nuevo nombre fresco.
@@ -703,7 +706,7 @@ Por ejemplo, la forma de escribir el término del primer ejemplo con índices es
 Los índices indican cuantas abstracciones se deben ``saltar'' para llegar a la que está ligando la variable.
 Los nombres de las ligaduras ya no son necesarios, por lo que la escritura se simplifica.
 Además, los términos tienen una única representación, es decir, no es necesario tener en cuenta las $\alpha$-equivalencias.
-A nivel implementación, esta representación facilita la manipulación de términos, en especial, cuando se implementa la $\beta$-reducción.
+A nivel de la implementación, esta representación facilita la manipulación de términos, en especial, cuando se implementa la $\beta$-reducción.
 
 \section{Substituciones explícitas}
 Utilizando la representación de De Bruijn, las sustituciones son simplemente mapeos de números naturales a términos, es decir que pueden interpretarse como una secuencia infinita de términos.

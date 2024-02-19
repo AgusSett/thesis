@@ -6,8 +6,8 @@ Por ejemplo, el tipo $(A \times B) \rightarrow C$ representa los programas que p
 Mientas que, por otro lado, el tipo $A \rightarrow B \rightarrow C$ representa los programas que primero aceptan un valor de tipo $A$, luego uno de tipo $B$ y finalmente devuelven un valor de tipo $C$.
 A pesar de que estos dos tipos son distintos en su forma, representan la misma idea, es decir, poseen el mismo significado desde el punto de vista de la utilidad e información que aportan.
 
-Esto se puede demostrar usando las funciones \textit{curry} y \textit{uncurry}, que permiten transformar una función en su forma currificada y viceversa, sin perdida de información en el proceso.
-Cuando ambos tipos contienen la misma cantidad de información, se dice que son isomorfos, en este caso, los tipos $(A \times B) \rightarrow C$ y $A \rightarrow B \rightarrow C$ del primer ejemplo, están relacionados por el isomorfismo de Curry.
+Esto se puede demostrar usando las funciones \textit{curry} y \textit{uncurry}, que permiten transformar una función en su forma currificada y viceversa, sin pérdida de información en el proceso.
+Cuando ambos tipos contienen la misma cantidad de información, se dice que son isomorfos, en este caso, los tipos $(A \times B) \rightarrow C$ y $A \rightarrow B \rightarrow C$ del primer ejemplo, están relacionados por el proceso de currificación.
 
 Un caso más simple que ilustra este concepto es el de los pares $A \times B$ y $B \times A$, resulta fácil notar que es posible transformar uno en el otro y viceversa sin perder información, ya que desde el punto de vista de la utilidad, cada uno aporta un elemento de tipo $A$ y un elemento de tipo $B$, el orden no es relevante.
 
@@ -27,7 +27,7 @@ Estos sistemas utilizan el cálculo lambda simplemente tipado con pares como mar
 El más relevante para este trabajo es Sistema I \cite{system-i}, que se corresponde con el fragmento de la lógica que incorpora las conectivas $\Rightarrow$ y $\wedge$.
 Este sistema ignora las formas de los tipos y se centra solo en su utilidad final, permitiendo así realizar aplicaciones de funciones y proyecciones que no son posibles en el cálculo tradicional.
 Además, se presentan propiedades interesantes como el no determinismo y otras que pueden utilizarse en la optimización de programas.
-Desde el punto de vista de la lógica, el no determinismo es interesante, ya que funciona como una surte de irrelevancia de pruebas.
+Desde el punto de vista de la lógica, el no determinismo es interesante, ya que funciona como una suerte de irrelevancia de pruebas.
 Sin embargo, desde el punto de vista de la programación es más útil que el comportamiento de los programas sea determinista.
 Afortunadamente, como se explicará en detalle más adelante, es posible recuperar el determinismo.
 
