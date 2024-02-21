@@ -1,3 +1,4 @@
+\iffalse
 \begin{frame}{Correspondencia de Curry-Howard}
 	\begin{itemize}[<+->]
 		\item Tipos $\Leftrightarrow$ Proposiciones
@@ -36,6 +37,7 @@
 		\end{center}
 	\end{itemize}
 \end{frame}
+\fi
 
 \begin{frame}{Motivación}
 	Los tipos indican la \textbf{forma} y la \textbf{clase de problema} de un programa:
@@ -43,7 +45,7 @@
 	\[ suma : (int \times int) \rightarrow int \]
 	
 	\pause
-	Existen programas con tipos distintos, pero la misma clase de problema:
+	Existen programas con tipos distintos para la misma clase de problema:
 	\[ suma' : int \rightarrow int \rightarrow int \]
 	
 	\pause
@@ -188,6 +190,7 @@
 
 \end{frame}
 
+\iffalse
 \begin{frame}{Ejemplo: proyección de funciones}
 	\begin{prooftree*}
 		\hypo{ \Gamma\vdash r: B }
@@ -217,7 +220,6 @@
 	\end{align*}
 \end{frame}
 
-\iffalse
 \begin{frame}{Ejemplo: aplicación de argumentos en cualquier orden}
 	\[ \lambda x^A. \lambda y^B. r : A \rightarrow B \rightarrow C \]
 	\pause

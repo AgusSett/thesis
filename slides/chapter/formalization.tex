@@ -326,6 +326,7 @@
 	\ExecuteMetaData[code/iso_term.tex]{sym-dist}
 \end{frame}
 
+\iffalse
 \begin{frame}{Equivalencias entre términos}	
 	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
 		\only<2>{\draw[red,thick,rounded corners] (1.76389, 4.94405) rectangle (3.73944, 4.59127);}
@@ -333,6 +334,7 @@
 	\end{tikzpicture}
 	\ExecuteMetaData[code/iso_term.tex]{cong-pair}
 \end{frame}
+\fi
 
 \begin{frame}{Equivalencias entre términos}	
 	\[ \lambda \textcolor{red}{x^A}. \lambda \textcolor{blue}{y^B}. r \rightleftarrows \lambda z^{A \times B}. r[\textcolor{blue}{\pi_B(z)/y}, \textcolor{red}{\pi_A(z)/x}] \]
@@ -370,9 +372,9 @@
 \end{frame}
 
 \begin{frame}{Ejemplo}
-	\ExecuteMetaData[code/example.tex]{iso-term-1}
-	$ \langle \star, \textcolor{red}{\langle \lambda x.x, \star \rangle} \rangle \rightleftarrows \langle \star, \textcolor{red}{\langle \star, \lambda x.x \rangle} \rangle $
-	\pause
+	%\ExecuteMetaData[code/example.tex]{iso-term-1}
+	%$ \langle \star, \textcolor{red}{\langle \lambda x.x, \star \rangle} \rangle \rightleftarrows \langle \star, \textcolor{red}{\langle \star, \lambda x.x \rangle} \rangle $
+	%\pause
 	\ExecuteMetaData[code/example.tex]{iso-term-2}
 	$ \lambda x. \textcolor{red}{\lambda y. \langle x, y \rangle} \rightleftarrows \lambda x. \textcolor{red}{\langle \lambda y.x, \lambda y.y \rangle} $
 \end{frame}
