@@ -126,7 +126,7 @@ Una vez definida la función \func{rename}, se puede implementar la aplicación 
 Para ello, se define de forma análoga, una función \func{exts} que extiende la sustitución cuando se atraviesa una abstracción.
 Utilizando la notación del álgebra-$\sigma$, se puede observar que aquí también se sigue la misma estructura: $`Z \bullet (\sigma \; \circ \text{rename } S\_)$.
 
-Luego se define la substitución simple \func{$\_[\_]$}, que dado un término \bound{N} cuya primera variable libre es de tipo \bound{B} y un término \bound{M} de tipo \bound{B}, reemplaza la primera variable libre de \bound{N} por \bound{M} y reduce en uno el resto de las variables libres.
+Luego se define la substitución simple \func{\_[\_]}, que dado un término \bound{N} cuya primera variable libre es de tipo \bound{B} y un término \bound{M} de tipo \bound{B}, reemplaza la primera variable libre de \bound{N} por \bound{M} y reduce en uno el resto de las variables libres.
 
 \begin{codigo}
 	Aplicación de substituciones sobre términos
@@ -181,7 +181,8 @@ Además de los axiomas, se agregan el constructor \const{sym} que representa la 
 \end{codigo}
 Utilizando estos constructores es posible construir cualquier isomorfismo.
 Notar que no existe una regla para la transitividad, ya que es posible obtenerla aplicando dos veces el constructor \const{$[\_]\equiv\_$}.
-Por ejemplo, el término \const{[ trans} \bound{$iso_1$} \bound{$iso_2$} \const{]$\equiv$} \bound{t} puede ser construido como \const{[} \bound{$iso_2$} \const{]$\equiv$} (\const{[} \bound{$iso_1$} \const{]$\equiv$} \bound{t}).
+Por ejemplo, el término \const{[ trans} \bound{$iso_1$} \bound{$iso_2$} \const{]$\equiv$} \bound{t} puede ser construido como \const{[}~\bound{$iso_2$}~\const{]$\equiv$}~(\const{[}~\bound{$iso_1$}~\const{]$\equiv$}~\bound{t}).
+También se omite el constructor correspondiente a la reflexividad, dado que este solo permite obtener isomorfismos de la forma $A \equiv A$, por lo que no aporta mayor expresividad a la formalización.
 
 \begin{example}
 	La relación \type{$\_\equiv\_$} se utiliza para probar que dos tipos son isomorfos.
@@ -192,19 +193,24 @@ Por ejemplo, el término \const{[ trans} \bound{$iso_1$} \bound{$iso_2$} \const{
 Una observación importante es que este conjunto de isomorfismos permite obtener la ecuación $\top \rightarrow \top \equiv \top$, esto posibilita tipar el término $\Omega = (\lambda x^\top.xx)(\lambda x^\top.xx): \top$.
 A continuación se muestra una posible derivación de tipos para dicho término:
 
+\[
+\boldsymbol{\omega} \quad = \quad
+\begin{prooftree}
+	\hypo{\top \equiv \top \rightarrow \top}
+	\infer0[($ax$)]{ x:\top \vdash x:\top }
+	\infer2[($\equiv$)]{ x:\top \vdash x: \top \rightarrow \top }
+	\infer0[($ax$)]{ x:\top \vdash x:\top }
+	\infer2[($\Rightarrow_e$)]{ x:\top\vdash x x: \top }
+	\infer1[($\Rightarrow_i$)]{ \vdash \lambda x.x x: \top \rightarrow \top }
+\end{prooftree}
+\]
+\vspace{1em}
 \begin{prooftree*}
-	\infer0[($ax$)]{ x:\top \vdash x:\top }
-	\infer1[($\equiv$)]{ x:\top \vdash x: \top \rightarrow \top }
-	\infer0[($ax$)]{ x:\top \vdash x:\top }
-	\infer2[($\Rightarrow_e$)]{ x:\top\vdash x x: \top }
-	\infer1[($\Rightarrow_i$)]{ \vdash \lambda x.x x: \top \rightarrow \top }
+	\hypo{\boldsymbol{\omega}}
 	
-	\infer0[($ax$)]{ x:\top \vdash x:\top }
-	\infer1[($\equiv$)]{ x:\top\vdash x: \top \rightarrow \top }
-	\infer0[($ax$)]{ x:\top \vdash x:\top }
-	\infer2[($\Rightarrow_e$)]{ x:\top\vdash x x: \top }
-	\infer1[($\Rightarrow_i$)]{ \vdash \lambda x.x x: \top \rightarrow \top }
-	\infer1[($\equiv$)]{ \vdash \lambda x.x x: \top }
+	\hypo{\top \rightarrow \top \equiv \top}
+	\hypo{\boldsymbol{\omega}}
+	\infer2[($\equiv$)]{ \vdash \lambda x.x x: \top }
 	
 	\infer2[($\Rightarrow_e$)]{ \vdash (\lambda x.xx) (\lambda x.xx): \top }	
 \end{prooftree*}
@@ -227,7 +233,7 @@ Si se incluyen estas reglas directamente, se pierde la propiedad de normalizaci�
 La solución es definir nuevos constructores que embeban estas reglas, como por ejemplo \const{asso-split}.
 
 Para facilitar la comprensión del código, se presenta una tabla de equivalencias utilizando la misma notación que la tabla presentada anteriormente para Sistema I.
-En esta se omiten las reglas de congruencia.
+En esta se omiten las reglas de congruencia y los constructores \const{[\_]$\equiv$\_} de los términos de la izquierda.
 
 \begin{figure}[H]
 	\centering
@@ -330,7 +336,7 @@ Existen tres constructores para los valores: los pares de valores, las abstracci
 	\ExecuteMetaData[code/progress.tex]{value}
 \end{codigo}
 
-Sin embargo, en la definición de progreso que se presentará a continuación, se implementa el orden de reducción aplicativo, es decir, se deben reducir los cuerpos de las abstracciones.
+Sin embargo, en la definición de progreso que se presentará a continuación, se implementa el orden de reducción \textit{strong call-by-value}, es decir, se deben reducir los cuerpos de las abstracciones.
 Cuando se reduce debajo de las abstracciones es posible encontrar variables libres.
 Cuando se trabaja con términos que pueden contener variables libres, los estados finales que se deben considerar son las formas normales.
 
@@ -445,7 +451,7 @@ Por lo tanto, la prueba \func{progress} es también un programa, que al ser apli
 \section{Evaluación}
 
 A través de la aplicación sucesiva de la prueba de progreso se puede definir la evaluación.
-Para esto, se define la relación \type{$\_\rightsquigarrow\_$}, que representa la clausura reflexiva y transitiva de la unión entre las relaciones \type{$\_\hookrightarrow\_$} y \type{$\_\rightleftarrows\_$}.
+Para esto, se define la relación \type{$\_\rightsquigarrow*\_$}, que representa la clausura reflexiva y transitiva de la unión entre las relaciones \type{$\_\hookrightarrow\_$} y \type{$\_\rightleftarrows\_$}.
 
 \begin{codigo}
 	Clausura reflexiva y transitiva de la unión entre las relaciones \type{$\_\hookrightarrow\_$} y \type{$\_\rightleftarrows\_$}.
@@ -453,7 +459,7 @@ Para esto, se define la relación \type{$\_\rightsquigarrow\_$}, que representa 
 \end{codigo}
 
 La evaluación se define sobre términos cerrados, de modo que estos siempre reduzcan a un valor.
-La definición aplica la prueba de progreso para obtener el nuevo término sobre el cual hacer el llamado recursivo y el paso de reducción que extenderá la relación \type{$\_\rightsquigarrow\_$}.
+La definición aplica la prueba de progreso para obtener el nuevo término sobre el cual hacer el llamado recursivo y el paso de reducción que extenderá la relación \type{$\_\rightsquigarrow*\_$}.
 
 Debido a que la recursión se realiza sobre el término resultante luego de un paso, Agda no tiene forma de determinar que dicho término es estructuralmente más pequeño que el argumento inicial.
 De hecho, probar la terminación de la evaluación, implicaría que todo término reduce a un valor en una cantidad finita de pasos, es decir, se estaría probando la propiedad de normalización.
@@ -504,6 +510,7 @@ En Agda se puede definir el conjunto $SN$ mediante el siguiente tipo de datos in
 
 Notar que es trivial construir un término de tipo \type{SN} para un valor, ya que, al no existir ninguna reducción posible para los valores, simplemente se debe pasar la función vacía como argumento a \const{sn}.
 Estos representan los casos base del tipo \type{SN}.
+Notar que la finitud de las secuencias de reducción termina siendo dada por la caracterización inductiva, dado que para construir un término de tipo \type{SN} se deben aplicar una cantidad necesariamente finita de constructores \const{sn}.
 
 \begin{example}
 	Cuando se construye un término de tipo \type{SN} \bound{t}, para cierto término \bound{t}, se deben tener en cuenta todos los pasos de reducción posibles a partir de \bound{t}.
@@ -535,7 +542,7 @@ El objetivo final de esta sección será entonces, definir una función que dado
 La prueba aquí presentada está basada y extendida a partir de una formalización realizada por 
 Andras Kovacs\footnote{\citeurl{Kovacs}} para cálculo lambda simplemente tipado.
 A su vez, el trabajo de Kovacs se basa en la tesis de Steven Schäfer \cite{Schafer}, donde se formaliza la prueba de normalización fuerte para Sistema F en Coq.
-La técnica utilizada por Schäfer difiere en ciertos aspectos con la prueba de candidatos de reducibilidad de Girard \cite{Girard}.
+La técnica utilizada por Schäfer difiere en ciertos aspectos con la prueba de candidatos de reducibilidad de Girard \cite{Girard}, en el capítulo 5.6 de \cite{Schafer} se discuten en detalle estas diferencias.
 Además, se utilizó como referencia una formalización de candidatos de reducibilidad en Agda realizada por Pablo Barenbaum\footnote{\citeurl{Barenbaum}}.
 
 \subsection{Prueba para STLC con pares y Top}
@@ -561,7 +568,7 @@ Luego, se define lo que se denomina \textit{interpretación del término}.
 Esta interpretación añade algunas hipótesis extra que permiten desatascar la prueba para los casos de las eliminaciones (proyecciones y aplicaciones).
 Para el caso de los productos, la interpretación provee evidencia de que los términos $a$ y $b$ del par son fuertemente normalizantes.
 Mientras que para el caso de la abstracción, la interpretación se define de modo que dado cualquier término $u$ fuertemente normalizante, permite concluir que $\rho (t) [u]$ es fuertemente normalizante, donde $t$ es el cuerpo de la abstracción.
-
+ 
 \ExecuteMetaData[code/strong_norm_base.tex]{candidate}
 
 La definición utiliza los productos \func{$\_\times\_$} y el tipo top \type{$\top$} definidos en los módulos \AgdaModule{Data.Product} y \AgdaModule{Data.Unit} de la librería estándar.

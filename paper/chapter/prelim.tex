@@ -151,6 +151,44 @@ A continuación se presentan los cuatro isomorfismos que pertenecen a dicho conj
 		A \rightarrow (B \times C) &\equiv (A \rightarrow B) \times (A \rightarrow C) \tag{\textsc{dist}}
 	\end{align*}
 	
+	\centering
+	\begin{prooftree}
+		\infer0{A \equiv A}
+	\end{prooftree}
+	\qquad
+	\begin{prooftree}
+		\hypo{A \equiv B}
+		\infer1{B \equiv A}
+	\end{prooftree}
+	\quad
+	\begin{prooftree}
+		\hypo{A \equiv B}
+		\hypo{B \equiv C}
+		\infer2{A \equiv C}
+	\end{prooftree}
+	\vspace{1em}
+	\\
+	
+	\begin{prooftree}
+		\hypo{A \equiv B}
+		\infer1{A \times C \equiv B \times C}
+	\end{prooftree}
+	\quad
+	\begin{prooftree}
+		\hypo{A \equiv B}
+		\infer1{C \times A \equiv C \times B}
+	\end{prooftree}
+	\quad
+	\begin{prooftree}
+		\hypo{A \equiv B}
+		\infer1{A \rightarrow C \equiv B \rightarrow C}
+	\end{prooftree}
+	\quad
+	\begin{prooftree}
+		\hypo{A \equiv B}
+		\infer1{C \rightarrow A \equiv C \rightarrow B}
+	\end{prooftree}
+	
 	\caption{Isomorfismos de tipo en Sistema I}
 \end{figure}
 
@@ -490,7 +528,7 @@ A continuación se muestra como emplear la regla $dist_e$ para reducir dicha pro
 	& \langle \lambda x^{R \times S}. \pi_S(x) , t \rangle \\
 \end{align*}
 
-Esto muestra que desde el punto de vista de la implementación, puede ser necesario agregar nuevas reglas de reescritura para lograr reducir a una forma normal.
+Esto muestra que desde el punto de vista de la implementación, puede ser necesario agregar nuevas reglas de reescritura para evitar que aparezcan eliminaciones en formas normales.
 Este punto es importante, ya que la formalización de la propiedad de progreso implica demostrar que es posible reducir todas las eliminaciones hasta llegar a una forma normal, en simples palabras, el conjunto de reglas es lo suficientemente grande como para desatascar cualquier término que pueda presentarse.
 	
 \section{Tipos dependientes}
