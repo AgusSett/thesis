@@ -169,7 +169,7 @@ _ = refl
 -- Evaluation
 ------------------------------------------------------------------------
 
-T₅⇝⋆ : ∀ {Γ} → T₅ {Γ} ⇝ ⋆
+T₅⇝⋆ : ∀ {Γ} → T₅ {Γ} ⇝* ⋆
 T₅⇝⋆ =
     π _ ([ sym dist ]≡ ([ curry ]≡ (ƛ (ƛ ⟨ ` (S Z) , ` Z ⟩)))) · ⟨ ⋆ , ⋆ ⟩
       ⇄⟨ ξ-·₁ (ξ-π (ξ-≡ curry)) ⟩
@@ -188,7 +188,7 @@ T₅⇝⋆ =
 Ω : ∅ ⊢ ⊤
 Ω = (ƛ [ sym abs ]≡ (` Z) · ` Z) · ([ abs ]≡ (ƛ [ sym abs ]≡ (` Z) · ` Z))
 
-Ω⇝⋆ : Ω ⇝ ⋆
+Ω⇝⋆ : Ω ⇝* ⋆
 Ω⇝⋆ =
     Ω
       ⇄⟨ ξ-·₁ (ζ (ξ-·₁ sym-abs)) ⟩
@@ -213,7 +213,7 @@ _ = refl
 
 -- pair encoding
 
-⟨a,a⟩-π₁ : ∀ {A} → π {∅ , A , A} A ⟨ ` Z , ` S Z ⟩ ⇝ ` Z
+⟨a,a⟩-π₁ : ∀ {A} → π {∅ , A , A} A ⟨ ` Z , ` S Z ⟩ ⇝* ` Z
 ⟨a,a⟩-π₁ {A} =
   begin
     π A ⟨ ` Z , ` S Z ⟩
@@ -221,7 +221,7 @@ _ = refl
     ` Z
   ∎
 
-⟨a,a⟩-π₂ : ∀ {A} → π {∅ , A , A} A ⟨ ` Z , ` S Z ⟩ ⇝ ` S Z
+⟨a,a⟩-π₂ : ∀ {A} → π {∅ , A , A} A ⟨ ` Z , ` S Z ⟩ ⇝* ` S Z
 ⟨a,a⟩-π₂ {A} =
   begin
     π A ⟨ ` Z , ` S Z ⟩
@@ -248,7 +248,7 @@ encode r s = ⟨ ⟦ r ⟧ One , ⟦ s ⟧ Two ⟩
 π₁ : ∀ {Γ A B} → (Γ ⊢ ((One ⇒ One) ⇒ A) × ((Two ⇒ Two) ⇒ B)) → Γ ⊢ A
 π₁ {A = A} x = One ⟪ π ((One ⇒ One) ⇒ A) {inj₁ refl} x ⟫
 
-encode-π₁ : ∀ {A} → π₁ {∅ , A , A} (encode (` Z) (` S Z)) ⇝ ` Z
+encode-π₁ : ∀ {A} → π₁ {∅ , A , A} (encode (` Z) (` S Z)) ⇝* ` Z
 encode-π₁ {A} =
   begin
     π₁ (encode (` Z) (` S Z))

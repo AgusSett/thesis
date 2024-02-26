@@ -233,7 +233,7 @@ A continuación, se presentan las reglas propuestas por Sistema I, las cuales fu
 	
 	\begin{prooftree}
 		\hypo{ t \rightleftarrows r }
-		\infer1{s \rightleftarrows t}
+		\infer1{r \rightleftarrows t}
 	\end{prooftree} \quad
 	\begin{prooftree}
 		\hypo{ t \rightleftarrows r }
@@ -306,7 +306,7 @@ se codifica como:
 Y la proyección $\pi_1 \langle r, s \rangle$ se codifica como:
 \[ (\pi_{\mathbb{X} \rightarrow A} \langle \lambda x^\mathbb{X}.r, \lambda x^\mathbb{Y}.s \rangle)\; y^\mathbb{X} \]
 
-Donde $\mathbb{X}$ y $\mathbb{Y}$ son dos tipos distintos, e $y^\mathbb{X}$ es cualquier elemento de tipo $\mathbb{X}$.
+Donde $\mathbb{X}$ y $\mathbb{Y}$ son dos tipos no isomorfos, como por ejemplo $\tau$ y $\tau \rightarrow \tau$, e $y^\mathbb{X}$ es cualquier elemento de tipo $\mathbb{X}$.
 De forma análoga se puede codificar $\pi_2$.
 
 
@@ -638,7 +638,7 @@ Se pueden visualizar las distintas dimensiones en las que es posible moverse hac
 		(m-4-3) edge (m-3-4)
 		edge (m-2-3);
 	\end{tikzpicture}
-	\caption{El cubo lambda representa las dependencias entre tipos y términos como dimensiones ortogonales, las flechas corresponden a la relación $\subsetneq$.}
+	\caption{El cubo lambda representa las dependencias entre tipos y términos como dimensiones ortogonales, las flechas corresponden a la relación ``incluido en''.}
 \end{figure}
 
 \begin{itemize}
@@ -678,19 +678,18 @@ Las correspondencias que surgen de esta interpretación pueden resumirse de la s
 	Una prueba de la proposición $A \wedge B$ consiste de una prueba de $A$ y una prueba de $B$.
 	
 	\item La disjunción $A \vee B$ se corresponde con la suma disjunta $A + B$.
-	Una prueba de la proposición $A \vee B$ consiste de una prueba de $A$ o una prueba de $B$.
+	Una prueba de la proposición $A \vee B$ consiste de una prueba de $A$ o una prueba de $B$ y un marcador que indica cuál de las dos alternativas está presente.
 	
 	\item La implicación $A \Rightarrow B$ se corresponde con el espacio de funciones $A \rightarrow B$.
 	Una prueba de la proposición $A \Rightarrow B$ consiste de una función que dada una prueba de $A$ devuelve una prueba de $B$.
 	
 	\item El cuantificador existencial $\exists x:A.B$ se corresponde con el tipo $\Sigma x:A.B$.
 	Básicamente, esto es una familia de tipos indexada por $a : A$ donde a cada término $a$ le corresponde un tipo $B(a)$.
-	Los elementos canónicos de $\Sigma x:A.B$ son pares dependientes $\langle a, b \rangle$ donde $a:A$ y $b:B(a)$.
+	Los habitantes de $\Sigma x:A.B$ son pares dependientes $\langle a, b \rangle$ donde $a:A$ y $b:B(a)$.
 	Cuando $B(x)$ es una función constante, este tipo es equivalente al producto cartesiano $A \times B$.
 	
-	
 	\item El cuantificador universal $\forall x:A.B$ se corresponde con $\Pi x:A.B$, al igual que para el tipo $\Sigma$, $B$ es una familia de tipos indexada por los términos de tipo $A$.
-	Los elementos canónicos de $\Pi x:A.B$ son funciones dependientes $a \rightarrow B(a)$.
+	Los habitantes de $\Pi x:A.B$ son funciones dependientes $a \rightarrow B(a)$.
 	Cuando $B(x)$ es una función constante, el tipo $\Pi$ es equivalente al tipo de las funciones ordinarias $A \rightarrow B$.
 \end{itemize}
 
