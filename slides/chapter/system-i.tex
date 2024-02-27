@@ -75,9 +75,9 @@
 		\[ (A \times B) \rightarrow C \equiv A \rightarrow (B \rightarrow C) \]
 		
 		\pause
-		\[ curry = \lambda f^{(A \times B) \rightarrow C}. \lambda a^A . \lambda b^B . f\langle a,b \rangle \]
+		\[ curry = \lambda f^{(\textcolor{red}{A} \times \textcolor{blue}{B}) \rightarrow C}. \lambda \textcolor{red}{a^A} . \lambda \textcolor{blue}{b^B} . f\langle \textcolor{red}{a},\textcolor{blue}{b} \rangle \]
 		\pause
-		\[ uncurry = \lambda f^{A \rightarrow B \rightarrow C}. \lambda y^{A \times B} . f(\pi_1 y)(\pi_2 y) \]
+		\[ uncurry = \lambda f^{\textcolor{red}{A} \rightarrow \textcolor{blue}{B} \rightarrow C}. \lambda y^{\textcolor{red}{A} \times \textcolor{blue}{B}} . f(\textcolor{red}{\pi_1 y})(\textcolor{blue}{\pi_2 y}) \]
 		
 		\pause
 		\[ curry \circ uncurry = id_{(A \times B) \rightarrow C} \quad
@@ -110,7 +110,7 @@
 \end{frame}
 
 \begin{frame}{Internalización de isomorfismos}
-	Se añade la regla $\equiv$ (eqiv)
+	Se añade la regla $\equiv$ (equiv)
 	\begin{center}
 		\begin{prooftree}
 			\hypo{A \equiv B}

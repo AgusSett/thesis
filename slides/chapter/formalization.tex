@@ -315,7 +315,7 @@
 \end{frame}
 
 \begin{frame}{Equivalencias entre términos}	
-	\[ \langle r,s \rangle \rightleftarrows_{\textsc{split}} \pause \textcolor{blue}{\langle} r, \textcolor{red}{\langle} \pi_B(s),\pi_C(s) \textcolor{red}{\rangle} \textcolor{blue}{\rangle} \pause \rightleftarrows_{\textsc{asso}} \textcolor{blue}{\langle} \textcolor{red}{\langle} r, \pi_B(s) \textcolor{red}{\rangle}, \pi_C(s) \textcolor{blue}{\rangle} \]
+	\[ \langle r,s \rangle \rightleftarrows_{\textsc{split}} \pause \langle r, \boldsymbol{\langle} \textcolor{red}{\pi_B(s)}, \textcolor{blue}{\pi_C(s)} \boldsymbol{\rangle} \rangle \pause \rightleftarrows_{\textsc{asso}} \langle \boldsymbol{\langle} r, \textcolor{red}{\pi_B(s)} \boldsymbol{\rangle}, \textcolor{blue}{\pi_C(s)} \rangle \]
 	\pause
 	\ExecuteMetaData[code/iso_term.tex]{asso-split}
 \end{frame}
@@ -350,10 +350,10 @@
 \end{frame}
 
 \begin{frame}{Equivalencias entre términos}	
-	\[ \lambda x^{A \times B}. r \rightleftarrows \lambda y^A. \lambda z^B. r[\langle y, z \rangle/x] \]
+	\[ \lambda x^{\textcolor{red}{A} \times \textcolor{blue}{B}}. r \rightleftarrows \lambda \textcolor{red}{y^A}. \lambda \textcolor{blue}{z^B}. r[\langle \textcolor{red}{y}, \textcolor{blue}{z} \rangle/x] \]
 
 	\pause
-	\[ \lambda \lambda r[\langle 1,0 \rangle] \]
+	\[ \lambda \lambda r[\langle \textcolor{red}{1},\textcolor{blue}{0} \rangle] \]
 	
 	\pause
 	\ExecuteMetaData[code/iso_term.tex]{subs-uncurry}

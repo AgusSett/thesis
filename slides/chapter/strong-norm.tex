@@ -35,10 +35,10 @@
 		\ExecuteMetaData[code/SN1.tex]{strong-proof}
 	\end{AgdaSuppressSpace}
 	
-	Por H.I. sabemos que $SN$ vale para los subterminos...
-	\pause
-	
-	Definimos algunos lemas para construir $SN$ para todo el término.
+	\begin{itemize}[<+->]
+		\item Por H.I. sabemos que $SN$ vale para los subterminos.
+		\item Definimos algunos lemas para construir $SN$ para todo el término.
+	\end{itemize}
 \end{frame}
 
 \begin{frame}{Approach 1}
@@ -102,49 +102,60 @@
 \end{frame}
 
 \begin{frame}{Approach 2}
-	La prueba queda divida en dos pasos.
-	\pause
-	Primero se prueba el teorema fundamental:
-	\ExecuteMetaData[code/SN2.tex]{adequacy-type}
-	
-	\pause
-	Luego es fácil probar $SN$:
-	\ExecuteMetaData[code/SN2.tex]{strong-proof}
+	La prueba queda divida en dos pasos:
+
+	\begin{itemize}[<+->]
+		\item Primero se prueba el teorema fundamental:
+		\ExecuteMetaData[code/SN2.tex]{adequacy-type}
+		
+		\item Luego es fácil probar $SN$:
+		\ExecuteMetaData[code/SN2.tex]{strong-proof}
+	\end{itemize}
 \end{frame}
 
 \begin{frame}{Approach 2}
 	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
 		\only<1>{
-			\draw[red,thick,rounded corners] (3.81, 5.43369) rectangle (4.33917, 5.04988);
-			\draw[red,thick,rounded corners] (7.72583, 5.43369) rectangle (8.96056, 5.04988);
-		}
-		\only<2>{
-			\draw[red,thick,rounded corners] (6.77333, 1.59266) rectangle (7.47889, 1.2017);
-			\draw[red,thick,rounded corners] (10.0894, 1.55447) rectangle (10.795, 1.16642);
+			\draw[red,thick,rounded corners] (3.81, 2.96247) rectangle (4.33917, 2.53913);
+			\draw[red,thick,rounded corners] (7.72583, 2.96247) rectangle (8.96056, 2.53913);
 		}
 	\end{tikzpicture}
+	
+	\begin{itemize}
+		\item La interpretación de la abstracción permite probar el caso de la aplicación.
+	\end{itemize}
 	\ExecuteMetaData[code/SN2.tex]{lemma-app}
-	La interpretación de la abstracción es precisamente lo que permite probar el caso de la aplicación.
-	\pause
-	Del mismo modo, la interpretación del par resuelve el caso de la proyección.
-	\ExecuteMetaData[code/SN2.tex]{lemma-proj}
 \end{frame}
 
 \begin{frame}{Approach 2}
 	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
-		\only<2>{\draw[red,thick,rounded corners] (5.18583, 4.93981) rectangle (7.44361, 4.55309);}
-		\only<3>{\draw[red,thick,rounded corners] (7.79639, 3.35364) rectangle (8.99583, 2.82575);}
+		\only<1>{
+			\draw[red,thick,rounded corners] (6.77333, 3.63893) rectangle (7.47889, 3.28616);
+			\draw[red,thick,rounded corners] (10.0894, 3.63893) rectangle (10.795, 3.28616);
+		}
 	\end{tikzpicture}
-	Por otro lado, las introducciones ahora deben construir las interpretaciones.
-	
-	\pause
-	El caso del par es simple:
-	\ExecuteMetaData[code/SN2.tex]{lemma-prod}
-	
-	\pause
-	Sin embargo, el caso de la abstracción es complejo:
-	\ExecuteMetaData[code/SN2.tex]{lemma-abs}
 
+	\begin{itemize}
+		\item La interpretación del par resuelve el caso de la proyección.
+	\end{itemize}
+	\ExecuteMetaData[code/SN2.tex]{lemma-proj}
+\end{frame}
+
+\begin{frame}{Approach 2}
+	\setlength{\leftmargini}{0cm}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<2>{\draw[red,thick,rounded corners] (5.18583, 5.39975) rectangle (7.44361, 4.97642);}
+		\only<3>{\draw[red,thick,rounded corners] (7.79639, 3.7417) rectangle (8.99583, 3.17725);}
+	\end{tikzpicture}
+	Las introducciones ahora deben construir las interpretaciones.
+
+	\begin{itemize}[<+->]
+		\item El caso del par es simple:
+		\ExecuteMetaData[code/SN2.tex]{lemma-prod}
+		
+		\item El caso de la abstracción es complejo:
+		\ExecuteMetaData[code/SN2.tex]{lemma-abs}
+	\end{itemize}
 \end{frame}
 
 \begin{frame}{Approach 2}
@@ -281,7 +292,11 @@
 \end{frame}
 
 \begin{frame}{Caso \textsc{comm}}
-	Para las equivalencias, la idea es ``desarmar'' las hipótesis del lado izquierdo, y reconstruir $SN$ del lado derecho usando los lemas anteriores:
+	Para las equivalencias la idea es:
+	\begin{itemize}
+		\item ``Desarmar'' las hipótesis del lado izquierdo.
+		\item Reconstruir $SN*$ del lado derecho usando los lemas anteriores.
+	\end{itemize}
 	\ExecuteMetaData[code/strong_norm.tex]{iso-comm}
 \end{frame}
 
@@ -290,13 +305,13 @@
 	\pause
 	
 	Por hipótesis sabemos:
-	\[ \forall u_1, u_2 \in SN \Longrightarrow t[u_1/x, u_2/y] \in SN \]
+	\[ \forall \textcolor{red}{u_1}, \textcolor{blue}{u_2} \in SN* \Longrightarrow t[\textcolor{red}{u_1/x}, \textcolor{blue}{u_2/y}] \in SN* \]
 	\pause
 	
 	Debemos probar:
-	\[ \lambda z. t[\pi_A(z)/x, \pi_B(z)/y] \in SN \]
+	\[ \lambda z. t[\textcolor{red}{\pi_A(z)/x}, \textcolor{blue}{\pi_B(z)/y}] \in SN* \]
 	\pause
-	\[ \forall u \in SN \Longrightarrow (t[\pi_A(\textcolor{red}{z})/x, \pi_B(\textcolor{red}{z})/y])[u/\textcolor{red}{z}] \pause = t[\pi_A(u)/x, \pi_B(u)/y] \in SN \]
+	\[ \forall u \in SN* \Longrightarrow (t[\pi_A(\textcolor{red}{z})/x, \pi_B(\textcolor{red}{z})/y])[\textcolor{red}{u}/\textcolor{red}{z}] \pause = t[\pi_A(\textcolor{red}{u})/x, \pi_B(\textcolor{red}{u})/y] \in SN* \]
 	 
 	\pause
 	Basta con instanciar la hipótesis usando:
@@ -308,14 +323,14 @@
 	\pause
 	
 	Por hipótesis sabemos:
-	\[ \forall u \in SN \Longrightarrow t[u/x] \in SN \]
+	\[ \forall u \in SN \Longrightarrow t[u/x] \in SN* \]
 	\pause
 	
 	Debemos probar:
-	\[ \lambda y. \lambda z. t[\langle y, z \rangle/x] \in SN \]
+	\[ \lambda \textcolor{blue}{y}. \lambda \textcolor{red}{z}. t[\langle \textcolor{blue}{y}, \textcolor{red}{z} \rangle/x] \in SN* \]
 	
 	\pause
-	\[ \forall u_1,u_2 \in SN \Longrightarrow ((t[\langle \textcolor{blue}{y}, \textcolor{red}{z} \rangle/x])[u_1/\textcolor{blue}{y}])[u_2/\textcolor{red}{z}] \pause = t[\langle u_1, u_2 \rangle/x] \in SN \]
+	\[ \forall \textcolor{blue}{u_1}, \textcolor{red}{u_2} \in SN* \Longrightarrow ((t[\langle \textcolor{blue}{y}, \textcolor{red}{z} \rangle/x])[\textcolor{blue}{u_1}/\textcolor{blue}{y}])[\textcolor{red}{u_2}/\textcolor{red}{z}] \pause = t[\langle \textcolor{blue}{u_1}, \textcolor{red}{u_2} \rangle/x] \in SN* \]
 
 	\pause
 	Basta con instanciar la hipótesis usando:
