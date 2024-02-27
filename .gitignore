@@ -10,3 +10,5 @@ MAlonzo/**
 *.bcf
 *.run.xml
 *.ptb
+*.snm
+*.nav

@@ -1,0 +1,181 @@
+\begin{frame}{$\lambda$-calculo}
+	\begin{itemize}[<+->]
+		\item Creado para investigar los fundamentos de la matemática. (principalmente, el concepto de recursión).
+		\item Es el lenguaje de programación funcional más simple que existe.
+		\begin{itemize}[<+->]
+			\item Las funciones son anónimas:
+			\[ suma(x, y)= x + y \quad\quad suma(2, 3) \]
+			\uncover<+->{
+				\[ ((x, y) \mapsto x + y)\; (2, 3) \]
+			}
+			
+			\item Las funciones toman un solo argumento:
+			\[ x \mapsto (y \mapsto x + y) \]
+			\uncover<+->{
+				\[ (x \mapsto (y \mapsto x + y))\; 2 \Rightarrow y \mapsto 2 + y \]
+			}
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Definición}
+	\begin{itemize}[<+->]
+		\item Gramática de términos
+		\pause
+		\[ t := x \mid \lambda x.t \mid t\; t
+		\pause \mid \langle t, t \rangle \mid \pi_1 t \mid \pi_2 t
+		\pause \mid \star \]
+		
+		\item Computación (reglas de reescritura)
+			\begin{itemize}[<+->]
+				\item Aplicación ($\beta$-reducción)
+				\[ (\lambda x.t) s \hookrightarrow_\beta t[s/x] \]
+				\uncover<+->{
+					$t[s/x]$ reemplaza todas las variables $x$ que aparecen en $t$ por $s$.
+				}
+				
+				\item Proyección
+				\[ \pi_1 \langle r, s \rangle \hookrightarrow_\pi r \quad \pi_2 \langle r, s \rangle \hookrightarrow_\pi s \]
+			\end{itemize}
+	\end{itemize}
+	
+	% Exlicar Church encodir para entender como algo tan simple es turing complete
+\end{frame}
+
+
+\iffalse
+\begin{frame}{Ejemplos}
+	\begin{exampleblock}{Función identidad}
+		\[ \lambda x.x \]
+		\pause
+		\[ (\lambda x.x) y \pause \hookrightarrow_\beta x[y/x] \pause = y \]
+	\end{exampleblock}
+	\pause
+	\begin{exampleblock}{Dos argumentos}
+		\[ \lambda x. \lambda y.x \]
+		\[ (\lambda x. \lambda y.x) a b
+		\pause \hookrightarrow_\beta (\lambda y.a) b
+		\pause \hookrightarrow_\beta a \]
+	\end{exampleblock}
+\end{frame}
+\fi	
+
+\begin{frame}{Ejemplos}	
+	\begin{exampleblock}{Swap}
+		\[ \lambda p. \langle \pi_2 (p), \pi_1 (p) \rangle \]
+		\pause
+		\begin{align*}	
+			&(\lambda \textcolor{red}{p}. \langle \pi_2 (\textcolor{red}{p}), \pi_1 (\textcolor{red}{p}) \rangle)\; \langle a,b \rangle \\
+		\onslide<3->{
+			&\hookrightarrow_\beta \langle \pi_{\textcolor{red}{2}} \langle a,\textcolor{red}{b} \rangle, \pi_1 \langle a,b \rangle \rangle \\
+		}
+		\onslide<4->{
+			&\hookrightarrow_\pi \langle b, \pi_{\textcolor{red}{1}} \langle \textcolor{red}{a},b \rangle \rangle \\
+		}
+		\onslide<5->{
+			&\hookrightarrow_\pi \langle b, a \rangle
+		}
+		\end{align*}
+	\end{exampleblock}
+\end{frame}
+
+\begin{frame}{Problemas}
+	Algunos términos no reducen (están atascados):
+	\[ \langle a, b \rangle \; c \]
+	\[ \pi_1(\lambda x.x) \]
+	
+	\pause
+	
+	Otros nunca terminan de reducir:
+	\[ (\lambda x.xx) \pause (\lambda x.xx) \pause
+	\hookrightarrow (\lambda x.xx)(\lambda x.xx) \pause
+	\hookrightarrow (\lambda x.xx)(\lambda x.xx) \dots \]
+\end{frame}
+
+\begin{frame}{Sistema de tipos}
+	\begin{itemize}[<+->]
+		\item Tipos
+		\[ A := A \rightarrow A \mid A \times A \mid \top \]
+		
+		\item Contextos de tipado
+		\[ \Gamma := \emptyset \mid \Gamma, x:A \]
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Sistema de tipos}
+	Reglas de tipado
+		\begin{figure}[H]
+			\centering
+			\begin{prooftree}
+				\hypo{\Gamma \ni x:\textcolor{red}{A}}
+				\infer1[($ax$)]{ \Gamma \vdash x:\textcolor{red}{A} }
+			\end{prooftree}
+			\pause
+			\quad
+			\begin{prooftree}
+				\infer0[($\top_i$)]{ \Gamma \vdash \star:\top }
+			\end{prooftree}
+			\pause
+			\vspace{1em}
+			\\
+			\begin{prooftree}
+				\hypo{\Gamma, x:\textcolor{red}{A} \vdash r:\textcolor{blue}{B} }
+				\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x.r : \textcolor{red}{A} \rightarrow \textcolor{blue}{B} }
+			\end{prooftree}
+			\quad
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r : \textcolor{red}{A} \rightarrow \textcolor{blue}{B} }
+				\hypo{\Gamma \vdash s:\textcolor{red}{A}}
+				\infer2[($\Rightarrow_e$)]{ \Gamma \vdash r\; s : \textcolor{blue}{B} }
+			\end{prooftree}
+			\pause
+			\vspace{1em}
+			\\
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r:\textcolor{red}{A}}
+				\hypo{\Gamma \vdash s:\textcolor{blue}{B}}
+				\infer2[($\times_i$)]{ \Gamma \vdash \langle r, s \rangle : \textcolor{red}{A} \times \textcolor{blue}{B} }
+			\end{prooftree}
+			\quad
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r : \textcolor{red}{A} \times \textcolor{blue}{B} }
+				\infer1[($\times_{e1}$)]{ \Gamma \vdash \pi_1(r) : \textcolor{red}{A} }
+			\end{prooftree}
+			\quad
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r : \textcolor{red}{A} \times \textcolor{blue}{B} }
+				\infer1[($\times_{e2}$)]{ \Gamma \vdash \pi_2(r) : \textcolor{blue}{B} }
+			\end{prooftree}
+		\end{figure}
+\end{frame}
+
+\iffalse
+\begin{frame}{Ejemplos}
+	\centering
+	\begin{prooftree}
+		\hypo{\emptyset,\; x:A,\; y:A \ni x:A}
+		\infer1[(ax)]{\emptyset,\; x:A,\; y:A \vdash x:A}
+		\infer1[($\Rightarrow_i$)]{ \emptyset,\; y:A \vdash \lambda x.x : A \rightarrow A }
+		\hypo{\emptyset,\; y:A \ni y:A}
+		\infer1[(ax)]{\emptyset,\; y:A \vdash y : A}
+		\infer2[($\Rightarrow_e$)]{ \emptyset,\; y:A \vdash (\lambda x.x) y : A }
+	\end{prooftree}
+\end{frame}
+\fi
+
+\begin{frame}{Propiedades}
+	\begin{block}{Definición (Forma normal)}
+		$t$ es normal si no puede reducirse. $t \not\hookrightarrow$
+	\end{block}
+	
+	\pause
+	\begin{block}{Progreso}
+		Si $\Gamma \vdash t : A$ entonces $t$ es normal o $t \hookrightarrow t'$.
+	\end{block}
+	
+	\pause
+	\begin{block}{Normalización Fuerte}
+		Si $\Gamma \vdash t : A$ entonces no existe ninguna secuencia de reducción infinita.
+		$t \hookrightarrow t_1 \hookrightarrow t_2 \hookrightarrow t_3 \hookrightarrow \dots$
+	\end{block}
+\end{frame}

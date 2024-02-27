@@ -1,0 +1,261 @@
+\iffalse
+\begin{frame}{Correspondencia de Curry-Howard}
+	\begin{itemize}[<+->]
+		\item Tipos $\Leftrightarrow$ Proposiciones
+			\begin{itemize}[<+->]
+				\item $A \times B \Leftrightarrow A \wedge B$
+				\item $A \rightarrow B \Leftrightarrow A \Rightarrow B$
+				\item $\top \Leftrightarrow true$
+			\end{itemize}
+		\item Programas $\Leftrightarrow$ Pruebas
+		
+		\centering
+		\begin{prooftree}
+			\hypo{\Gamma \ni x:A}
+			\infer1[($ax$)]{ \Gamma \vdash x:A }
+			\hypo{\Gamma \ni y:A}
+			\infer1[($ax$)]{ \Gamma \vdash y:B }
+			\infer2[($\times_i$)]{ \Gamma \vdash \langle x, y \rangle : A \times B }
+		\end{prooftree}
+		\quad
+		\begin{prooftree}
+			\infer0{\Gamma, A \vdash A}
+			\infer0{\Gamma, B \vdash B}
+			\infer2[$\wedge_i$]{ \Gamma \vdash A \wedge B }
+		\end{prooftree}
+		
+		\item Evaluación $\Leftrightarrow$ Simplificación
+		
+		\begin{center}
+			\begin{prooftree}
+				\hypo{[A]}
+				\hypo{[B]}
+				\infer2[$\wedge_i$]{ \Gamma \vdash A \wedge B }
+				\infer1[$\wedge_{e_1}$]{ \Gamma \vdash A }
+			\end{prooftree}
+			$\quad\Rightarrow\quad [A]$ 
+		\end{center}
+	\end{itemize}
+\end{frame}
+\fi
+
+\begin{frame}{Motivación}
+	Los tipos indican la \textbf{forma} y la \textbf{clase de problema} de un programa:
+	\pause
+	\[ suma : (int \times int) \rightarrow int \]
+	
+	\pause
+	Existen programas con tipos distintos para la misma clase de problema:
+	\[ suma' : int \rightarrow int \rightarrow int \]
+	
+	\pause
+	Los programas se combinan según su forma:
+	\[ suma \;\langle2,\; 3\rangle \quad suma'\; 2\; 3 \]
+	
+	\pause
+	Sería interesante poder combinarlos según su significado:
+	\[ suma\; 2\; 3 \quad suma' \;\langle2,\; 3\rangle \]
+\end{frame}
+
+\begin{frame}{Isomorfismos entre tipos}
+	Dos tipos \textcolor{red}{A} y \textcolor{blue}{B} son \textit{isomorfos} si solo si existen:
+	\[ f: \textcolor{red}{A} \rightarrow \textcolor{blue}{B} \quad g: \textcolor{blue}{B} \rightarrow \textcolor{red}{A} \]
+	
+	\pause
+	
+	Tales que:
+	\[ f \circ g = id_{\textcolor{red}{A}} \quad g \circ f = id_{\textcolor{blue}{B}} \]
+	
+	\pause
+	Y lo notamos $\textcolor{red}{A} \equiv \textcolor{blue}{B}$.
+\end{frame}
+
+\begin{frame}{Ejemplo}
+	\begin{exampleblock}{Isomorfismo de Curry}
+		\[ (A \times B) \rightarrow C \equiv A \rightarrow (B \rightarrow C) \]
+		
+		\pause
+		\[ curry = \lambda f^{(\textcolor{red}{A} \times \textcolor{blue}{B}) \rightarrow C}. \lambda \textcolor{red}{a^A} . \lambda \textcolor{blue}{b^B} . f\langle \textcolor{red}{a},\textcolor{blue}{b} \rangle \]
+		\pause
+		\[ uncurry = \lambda f^{\textcolor{red}{A} \rightarrow \textcolor{blue}{B} \rightarrow C}. \lambda y^{\textcolor{red}{A} \times \textcolor{blue}{B}} . f(\textcolor{red}{\pi_1 y})(\textcolor{blue}{\pi_2 y}) \]
+		
+		\pause
+		\[ curry \circ uncurry = id_{(A \times B) \rightarrow C} \quad
+		uncurry \circ curry = id_{A \rightarrow B \rightarrow C} \]
+	\end{exampleblock}
+\end{frame}
+
+\begin{frame}{Conjunto axiomático}
+	\begin{align*}
+		A \times B &\equiv B \times A \tag{\textsc{comm}} \\
+		\uncover<2->{
+		A \times (B \times C) &\equiv (A \times B) \times C \tag{\textsc{asso}} \\
+		}
+		\uncover<3->{
+		(A \times B) \rightarrow C &\equiv A \rightarrow (B \rightarrow C) \tag{\textsc{curry}} \\
+		}
+		\uncover<4->{
+		A \rightarrow (B \times C) &\equiv (A \rightarrow B) \times (A \rightarrow C) \tag{\textsc{dist}} \\
+		}
+		\uncover<5->{
+		A \times \top &\equiv A \tag{\textsc{id$_\times$}} \\
+		}
+		\uncover<6->{
+		A \rightarrow \top &\equiv \top \tag{\textsc{ABS}} \\
+		}
+		\uncover<7->{
+		\top \rightarrow A &\equiv \tag{\textsc{id$_\Rightarrow$}} A \\
+		}
+	\end{align*}
+\end{frame}
+
+\begin{frame}{Internalización de isomorfismos}
+	Se añade la regla $\equiv$ (equiv)
+	\begin{center}
+		\begin{prooftree}
+			\hypo{A \equiv B}
+			\hypo{\Gamma \vdash r:A}
+			\infer2[($\equiv$)]{ \Gamma \vdash r:B }
+		\end{prooftree}
+	\end{center}
+	
+	\pause
+	Esto permite usar $a: A$ en lugar de $b : B$, siempre y cuando $A \equiv B$
+	
+	\begin{prooftree*}
+		\hypo{ \Gamma\vdash r: A }
+		\infer1[($\Rightarrow_i$)]{ \Gamma\vdash \lambda x.r: C \rightarrow A }
+		\hypo{ \Gamma\vdash s: B }
+		\infer1[($\Rightarrow_i$)]{ \Gamma\vdash \lambda x.s: C \rightarrow B }
+		\infer2[($\times_i$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle : \textcolor{red}{(C \rightarrow A) \times (C \rightarrow B)} }
+		\infer1[\textcolor{red}{($\equiv$)}]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle : \textcolor{red}{C \rightarrow (A \times B)} }
+		\hypo{ \Gamma\vdash t: C }
+		\infer2[($\Rightarrow_e$)]{ \Gamma\vdash \langle \lambda x.r, \lambda x.s \rangle \; t : A \times B }
+	\end{prooftree*}
+\end{frame}
+
+\begin{frame}{Relación de equivalencia entre términos}
+	\begin{align*}
+		\langle r,s \rangle &\rightleftarrows \langle s,r \rangle \tag{\textsc{comm}} \\
+		\uncover<2->{
+		\langle r, \langle s,t \rangle \rangle &\rightleftarrows \langle \langle r, s \rangle, t \rangle \tag{\textsc{asso}} \\
+		}
+		\uncover<3->{
+		\lambda x^A. \langle r,s \rangle &\rightleftarrows \langle \lambda x^A.r, \lambda x^A.s \rangle \tag{$\textsc{dist}_{\lambda}$} \\
+		}
+		\uncover<4->{
+		\langle r,s \rangle\, t &\rightleftarrows \langle r\, t, s\, t \rangle \tag{$\textsc{dist}_{app}$} \\
+		}
+		\uncover<5->{
+		r\, \langle s, t \rangle &\rightleftarrows r\, s\, t \tag{\textsc{curry}} \\
+		}
+	\end{align*}
+	\pause[6]
+	\begin{align*}
+		& \langle \lambda x.r, \lambda x.s \rangle \; t \\
+	\onslide<7->{
+		\rightleftarrows&_{\textsc{dist}_\lambda} \\
+		& (\lambda x. \langle r, s \rangle)\; t \\
+	}
+	\onslide<8->{
+		\hookrightarrow&_\beta \\
+		& \langle r[t/x], s[t/x] \rangle
+	}
+	\end{align*}
+\end{frame}
+
+\begin{frame}{Problema}
+	$\textsc{comm}$ permite cambiar el elemento de una proyección:
+	\pause
+	\begin{align*}
+		\pi_1 \langle r, s \rangle& \hookrightarrow_{\pi_1} r \\
+		\pi_1 \langle r, s \rangle& \rightleftarrows_{\textsc{comm}} \pi_1 \langle s, r \rangle \hookrightarrow_{\pi_1} s
+	\end{align*}
+	\pause
+	Si $r: A$ y $s: B$ esto puede ser un problema.
+	
+	\pause
+	
+	La solución es acceder al elemento usando los tipos:
+	\[ \text{si} \; r:A \quad \pi_A \langle r, s \rangle \hookrightarrow_{\pi} r \]
+	
+\end{frame}
+
+\begin{frame}{Relación de reducción}
+	Se define la relación de reducción módulo isomorfismos:
+	\[ \rightsquigarrow \; := \; \rightleftarrows^* \circ \hookrightarrow \circ \rightleftarrows^* \]
+
+	\pause
+	Se aplican todas las transformaciones necesarias para poder reducir el término correctamente.
+
+\end{frame}
+
+\iffalse
+\begin{frame}{Ejemplo: proyección de funciones}
+	\begin{prooftree*}
+		\hypo{ \Gamma\vdash r: B }
+		\hypo{ \Gamma\vdash s: C }
+		\infer2[($\times_i$)]{ \Gamma\vdash \langle r,s \rangle: B \times C }
+		\infer1[($\Rightarrow_i$)]{ \Gamma\vdash \lambda x. \langle r,s \rangle: \textcolor{red}{A \rightarrow (B \times C)} }
+		\infer1[\textcolor{red}{($\equiv$)}]{ \Gamma\vdash \lambda x. \langle r,s \rangle: \textcolor{red}{(A \rightarrow B) \times (A \rightarrow C)} }
+		\infer1[($\times_e$)]{ \Gamma\vdash \pi_{A \rightarrow B} (\lambda x. \langle r,s \rangle) : A \rightarrow B }
+	\end{prooftree*}
+\end{frame}
+
+\begin{frame}{Ejemplo: proyección de funciones}
+	\begin{align*}
+		&\pi_{A \rightarrow B}(\lambda x^A . \langle r,s \rangle)\, a \\
+	\uncover<2->{
+		\rightleftarrows&_{\textsc{dist}_\lambda} \\
+		&\pi_{A \rightarrow B}(\langle \lambda x^A.r, \lambda x^A.s \rangle)\, a \\
+	}
+	\uncover<3->{
+		\hookrightarrow&_\pi \\
+		&(\lambda x^A. r)\, a \\
+	}
+	\uncover<4->{
+		\hookrightarrow&_\beta \\
+		&r[a/x]
+	}
+	\end{align*}
+\end{frame}
+
+\begin{frame}{Ejemplo: aplicación de argumentos en cualquier orden}
+	\[ \lambda x^A. \lambda y^B. r : A \rightarrow B \rightarrow C \]
+	\pause
+	
+	\begin{align*}
+		&A \rightarrow B \rightarrow C \\
+		\equiv&_{\textsc{curry}} \\
+		&(A \times B) \rightarrow C \\
+		\equiv&_{\textsc{comm}} \\
+		&(B \times A) \rightarrow C \\
+		\equiv&_{\textsc{curry}} \\
+		&B \rightarrow A \rightarrow C
+	\end{align*}	
+\end{frame}
+
+\begin{frame}{Ejemplo: aplicación de argumentos en cualquier orden}
+	\begin{align*}
+		&(\lambda x^A. \lambda y^B. r)\, b\, a \\
+	\uncover<2->{
+		\rightleftarrows&_{\textsc{curry}} \\
+		&(\lambda x^A. \lambda y^B. r)\, \langle b,a \rangle \\
+	}
+	\uncover<3->{
+		\rightleftarrows&_{\textsc{comm}} \\
+		&(\lambda x^A. \lambda y^B. r)\, \langle a,b \rangle \\
+	}
+	\uncover<4->{
+		\rightleftarrows&_{\textsc{curry}} \\
+		&(\lambda x^A. \lambda y^B. r)\, a\, b \\
+	}
+	\uncover<5->{
+		\hookrightarrow&_\beta \\
+		&(\lambda y^B. r[a/x])\, b \\
+		\hookrightarrow&_\beta \\
+		&r[a/x, b/y]
+	}
+	\end{align*}
+\end{frame}
+\fi

@@ -1,0 +1,338 @@
+
+\begin{frame}{Normalización Fuerte}
+	\begin{block}{Definición (SN)}
+		Un término $s$ es fuertemente normalizante si todos sus reductos también lo son:
+
+		\centering
+		\begin{prooftree}
+			\hypo{ \forall t. s \hookrightarrow t \implies t \in SN }
+			\infer1{ s \in SN }
+		\end{prooftree}
+	\end{block}
+	
+	\pause
+	
+	\ExecuteMetaData[code/SN1.tex]{sn-def}
+	
+	%\ExecuteMetaData[code/SN3.tex]{adequacy-proof}
+\end{frame}
+
+\begin{frame}{Ejemplos}
+	\ExecuteMetaData[code/example.tex]{sn-1}
+	\pause
+	\ExecuteMetaData[code/example.tex]{sn-2}
+	\pause
+	\ExecuteMetaData[code/example.tex]{sn-3}
+\end{frame}
+
+\begin{frame}{Approach 1}
+	Realizamos inducción directa sobre los términos:
+	\begin{AgdaSuppressSpace}
+		\ExecuteMetaData[code/SN1.tex]{strong-type}
+		
+		\pause
+		
+		\ExecuteMetaData[code/SN1.tex]{strong-proof}
+	\end{AgdaSuppressSpace}
+	
+	\begin{itemize}[<+->]
+		\item Por H.I. sabemos que $SN$ vale para los subterminos.
+		\item Definimos algunos lemas para construir $SN$ para todo el término.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Approach 1}
+	Definimos una función auxiliar para realizar \textit{pattern matching} sobre el paso de reducción:
+
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<2>{\draw[red,thick,rounded corners] (4.40972, 5.01036) rectangle (5.29167, 4.58964);
+		\draw[red,thick,rounded corners] (4.23333, 4.20031) rectangle (5.715, 3.7417);}
+		\only<3>{
+		\draw[red,thick,rounded corners] (7.54944, 4.20031) rectangle (9.13694, 3.7417);}
+	\end{tikzpicture}
+	\ExecuteMetaData[code/SN1.tex]{lemma-abs}
+	
+	\pause
+	$ step : t \hookrightarrow t' $
+	
+	\pause
+	$ f\; step : SN\; t' $
+	
+	\pause
+	$ \text{lemma-ƛ } (f\; step) : SN\; (ƛ\; t') $
+\end{frame}
+
+\begin{frame}{Approach 1}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<1>{
+			\draw[red,thick,rounded corners] (5.04472, 4.93981) rectangle (6.91444, 4.05786);
+			\draw[red,thick,rounded corners] (8.78417, 4.93981) rectangle (10.3011, 4.48119);
+			\draw[red,thick,rounded corners] (9.525, 4.51647) rectangle (11.0067, 4.09314);
+		}
+	\end{tikzpicture}
+	\ExecuteMetaData[code/SN1.tex]{lemma-app}
+	\pause
+	No podemos concluir nada sobre $t[b]$, de hecho, la substitución podría crear nuevos redexes dentro de $t$.
+\end{frame}
+
+\begin{frame}{Approach 1}
+	El lema de introducción del par es simple...
+	\ExecuteMetaData[code/SN1.tex]{lemma-prod}
+\end{frame}
+
+\begin{frame}{Approach 1}
+	Pero la eliminación también da problemas:
+	\ExecuteMetaData[code/SN1.tex]{lemma-proj}
+\end{frame}
+
+\begin{frame}{Approach 2}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\draw[red,thick,rounded corners] (2.2225, 6.63447) rectangle (2.92806, 6.24642);
+	\end{tikzpicture}
+	Definimos un $SN$ más general que añade un predicado sobre el término:
+	\ExecuteMetaData[code/SN2.tex]{sn-star}
+	\pause
+	Es fácil ver que $SN^*$ implica $SN$:
+	\ExecuteMetaData[code/SN2.tex]{sn-star-sn}
+	\pause
+	Luego definimos la \textbf{interpretación del término}:
+	\ExecuteMetaData[code/SN2.tex]{inter}
+	
+	% La definición de la interpretacíon en un término particular refleja la estructura lógica de ese término de forma apropiada.
+\end{frame}
+
+\begin{frame}{Approach 2}
+	La prueba queda divida en dos pasos:
+
+	\begin{itemize}[<+->]
+		\item Primero se prueba el teorema fundamental:
+		\ExecuteMetaData[code/SN2.tex]{adequacy-type}
+		
+		\item Luego es fácil probar $SN$:
+		\ExecuteMetaData[code/SN2.tex]{strong-proof}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Approach 2}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<1>{
+			\draw[red,thick,rounded corners] (3.81, 2.96247) rectangle (4.33917, 2.53913);
+			\draw[red,thick,rounded corners] (7.72583, 2.96247) rectangle (8.96056, 2.53913);
+		}
+	\end{tikzpicture}
+	
+	\begin{itemize}
+		\item La interpretación de la abstracción permite probar el caso de la aplicación.
+	\end{itemize}
+	\ExecuteMetaData[code/SN2.tex]{lemma-app}
+\end{frame}
+
+\begin{frame}{Approach 2}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<1>{
+			\draw[red,thick,rounded corners] (6.77333, 3.63893) rectangle (7.47889, 3.28616);
+			\draw[red,thick,rounded corners] (10.0894, 3.63893) rectangle (10.795, 3.28616);
+		}
+	\end{tikzpicture}
+
+	\begin{itemize}
+		\item La interpretación del par resuelve el caso de la proyección.
+	\end{itemize}
+	\ExecuteMetaData[code/SN2.tex]{lemma-proj}
+\end{frame}
+
+\begin{frame}{Approach 2}
+	\setlength{\leftmargini}{0cm}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<2>{\draw[red,thick,rounded corners] (5.18583, 5.39975) rectangle (7.44361, 4.97642);}
+		\only<3>{\draw[red,thick,rounded corners] (7.79639, 3.7417) rectangle (8.99583, 3.17725);}
+	\end{tikzpicture}
+	Las introducciones ahora deben construir las interpretaciones.
+
+	\begin{itemize}[<+->]
+		\item El caso del par es simple:
+		\ExecuteMetaData[code/SN2.tex]{lemma-prod}
+		
+		\item El caso de la abstracción es complejo:
+		\ExecuteMetaData[code/SN2.tex]{lemma-abs}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Approach 2}
+	\ExecuteMetaData[code/SN2.tex]{adequacy-proof}
+\end{frame}
+
+\begin{frame}{Approach 3}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<1>{\draw[red,thick,rounded corners] (7.44361, 5.22336) rectangle (10.16, 4.80003);}
+		\only<2>{\draw[red,thick,rounded corners] (11.9592, 5.22336) rectangle (12.8411, 4.80003);}
+		\only<3>{\draw[red,thick,rounded corners] (7.3025, 3.17725) rectangle (7.9375, 2.82447);}
+	\end{tikzpicture}
+
+	Generalizamos el teorema fundamental, vamos a probar que vale para cualquier $t$ con cualquier substitución aplicada:
+	\ExecuteMetaData[code/SN3.tex]{adequacy-type}
+	\pause[3]
+	\ExecuteMetaData[code/SN3.tex]{strong-proof}
+\end{frame}
+
+
+\begin{frame}{Approach 3}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<1>{\draw[red,thick,rounded corners] (6.70278, 4.83659) rectangle (7.90222, 4.37797);
+			\draw[red,thick,rounded corners] (3.77472, 4.34142) rectangle (5.18583, 3.95336);
+		}
+	\end{tikzpicture}
+	%\ExecuteMetaData[code/SN3.tex]{subst-split}
+	
+	\ExecuteMetaData[code/SN3.tex]{adequacy-proof}
+	\pause
+	Ahora el problema está en el caso de las variables, una substitución arbitraria podría ``romper'' el término.
+\end{frame}
+
+\begin{frame}{Approach 4}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<1>{
+			\draw[red,thick,rounded corners] (5.04472, 7.05781) rectangle (7.26722, 6.56392);
+		}
+		\only<4>{
+			\draw[red,thick,rounded corners] (7.65528, 1.27225) rectangle (8.74889, 0.778363);
+		}
+	\end{tikzpicture}
+	Definimos las \textbf{substituciones adecuadas}:
+	\ExecuteMetaData[code/SN4.tex]{adequacy-subst}
+	\pause
+	En particular $ids$ es adecuada:
+	\ExecuteMetaData[code/SN4.tex]{adequacy-ids}
+	\pause
+	El cons entre un término $SN$ y una subst. adecuada, también es adecuada:
+	\ExecuteMetaData[code/SN4.tex]{adequacy-cons}
+	\pause
+	Nuevamente fortalecemos el teorema:
+	\ExecuteMetaData[code/SN4.tex]{adequacy-type}
+\end{frame}
+
+\begin{frame}{Approach 4}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<3>{\draw[red,thick,rounded corners] (3.77472, 4.72) rectangle (5.60917, 4.35);}
+	\end{tikzpicture}
+	
+	\ExecuteMetaData[code/SN4.tex]{adequacy-proof}
+	\pause
+	\ExecuteMetaData[code/SN4.tex]{strong-proof}
+\end{frame}
+
+\begin{frame}{Approach 4}
+	La extensión de una subst. adecuada es también es adecuada:
+	\ExecuteMetaData[code/SN4.tex]{adequacy-exts}
+	\pause
+	Los renombres preservan la propiedad $SN^*$:
+	\ExecuteMetaData[code/SN4.tex]{sn-rename}
+	\pause
+	Los renombres preservan la interpretación:
+	\ExecuteMetaData[code/SN4.tex]{inter-rename}
+\end{frame}
+
+\begin{frame}{Approach 5}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<1>{\draw[red,thick,rounded corners] (8.64306, 6.63447) rectangle (11.5711, 6.14059);}
+	\end{tikzpicture}
+
+	Generalizamos la interpretación de la abstracción:
+	\ExecuteMetaData[code/SN5.tex]{inter}
+	\pause
+	\ExecuteMetaData[code/SN5.tex]{inter-rename}
+	\pause
+	La composición entre un renombre y una subst. adecuada, también es adecuada:
+	\ExecuteMetaData[code/SN5.tex]{adequacy-rename}
+\end{frame}
+
+\begin{frame}{Approach 5}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<2>{\draw[red,thick,rounded corners] (7.83167, 4.6602) rectangle (10.3011, 4.16631);}
+	\end{tikzpicture}
+	%\ExecuteMetaData[code/SN5.tex]{subst-split}
+	\ExecuteMetaData[code/SN5.tex]{adequacy-proof}
+\end{frame}
+
+\begin{frame}{Prueba para Sistema I}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<1>{
+			\draw[red,thick,rounded corners] (2.92806, 6.66975) rectangle (3.4925, 6.35225);
+			\draw[red,thick,rounded corners] (4.72722, 6.66975) rectangle (5.25639, 6.35225);
+		}
+		\only<2>{
+			\draw[red,thick,rounded corners] (4.05694, 5.47031) rectangle (4.58611, 5.11753);
+		}
+	\end{tikzpicture}
+	Definimos la $SN$ para la unión entre $\hookrightarrow$ y $\rightleftarrows$:
+	\ExecuteMetaData[code/strong_norm.tex]{SN}
+	\pause
+	La suma $\biguplus$ funciona igual al \textbf{Either} de Haskell:
+	\pause
+	\[ \text{data } \textbf{Either } a\; b  = \textbf{Left } a \mid \textbf{Right } b \]
+	\pause
+	Donde \textbf{Left} y \textbf{Right} se llaman $inj_1$ y $inj_2$ resp.
+	
+	\pause
+	\ExecuteMetaData[code/strong_norm.tex]{sn-star}
+\end{frame}
+
+\begin{frame}{Prueba para Sistema I}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<2>{
+			\draw[red,thick,rounded corners] (4.33917, 2.64936) rectangle (7.47889, 1.76742);
+			\draw[red,thick,rounded corners] (9.34861, 2.64936) rectangle (12.1003, 1.8027);
+		}
+	\end{tikzpicture}
+	Se agrega el caso en adequacy:
+	\ExecuteMetaData[code/strong_norm.tex]{adecuacy-iso}
+	\pause
+	El caso de la congruencia es simple:
+	\ExecuteMetaData[code/strong_norm.tex]{lemma-iso-type}
+\end{frame}
+
+\begin{frame}{Caso \textsc{comm}}
+	Para las equivalencias la idea es:
+	\begin{itemize}
+		\item ``Desarmar'' las hipótesis del lado izquierdo.
+		\item Reconstruir $SN*$ del lado derecho usando los lemas anteriores.
+	\end{itemize}
+	\ExecuteMetaData[code/strong_norm.tex]{iso-comm}
+\end{frame}
+
+\begin{frame}{Caso \textsc{curry}}
+	\[ \lambda x^A. \lambda y^B. t \rightleftarrows \lambda z^{A \times B}. t[\pi_A(z)/x, \pi_B(z)/y] \]
+	\pause
+	
+	Por hipótesis sabemos:
+	\[ \forall \textcolor{red}{u_1}, \textcolor{blue}{u_2} \in SN* \Longrightarrow t[\textcolor{red}{u_1/x}, \textcolor{blue}{u_2/y}] \in SN* \]
+	\pause
+	
+	Debemos probar:
+	\[ \lambda z. t[\textcolor{red}{\pi_A(z)/x}, \textcolor{blue}{\pi_B(z)/y}] \in SN* \]
+	\pause
+	\[ \forall u \in SN* \Longrightarrow (t[\pi_A(\textcolor{red}{z})/x, \pi_B(\textcolor{red}{z})/y])[\textcolor{red}{u}/\textcolor{red}{z}] \pause = t[\pi_A(\textcolor{red}{u})/x, \pi_B(\textcolor{red}{u})/y] \in SN* \]
+	 
+	\pause
+	Basta con instanciar la hipótesis usando:
+	\[ u_1 = \pi_A(u) \quad u_2 = \pi_B(u) \]
+\end{frame}
+
+\begin{frame}{Caso \textsc{curry}}
+	\[ \lambda x^{A \times B}. t \rightleftarrows \lambda y^A. \lambda z^B. t[\langle y, z \rangle/x] \]
+	\pause
+	
+	Por hipótesis sabemos:
+	\[ \forall u \in SN \Longrightarrow t[u/x] \in SN* \]
+	\pause
+	
+	Debemos probar:
+	\[ \lambda \textcolor{blue}{y}. \lambda \textcolor{red}{z}. t[\langle \textcolor{blue}{y}, \textcolor{red}{z} \rangle/x] \in SN* \]
+	
+	\pause
+	\[ \forall \textcolor{blue}{u_1}, \textcolor{red}{u_2} \in SN* \Longrightarrow ((t[\langle \textcolor{blue}{y}, \textcolor{red}{z} \rangle/x])[\textcolor{blue}{u_1}/\textcolor{blue}{y}])[\textcolor{red}{u_2}/\textcolor{red}{z}] \pause = t[\langle \textcolor{blue}{u_1}, \textcolor{red}{u_2} \rangle/x] \in SN* \]
+
+	\pause
+	Basta con instanciar la hipótesis usando:
+	\[ u = \langle u_1, u_2 \rangle \]
+\end{frame}

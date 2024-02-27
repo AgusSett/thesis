@@ -1,0 +1,415 @@
+
+\begin{frame}{Indices de De Bruijn}
+	\[ \lambda z. (\lambda y. y (\lambda x. x)) (\lambda x. z x) \]
+	
+	\pause
+	\[ \textcolor{red}{\lambda} (\textcolor{blue}{\lambda\; 0} \; (\textcolor{orange}{\lambda\; 0})) (\textcolor{green}{\lambda}\; \textcolor{red}{1} \; \textcolor{green}{0}) \]
+	
+	\pause
+	\[ (\lambda x. \lambda y. z x (\lambda z. z x)) \; (\lambda x. w x) \]
+	
+	\pause
+	\[
+	(\textcolor{red}{\lambda}\; \lambda\; \textcolor{magenta}{2}\; \textcolor{red}{1}\; (\textcolor{green}{\lambda\; 0}\; \textcolor{red}{2}))\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{2}\; \textcolor{blue}{0})
+	\pause
+	\hookrightarrow_\beta
+	\alt{
+		\lambda \; \textcolor{magenta}{1} \; (\textcolor{blue}{\lambda}\; \textcolor{orange}{3}\; \textcolor{blue}{0})\; (\textcolor{green}{\lambda\; 0}\; (\textcolor{blue}{\lambda}\; \textcolor{orange}{4}\; \textcolor{blue}{0}))\;
+	}{
+		\lambda \; \textcolor{magenta}{1} \; \textcolor{red}{\square} \; (\textcolor{green}{\lambda\; 0}\; \textcolor{red}{\square})\;
+	}<6>
+	\]
+\end{frame}
+
+\begin{frame}{Substituciones explícitas}
+	Usando índices, las substituciones son secuencias de términos:
+	\[ \{0\mapsto a, 1\mapsto b, 2\mapsto 0, 3\mapsto 1, \dots \} = \{a, b, 0, 1, \dots\} \]
+	
+	\pause
+	\begin{itemize}[<+->]
+		\item $id$ (substitución identidad) $\{i \mapsto i\} = \{0, 1, 2, \dots \}$.
+		\item $\uparrow$ (shift) $\{i \mapsto i+1\} = \{1, 2, 3, \dots \}$.
+		\item $a \bullet s$ (cons) $\{0 \mapsto a, i+1 \mapsto s(i)\}$. \pause \\ Por ejemplo $a \bullet id = \{ 0 \mapsto a, i+1 \mapsto i \} = \{ a, 0, 1, 2, \dots \}$
+		%\item $s \circ t$ (composición) $t$ $\{ i \mapsto \llangle t \rrangle (s(i)) \}$.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Substituciones explícitas}
+	Usamos $\llangle s \rrangle t$ para denotar la aplicación de la subst $s$ sobre $t$.
+
+	\pause
+	\begin{align*}
+		\llangle s \rrangle n &= s(n) \\
+		\uncover<3->{
+		\llangle s \rrangle (a\; b) &= \llangle s \rrangle a\; \llangle s \rrangle b \\
+		}
+		\uncover<4->{
+		\llangle s \rrangle (\lambda a) &= \lambda \llangle 0 \bullet (\uparrow \circ\; s) \rrangle a
+		}
+	\end{align*}
+	
+	\pause[5]
+	Implementación de la $\beta$-reducción usando esta notación:
+	\[ (\lambda t)\; a \hookrightarrow_\beta t[a] = \llangle a \bullet id \rrangle t \]
+\end{frame}
+
+\begin{frame}{Tipos}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\[ A := \top \mid A \rightarrow A \mid A \times A \]
+			
+			\input{code/type.tex}
+		\end{column}
+		%\begin{column}{0.5\textwidth}
+		%	\pause
+		%	\ExecuteMetaData[code/example.tex]{types}
+		%%\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Indices intrínsecamente tipados}
+	$\Gamma := \emptyset \mid \Gamma, x:A$
+	\ExecuteMetaData[code/context.tex]{ctx}
+	\pause
+	\ExecuteMetaData[code/context.tex]{index}
+\end{frame}
+
+\begin{frame}{Ejemplo}
+	\ExecuteMetaData[code/context.tex]{example}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Términos}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/term.tex]{base}		
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{prooftree}
+				\infer0[($ax$)]{ \Gamma, x:A \vdash x:A }
+			\end{prooftree}
+			
+			\vspace{1em}
+			\begin{prooftree}
+				\infer0[($\top_i$)]{ \Gamma \vdash \star:\top }
+			\end{prooftree}
+		\end{column}
+	\end{columns}
+	
+	\pagebreak
+	
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/term.tex]{abs}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{prooftree}
+				\hypo{\Gamma, x:A \vdash r:B}
+				\infer1[($\Rightarrow_i$)]{ \Gamma \vdash \lambda x.r : A \rightarrow B }
+			\end{prooftree}
+			
+			\vspace{1em}
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r : A \rightarrow B}
+				\hypo{\Gamma \vdash s:A}
+				\infer2[($\Rightarrow_e$)]{ \Gamma \vdash rs : B }
+			\end{prooftree}
+		\end{column}
+	\end{columns}
+	
+	\pagebreak
+		
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/term.tex]{prod}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r:A}
+				\hypo{\Gamma \vdash s:B}
+				\infer2[($\times_i$)]{ \Gamma \vdash \langle r, s \rangle : A \times B }
+			\end{prooftree}
+			
+			\vspace{1em}
+			\begin{prooftree}
+				\hypo{\Gamma \vdash r : A \times B}
+				\infer1[($\times_e$)]{ \Gamma \vdash \pi_A(r) : A }
+			\end{prooftree}
+		\end{column}
+	\end{columns}
+	
+	\pagebreak
+	
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/term.tex]{equiv}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{prooftree}
+				\hypo{A \equiv B}
+				\hypo{\Gamma \vdash r:A}
+				\infer2[($\equiv$)]{ \Gamma \vdash r:B }
+			\end{prooftree}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Ejemplo}
+	\ExecuteMetaData[code/example.tex]{term1}
+	\pause
+	\ExecuteMetaData[code/example.tex]{term2}
+	\pause
+	\ExecuteMetaData[code/example.tex]{term3}
+\end{frame}
+
+\begin{frame}{Substituciones explícitas}
+	\ExecuteMetaData[code/subs.tex]{subs-type}
+	\pause
+	\ExecuteMetaData[code/subs.tex]{ids}
+	\pause
+	\ExecuteMetaData[code/subs.tex]{cons}
+\end{frame}
+
+\begin{frame}{Substituciones explícitas}
+	\ExecuteMetaData[code/subs.tex]{single}
+	
+	%\pause
+	%\ExecuteMetaData[code/example.tex]{subst1}
+	%\ExecuteMetaData[code/example.tex]{subst2}
+	%$ (\lambda x. y\; (y \; x)) [ \lambda z.z ] \cong \lambda x. (\lambda z.z)\; ((\lambda z.z) \; x) $
+\end{frame}
+
+\begin{frame}{Substituciones explícitas}
+	\ExecuteMetaData[code/subs.tex]{ren-type}
+	\ExecuteMetaData[code/subs.tex]{rename}
+	
+	%\pause
+	%\ExecuteMetaData[code/example.tex]{rename}
+\end{frame}
+
+\begin{frame}{Substituciones explícitas}
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<4>{
+			\draw[red,thick,rounded corners] (4.37444, 2.65099) rectangle (7.23194, 1.8396);
+		}
+	\end{tikzpicture}
+	\ExecuteMetaData[code/subs.tex]{exts}
+	\pause
+	\ExecuteMetaData[code/subs.tex]{shift}
+	\pause
+	\ExecuteMetaData[code/subs.tex]{impl}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Reducción}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/reduction.tex]{app}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\centering
+			\begin{prooftree}
+				\hypo{t \hookrightarrow t'}
+				\infer1{ t\;s \hookrightarrow t'\;s }
+			\end{prooftree}
+			
+			\vspace{1em}
+			\begin{prooftree}
+				\hypo{s \hookrightarrow s'}
+				\infer1{ t\;s \hookrightarrow t\;s' }
+			\end{prooftree}
+			
+			\vspace{1em}
+			\begin{prooftree}
+				\hypo{t \hookrightarrow t'}
+				\infer1{ \lambda t \hookrightarrow \lambda t' }
+			\end{prooftree}
+		\end{column}
+	\end{columns}
+	
+	\pagebreak
+	
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/reduction.tex]{app2}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\[ (\lambda t)\; s \hookrightarrow t[s] \]
+		\end{column}
+	\end{columns}
+	
+	\pagebreak
+	
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/reduction.tex]{pair}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\centering
+			\begin{prooftree}
+				\hypo{r \hookrightarrow r'}
+				\infer1{ \langle r,s \rangle \hookrightarrow \langle r',s \rangle }
+			\end{prooftree}
+			
+			\vspace{1em}
+			\begin{prooftree}
+				\hypo{s \hookrightarrow s'}
+				\infer1{ \langle r,s \rangle \hookrightarrow \langle r,s' \rangle }
+			\end{prooftree}
+			
+			\vspace{1em}
+			\begin{prooftree}
+				\hypo{t \hookrightarrow t'}
+				\infer1{ \pi_C t \hookrightarrow \pi_C t' }
+			\end{prooftree}
+		\end{column}
+	\end{columns}
+	
+	\pagebreak
+	
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/reduction.tex]{pair2}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\[ \text{Si } r: A \quad \pi_A \langle r,s \rangle \hookrightarrow r \]
+		\end{column}
+	\end{columns}
+	
+	\pagebreak
+
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/reduction.tex]{iso}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\centering
+			\begin{prooftree}
+				\hypo{t \hookrightarrow t'}
+				\infer1{ [iso]\!\!\equiv t \hookrightarrow [iso]\!\!\equiv t' }
+			\end{prooftree}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}{Ejemplo}
+	$ (\pi_{A \rightarrow A} \langle \lambda x.x, \star \rangle)\; y \hookrightarrow_\pi (\lambda x.x)\; y $
+	\pause
+	\ExecuteMetaData[code/example.tex]{reduction}
+\end{frame}
+
+\begin{frame}{Isomorfismos de tipos}
+	\input{code/iso_type.tex}
+\end{frame}
+
+\begin{frame}{Ejemplo}
+	\ExecuteMetaData[code/example.tex]{iso-type}
+\end{frame}
+
+\begin{frame}{Equivalencias entre términos}
+	\[ \langle r,s \rangle \rightleftarrows \langle s,r \rangle \]
+	\ExecuteMetaData[code/iso_term.tex]{comm}
+\end{frame}
+
+\begin{frame}{Equivalencias entre términos}
+	\[ \langle r,\langle s,t \rangle \rangle \rightleftarrows \langle \langle r,s \rangle,t \rangle \]
+	\ExecuteMetaData[code/iso_term.tex]{asso}
+\end{frame}
+
+\begin{frame}{Equivalencias entre términos}	
+	\[ \langle r,s \rangle \rightleftarrows_{\textsc{split}} \pause \langle r, \boldsymbol{\langle} \textcolor{red}{\pi_B(s)}, \textcolor{blue}{\pi_C(s)} \boldsymbol{\rangle} \rangle \pause \rightleftarrows_{\textsc{asso}} \langle \boldsymbol{\langle} r, \textcolor{red}{\pi_B(s)} \boldsymbol{\rangle}, \textcolor{blue}{\pi_C(s)} \rangle \]
+	\pause
+	\ExecuteMetaData[code/iso_term.tex]{asso-split}
+\end{frame}
+
+\begin{frame}{Equivalencias entre términos}	
+	\[ \lambda \langle r, s \rangle \rightleftarrows \langle \lambda r, \lambda s \rangle \]
+	\ExecuteMetaData[code/iso_term.tex]{dist}
+	\ExecuteMetaData[code/iso_term.tex]{sym-dist}
+\end{frame}
+
+\iffalse
+\begin{frame}{Equivalencias entre términos}	
+	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
+		\only<2>{\draw[red,thick,rounded corners] (1.76389, 4.94405) rectangle (3.73944, 4.59127);}
+		\only<2>{\draw[red,thick,rounded corners] (7.44361, 5.0146) rectangle (9.38389, 4.55599);}
+	\end{tikzpicture}
+	\ExecuteMetaData[code/iso_term.tex]{cong-pair}
+\end{frame}
+\fi
+
+\begin{frame}{Equivalencias entre términos}	
+	\[ \lambda \textcolor{red}{x^A}. \lambda \textcolor{blue}{y^B}. r \rightleftarrows \lambda z^{A \times B}. r[\textcolor{blue}{\pi_B(z)/y}, \textcolor{red}{\pi_A(z)/x}] \]
+
+	\pause
+	\[ \lambda r[\textcolor{blue}{\pi_B(0)}, \textcolor{red}{\pi_A(0)}] \]
+	
+	\pause
+	\ExecuteMetaData[code/iso_term.tex]{subs-curry}
+	
+	\pause
+	\ExecuteMetaData[code/iso_term.tex]{curry}
+\end{frame}
+
+\begin{frame}{Equivalencias entre términos}	
+	\[ \lambda x^{\textcolor{red}{A} \times \textcolor{blue}{B}}. r \rightleftarrows \lambda \textcolor{red}{y^A}. \lambda \textcolor{blue}{z^B}. r[\langle \textcolor{red}{y}, \textcolor{blue}{z} \rangle/x] \]
+
+	\pause
+	\[ \lambda \lambda r[\langle \textcolor{red}{1},\textcolor{blue}{0} \rangle] \]
+	
+	\pause
+	\ExecuteMetaData[code/iso_term.tex]{subs-uncurry}
+	
+	\pause
+	\ExecuteMetaData[code/iso_term.tex]{uncurry}
+	
+	%\ExecuteMetaData[code/iso_term.tex]{id-pair}
+	%\ExecuteMetaData[code/iso_term.tex]{cong-abs}
+	%\ExecuteMetaData[code/iso_term.tex]{cong-pair}
+	%\ExecuteMetaData[code/iso_term.tex]{cong-app}
+\end{frame}
+
+\begin{frame}{Equivalencias entre términos}	
+	\ExecuteMetaData[code/iso_term.tex]{cong-proj}
+\end{frame}
+
+\begin{frame}{Ejemplo}
+	%\ExecuteMetaData[code/example.tex]{iso-term-1}
+	%$ \langle \star, \textcolor{red}{\langle \lambda x.x, \star \rangle} \rangle \rightleftarrows \langle \star, \textcolor{red}{\langle \star, \lambda x.x \rangle} \rangle $
+	%\pause
+	\ExecuteMetaData[code/example.tex]{iso-term-2}
+	$ \lambda x. \textcolor{red}{\lambda y. \langle x, y \rangle} \rightleftarrows \lambda x. \textcolor{red}{\langle \lambda y.x, \lambda y.y \rangle} $
+\end{frame}
+
+\iffalse
+\begin{frame}{Evaluación}
+	\ExecuteMetaData[code/eval.tex]{relation}
+\end{frame}
+
+\begin{frame}{Evaluación}
+	\AtBeginEnvironment{code}{\fontsize{7}{11}\selectfont}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\ExecuteMetaData[code/example.tex]{eval1}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\fontsize{7}{8}\selectfont
+			\vspace{4.5em}
+			\begin{align*}
+				&\pi_{(\top \times (A \rightarrow A) ) \rightarrow \top} (\lambda x. \lambda y. \langle x, y \rangle) \; \langle \star , \lambda z.z \rangle \\
+				&\rightleftarrows_{\textsc{curry}} \\
+				&\pi_{(\top \times (A \rightarrow A) ) \rightarrow \top} (\lambda x. \langle \pi_\top x , \pi_{A \rightarrow A} x \rangle) \; \langle \star , \lambda z.z \rangle \\
+				\\
+				&\rightleftarrows_{\textsc{dist}} \\
+				&\pi_{(\top \times (A \rightarrow A) ) \rightarrow \top} (\langle \lambda x. \pi_\top x , \lambda x. \pi_{A \rightarrow A} x \rangle) \; \langle \star , \lambda x.x \rangle \\
+				&\hookrightarrow_\pi \\
+				&(\lambda x. \pi_\top x)\; \langle \star , \lambda z.z \rangle \\
+				&\hookrightarrow_\beta \\
+				&\pi_\top \langle \star , \lambda z.z \rangle \\
+				&\hookrightarrow_\pi \\
+				&\star
+			\end{align*}
+		\end{column}
+	\end{columns}
+	\AtBeginEnvironment{code}{\fontsize{10}{12}\selectfont}
+	%\ExecuteMetaData[code/eval.tex]{eval}
+\end{frame}
+\fi
