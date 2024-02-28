@@ -39,7 +39,7 @@
 
 	\pause
 	\begin{align*}
-		\llangle s \rrangle n &= s(n) \\
+		\llangle s \rrangle x &= s(x) \\
 		\uncover<3->{
 		\llangle s \rrangle (a\; b) &= \llangle s \rrangle a\; \llangle s \rrangle b \\
 		}
@@ -155,8 +155,10 @@
 
 \begin{frame}{Ejemplo}
 	\ExecuteMetaData[code/example.tex]{term1}
+	$\quad\lambda x^\top . y\; (y\; x) : \top \rightarrow \top$
 	\pause
 	\ExecuteMetaData[code/example.tex]{term2}
+	$\lambda y^{\top \rightarrow \top} . \lambda x^\top . y\;(y\; x) : (\top \rightarrow \top) \rightarrow \top \rightarrow \top$
 	\pause
 	\ExecuteMetaData[code/example.tex]{term3}
 \end{frame}
@@ -192,9 +194,9 @@
 			\draw[red,thick,rounded corners] (4.37444, 2.65099) rectangle (7.23194, 1.8396);
 		}
 	\end{tikzpicture}
-	\ExecuteMetaData[code/subs.tex]{exts}
-	\pause
 	\ExecuteMetaData[code/subs.tex]{shift}
+	\pause
+	\ExecuteMetaData[code/subs.tex]{exts}
 	\pause
 	\ExecuteMetaData[code/subs.tex]{impl}
 \end{frame}
@@ -291,7 +293,7 @@
 \end{frame}
 
 \begin{frame}{Ejemplo}
-	$ (\pi_{A \rightarrow A} \langle \lambda x.x, \star \rangle)\; y \hookrightarrow_\pi (\lambda x.x)\; y $
+	$ (\textcolor{red}{\pi_{A \rightarrow A} \langle \lambda x.x, \star \rangle})\; y \hookrightarrow_\pi (\lambda x.x)\; y $
 	\pause
 	\ExecuteMetaData[code/example.tex]{reduction}
 \end{frame}
@@ -376,7 +378,7 @@
 	%$ \langle \star, \textcolor{red}{\langle \lambda x.x, \star \rangle} \rangle \rightleftarrows \langle \star, \textcolor{red}{\langle \star, \lambda x.x \rangle} \rangle $
 	%\pause
 	\ExecuteMetaData[code/example.tex]{iso-term-2}
-	$ \lambda x. \textcolor{red}{\lambda y. \langle x, y \rangle} \rightleftarrows \lambda x. \textcolor{red}{\langle \lambda y.x, \lambda y.y \rangle} $
+	$ \lambda x. \textcolor{red}{\lambda y. \langle} x, y \textcolor{red}{\rangle} \rightleftarrows \lambda x. \textcolor{red}{\langle \lambda y.} x, \textcolor{red}{\lambda y.}y \textcolor{red}{\rangle} $
 \end{frame}
 
 \iffalse

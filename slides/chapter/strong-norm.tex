@@ -5,8 +5,8 @@
 
 		\centering
 		\begin{prooftree}
-			\hypo{ \forall t. s \hookrightarrow t \implies t \in SN }
-			\infer1{ s \in SN }
+			\hypo{ \forall t'.\; t \hookrightarrow t' \implies t' \in SN }
+			\infer1{ t \in SN }
 		\end{prooftree}
 	\end{block}
 	
@@ -178,13 +178,17 @@
 
 \begin{frame}{Approach 3}
 	\begin{tikzpicture}[overlay, remember picture, shift=(current page.south west)]
-		\only<1>{\draw[red,thick,rounded corners] (6.70278, 4.83659) rectangle (7.90222, 4.37797);
-			\draw[red,thick,rounded corners] (3.77472, 4.34142) rectangle (5.18583, 3.95336);
+		\only<1>{\draw[red,thick,rounded corners] (6.70278, 5.3) rectangle (7.90222, 4.85);
+			\draw[red,thick,rounded corners] (3.77472, 4.85) rectangle (5.18583, 4.38);
 		}
 	\end{tikzpicture}
 	%\ExecuteMetaData[code/SN3.tex]{subst-split}
 	
 	\ExecuteMetaData[code/SN3.tex]{adequacy-proof}
+	\pause
+	
+	\vspace*{-0.5cm}
+	\ExecuteMetaData[code/SN4.tex]{subst-split}
 	\pause
 	Ahora el problema está en el caso de las variables, una substitución arbitraria podría ``romper'' el término.
 \end{frame}
@@ -217,7 +221,6 @@
 	\end{tikzpicture}
 	
 	\ExecuteMetaData[code/SN4.tex]{adequacy-proof}
-	\ExecuteMetaData[code/SN4.tex]{subst-split}
 	\pause
 	\ExecuteMetaData[code/SN4.tex]{strong-proof}
 \end{frame}

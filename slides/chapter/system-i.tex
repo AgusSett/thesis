@@ -113,14 +113,14 @@
 	Se añade la regla $\equiv$ (equiv)
 	\begin{center}
 		\begin{prooftree}
-			\hypo{A \equiv B}
-			\hypo{\Gamma \vdash r:A}
-			\infer2[($\equiv$)]{ \Gamma \vdash r:B }
+			\hypo{\textcolor{red}{A} \equiv \textcolor{blue}{B}}
+			\hypo{\Gamma \vdash r:\textcolor{red}{A}}
+			\infer2[($\equiv$)]{ \Gamma \vdash r:\textcolor{blue}{B} }
 		\end{prooftree}
 	\end{center}
 	
 	\pause
-	Esto permite usar $r: A$ en lugar de $r : B$, siempre y cuando $A \equiv B$
+	Esto permite usar $r: \textcolor{red}{A}$ en lugar de $r : \textcolor{blue}{B}$, siempre y cuando $\textcolor{red}{A} \equiv \textcolor{blue}{B}$
 	
 	\begin{prooftree*}
 		\hypo{ \Gamma\vdash r: A }
@@ -151,6 +151,7 @@
 		}
 	\end{align*}
 	\pause[6]
+	\vspace*{-1.5cm}
 	\begin{align*}
 		& \langle \lambda x.r, \lambda x.s \rangle \; t \\
 	\onslide<7->{
@@ -168,11 +169,11 @@
 	$\textsc{comm}$ permite cambiar el elemento de una proyección:
 	\pause
 	\begin{align*}
-		\pi_1 \langle r, s \rangle& \hookrightarrow_{\pi_1} r \\
-		\pi_1 \langle r, s \rangle& \rightleftarrows_{\textsc{comm}} \pi_1 \langle s, r \rangle \hookrightarrow_{\pi_1} s
+		\pi_1 \langle \textcolor{red}{r}, \textcolor{blue}{s} \rangle& \hookrightarrow_{\pi_1} \textcolor{red}{r} \\
+		\pi_1 \langle \textcolor{red}{r}, \textcolor{blue}{s} \rangle& \rightleftarrows_{\textsc{comm}} \pi_1 \langle \textcolor{blue}{s}, \textcolor{red}{r} \rangle \hookrightarrow_{\pi_1} \textcolor{blue}{s}
 	\end{align*}
 	\pause
-	Si $r: A$ y $s: B$ esto puede ser un problema.
+	Si $r: A$, $s: B$ y $A \not\equiv B$ esto puede ser un problema.
 	
 	\pause
 	
